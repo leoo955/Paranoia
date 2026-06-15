@@ -245,7 +245,7 @@ export default function CardDisplay({
   };
 
   return (
-    <div className={`relative ${wrapperClass} aspect-[2.5/3.5] mx-auto ${isEditing ? '' : 'perspective-1000'}`}>
+    <div className={`relative ${wrapperClass} aspect-[2.5/3.5] mx-auto ${isEditing ? '' : 'perspective-1000'} @container`}>
       <InteractiveCard 
         card={{...card, isEditing}} 
         className={`${wrapperClass} aspect-[2.5/3.5] border-2 ${getLevelBorder(card.level)} ${(attrs.cardGlowColor || attrs.mainColor) ? 'animate-pulse-glow-custom' : getRarityGlow(card.rarity)}`}
@@ -264,7 +264,7 @@ export default function CardDisplay({
             style={{
               left: `${badge.x}%`,
               top: `${badge.y}%`,
-              width: `${badge.size}px`,
+              width: `${(badge.size / 288) * 100}cqi`,
               transform: `translate(-50%, -50%) translateZ(${parseInt(translateZ) * 1.5}px)`
             }}
           />
@@ -275,7 +275,7 @@ export default function CardDisplay({
           <img 
             src={attrs.levelBadgeUrl || getLevelIcon(card.level)!} 
             alt={card.level} 
-            className={`absolute ${size === "lg" ? "w-28 h-28" : size === "md" ? "w-16 h-16" : "w-12 h-12"} object-contain z-40 ${isEditing ? 'cursor-grab active:cursor-grabbing animate-none hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'pointer-events-none animate-bounce-slow drop-shadow-[0_0_15px_rgba(0,0,0,0.6)]'}`} 
+            className={`absolute w-[22cqi] h-[22cqi] object-contain z-40 ${isEditing ? 'cursor-grab active:cursor-grabbing animate-none hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'pointer-events-none animate-bounce-slow drop-shadow-[0_0_15px_rgba(0,0,0,0.6)]'}`} 
             onMouseDown={(e) => handleMouseDown(e, 'levelBadge')}
             onWheel={(e) => handleWheel(e, 'levelBadge')}
             style={{ 
@@ -291,7 +291,7 @@ export default function CardDisplay({
           <img 
             src={attrs.editionBadgeUrl} 
             alt="Edition" 
-            className={`absolute ${size === "lg" ? "w-20 h-20" : size === "md" ? "w-12 h-12" : "w-10 h-10"} object-contain z-40 ${isEditing ? 'cursor-grab active:cursor-grabbing animate-none hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.6)]'}`} 
+            className={`absolute w-[16cqi] h-[16cqi] object-contain z-40 ${isEditing ? 'cursor-grab active:cursor-grabbing animate-none hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.6)]'}`} 
             onMouseDown={(e) => handleMouseDown(e, 'editionBadge')}
             onWheel={(e) => handleWheel(e, 'editionBadge')}
             style={{ 
@@ -350,7 +350,7 @@ export default function CardDisplay({
       {/* Rarity Badge */}
       {attrs.showRarityBadge !== false && (
         <div 
-          className={`absolute z-30 inline-block px-2 py-1 text-[10px] font-bold uppercase rounded-md border ${getRarityBadge(card.rarity)} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+          className={`absolute z-30 inline-block px-[2.5cqi] py-[1cqi] text-[3.5cqi] font-bold uppercase rounded-md border ${getRarityBadge(card.rarity)} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
           onMouseDown={(e) => handleMouseDown(e, 'rarityBadge')}
           onWheel={(e) => handleWheel(e, 'rarityBadge')}
           style={{
@@ -368,7 +368,7 @@ export default function CardDisplay({
       {/* Title */}
       {attrs.showTitle !== false && (
         <h3 
-          className={`absolute z-30 font-outfit font-black text-lg text-white leading-tight uppercase text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+          className={`absolute z-30 font-outfit font-black text-[6.5cqi] text-white leading-tight uppercase text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
           onMouseDown={(e) => handleMouseDown(e, 'title')}
           onWheel={(e) => handleWheel(e, 'title')}
           style={{
@@ -386,7 +386,7 @@ export default function CardDisplay({
       {/* Level Text */}
       {attrs.showLevelText !== false && (
         <span 
-          className={`absolute z-30 text-xs font-bold text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${levelColorClass} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+          className={`absolute z-30 text-[4cqi] font-bold text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${levelColorClass} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
           onMouseDown={(e) => handleMouseDown(e, 'levelText')}
           onWheel={(e) => handleWheel(e, 'levelText')}
           style={{
@@ -404,7 +404,7 @@ export default function CardDisplay({
       {/* Description */}
       {attrs.showDesc !== false && card.description && (
         <div 
-          className={`absolute z-30 flex justify-center items-center pt-2 ${!attrs.titlePos && !attrs.textPos ? 'border-t border-white/10' : ''} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+          className={`absolute z-30 flex justify-center items-center pt-[2cqi] ${!attrs.titlePos && !attrs.textPos ? 'border-t border-white/10' : ''} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
           onMouseDown={(e) => handleMouseDown(e, 'desc')}
           onWheel={(e) => handleWheel(e, 'desc')}
           style={{
@@ -414,7 +414,7 @@ export default function CardDisplay({
             width: '90%'
           }}
         >
-          <span className="text-xs font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center" style={{ color: attrs.descColor || 'white' }}>
+          <span className="text-[3.5cqi] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center" style={{ color: attrs.descColor || 'white' }}>
             {card.description}
           </span>
         </div>
