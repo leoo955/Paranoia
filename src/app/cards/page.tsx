@@ -47,6 +47,17 @@ export default async function CardsPage() {
     orderBy: { rarity: 'desc' }
   });
 
+  const allUsers = await prisma.user.findMany({
+    select: { minecraftName: true, id: true }
+  });
+  
+  const serverPlayers = allUsers
+    .map(u => u.minecraftName)
+    .filter(Boolean) as string[];
+
+  // Find current user's minecraftName
+  const currentUserMCName = allUsers.find(u => u.id === userId)?.minecraftName || "";
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background Ambience */}
@@ -74,6 +85,8 @@ export default async function CardsPage() {
           initialCoins={paraCoins} 
           isLoggedIn={!!userId} 
           allCards={allCards}
+          serverPlayers={serverPlayers}
+          currentUserMCName={currentUserMCName}
         />
       </div>
     </div>

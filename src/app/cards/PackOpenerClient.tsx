@@ -54,7 +54,23 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
   );
 };
 
-export default function PackOpenerClient({ initialInventory, initialBoxes, initialCoins, isLoggedIn, allCards = [] }: { initialInventory: UserCard[], initialBoxes?: any[], initialCoins: number, isLoggedIn: boolean, allCards?: TradingCard[] }) {
+export default function PackOpenerClient({ 
+  initialInventory, 
+  initialBoxes, 
+  initialCoins, 
+  isLoggedIn, 
+  allCards = [],
+  serverPlayers = [],
+  currentUserMCName = ""
+}: { 
+  initialInventory: UserCard[], 
+  initialBoxes?: any[], 
+  initialCoins: number, 
+  isLoggedIn: boolean, 
+  allCards?: TradingCard[],
+  serverPlayers?: string[],
+  currentUserMCName?: string
+}) {
   const [inventory, setInventory] = useState<UserCard[]>(initialInventory);
   const [boxes, setBoxes] = useState<any[]>(initialBoxes || []);
   const [coins, setCoins] = useState<number>(initialCoins || 0);
@@ -76,7 +92,11 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
   const router = useRouter();
 
   useEffect(() => {
-    const fomoPlayers = ["Dark_Slayer2", "Xx_Gamer_xX", "ShadowNinja", "MineCrafter99", "ProBuilder", "LuckyLuke"];
+    // Filter out the current user
+    const eligiblePlayers = serverPlayers.filter(name => name && name !== currentUserMCName);
+    
+    // Fallback if no other players exist
+    const fomoPlayers = eligiblePlayers.length > 0 ? eligiblePlayers : ["Joueur_Mystère"];
     const fomoRarities = ["Légendaire", "Mythique", "Épique"];
     
     const interval = setInterval(() => {
@@ -88,7 +108,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
     }, 15000); // Change every 15 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [serverPlayers, currentUserMCName]);
 
   const buyBooster = async (type: string, price: number) => {
     if (!isLoggedIn) {
