@@ -871,7 +871,7 @@ export default function AdminPage() {
                   
                   <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-[var(--color-accent-purple)] font-bold">
                     <input type="checkbox" checked={isFullArt} onChange={(e) => setIsFullArt(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
-                    🚀 Activer le Mode "Full Art" (Layout Personnalisé)
+                    Activer le Mode "Full Art" (Layout Personnalisé)
                   </label>
 
                   <div className="grid grid-cols-2 gap-4 mb-4">
