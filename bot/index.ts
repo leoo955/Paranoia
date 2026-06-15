@@ -36,7 +36,15 @@ const commands = [
       option.setName('carte_demandée')
         .setDescription('La carte que vous demandez (tapez pour chercher)')
         .setAutocomplete(true)
-        .setRequired(true))
+        .setRequired(true)),
+  new SlashCommandBuilder()
+    .setName('card')
+    .setDescription('Commandes relatives aux cartes')
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('list')
+        .setDescription('Afficher votre inventaire de cartes (pour flex)')
+    )
 ];
 
 client.once('ready', async () => {
@@ -185,6 +193,71 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
       } catch (error) {
         console.error("Trade command error:", error);
+        await interaction.reply({ content: "Une erreur est survenue.", ephemeral: true });
+      }
+    }
+
+    if (interaction.commandName === 'card') {
+      try {
+        const subcommand = interaction.options.getSubcommand();
+        if (subcommand === 'list') {
+          const user = await prisma.user.findUnique({ where: { discordId: interaction.user.id } });
+          if (!user) return await interaction.reply({ content: "Vous n'êtes pas enregistré sur Paranoia.", ephemeral: true });
+
+          const inventory = await prisma.userCard.findMany({
+            where: { userId: user.id },
+            include: { tradingCard: true }
+          });
+
+          if (inventory.length === 0) {
+            return await interaction.reply({ content: 'Votre inventaire est vide ! Ouvrez des boosters sur le site.', ephemeral: true });
+          }
+
+          const rarityGroups: Record<string, any[]> = {
+            'MYTHIC': [],
+            'LEGENDARY': [],
+            'EPIC': [],
+            'RARE': [],
+            'UNCOMMON': [],
+            'COMMON': []
+          };
+
+          const cardCounts = new Map();
+          for (const item of inventory) {
+            const c = item.tradingCard;
+            if (!cardCounts.has(c.id)) {
+              cardCounts.set(c.id, { card: c, count: 1 });
+            } else {
+              cardCounts.get(c.id).count++;
+            }
+          }
+
+          for (const { card, count } of cardCounts.values()) {
+            if (rarityGroups[card.rarity]) {
+              rarityGroups[card.rarity].push(`**${card.title}** (x${count})`);
+            } else {
+              if (!rarityGroups['AUTRE']) rarityGroups['AUTRE'] = [];
+              rarityGroups['AUTRE'].push(`**${card.title}** (x${count})`);
+            }
+          }
+
+          const embed = new EmbedBuilder()
+            .setTitle(`Collection de ${interaction.user.username} 🏆`)
+            .setColor('#facc15')
+            .setDescription(`Total : **${inventory.length}** cartes`);
+
+          for (const [rarity, cards] of Object.entries(rarityGroups)) {
+            if (cards.length > 0) {
+              let text = cards.join(', ');
+              if (text.length > 1020) text = text.slice(0, 1000) + '...';
+              embed.addFields({ name: `${rarity} (${cards.length} modèles)`, value: text });
+            }
+          }
+
+          await interaction.reply({ embeds: [embed] });
+        }
+      } catch (error) {
+        console.error("Card command error:", error);
         await interaction.reply({ content: "Une erreur est survenue.", ephemeral: true });
       }
     }
