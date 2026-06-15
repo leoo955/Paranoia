@@ -14,8 +14,8 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
 
   return (
     <div 
-      className="relative z-10 transform transition-transform hover:scale-105 duration-500 animate-epic-reveal cursor-pointer group" 
-      style={{ animationDelay: `${index * 0.4}s`, animationFillMode: 'both', perspective: '1000px', width: '16rem', height: '24rem' }}
+      className="relative z-10 transform transition-transform hover:scale-105 duration-500 animate-epic-reveal cursor-pointer group shrink-0" 
+      style={{ animationDelay: `${index * 0.4}s`, animationFillMode: 'both', perspective: '1000px', width: '16rem', height: '24rem', minWidth: '16rem' }}
       onClick={() => setIsFlipped(true)}
     >
       <div 
