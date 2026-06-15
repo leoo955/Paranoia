@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock, BookOpen } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock, BookOpen, Flame, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CardDisplay from "@/components/cards/CardDisplay";
 
@@ -65,11 +65,30 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
   const [openingGlow, setOpeningGlow] = useState<string | null>(null);
+  const [showRatesModal, setShowRatesModal] = useState(false);
+  
+  // Fake recent drops for massive FOMO
+  const [fomoDrop, setFomoDrop] = useState<{player: string, rarity: string, time: number}>({ player: 'GamerX_99', rarity: 'Légendaire', time: 2 });
 
   const [activeTab, setActiveTab] = useState<"opener" | "collection" | "catalogue">("opener");
   const [searchQuery, setSearchQuery] = useState("");
   const [rarityFilter, setRarityFilter] = useState("ALL");
   const router = useRouter();
+
+  useEffect(() => {
+    const fomoPlayers = ["Dark_Slayer2", "Xx_Gamer_xX", "ShadowNinja", "MineCrafter99", "ProBuilder", "LuckyLuke"];
+    const fomoRarities = ["Légendaire", "Mythique", "Épique"];
+    
+    const interval = setInterval(() => {
+      setFomoDrop({
+        player: fomoPlayers[Math.floor(Math.random() * fomoPlayers.length)],
+        rarity: fomoRarities[Math.floor(Math.random() * fomoRarities.length)],
+        time: Math.floor(Math.random() * 5) + 1
+      });
+    }, 15000); // Change every 15 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const buyBooster = async (type: string, price: number) => {
     if (!isLoggedIn) {
@@ -278,10 +297,33 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
         <div className="bg-[#0f0f16] border border-indigo-500/20 rounded-3xl p-8 lg:p-16 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0f0f16] to-[#0f0f16] pointer-events-none" />
           
-          <h2 className="text-4xl lg:text-5xl font-outfit font-black text-white mb-4 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Ouvrir des Boosters</h2>
-          <p className="text-[var(--color-text-secondary)] mb-12 max-w-xl z-10 text-lg">
-            Sélectionnez un booster et ouvrez-le pour obtenir de nouvelles cartes !
-          </p>
+          {/* FOMO TICKER */}
+          <div className="absolute top-4 w-full flex justify-center z-20">
+            <div className="bg-red-500/10 border border-red-500/30 backdrop-blur-md px-6 py-2 rounded-full flex items-center gap-3 animate-pulse-glow">
+              <Flame className="w-5 h-5 text-red-500" />
+              <p className="text-sm font-bold text-white tracking-wide">
+                <span className="text-red-400">{fomoDrop.player}</span> vient d'obtenir une carte <span className={
+                  fomoDrop.rarity === 'Mythique' ? 'text-red-500 font-black' :
+                  fomoDrop.rarity === 'Légendaire' ? 'text-yellow-400 font-black' : 'text-purple-400 font-black'
+                }>{fomoDrop.rarity}</span> ! 
+                <span className="text-white/40 ml-2 font-normal text-xs">il y a {fomoDrop.time} min</span>
+              </p>
+            </div>
+          </div>
+
+          <h2 className="text-4xl lg:text-5xl font-outfit font-black text-white mt-10 mb-4 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Ouvrir des Boosters</h2>
+          
+          <div className="flex flex-col items-center gap-4 mb-12 z-10">
+            <p className="text-[var(--color-text-secondary)] max-w-xl text-lg">
+              Sélectionnez un booster et ouvrez-le pour obtenir de nouvelles cartes !
+            </p>
+            <button 
+              onClick={() => setShowRatesModal(true)}
+              className="text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-lg text-white/70 hover:text-white transition-colors flex items-center gap-2"
+            >
+              <Search className="w-4 h-4" /> Voir les Drop Rates
+            </button>
+          </div>
 
           {!showReveal && (
             <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 z-10">
@@ -380,14 +422,18 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
                 onClick={() => setSelectedBoxType("mythic")}
                 className={`p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "mythic" ? "bg-red-900/30 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-red-500/50 opacity-80 hover:opacity-100"}`}
               >
+                <div className="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-lg tracking-wider shadow-[0_0_10px_rgba(220,38,38,0.8)] z-20 flex items-center gap-1">
+                  <Clock className="w-3 h-3" /> Offre Flash
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-b from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
+                <div className="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500 mt-2">
                   <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
                   <img src="/MythiqueB.png" alt="Mythique" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] relative z-10 animate-pulse-glow" />
                 </div>
                 <div className="relative z-10 text-center">
                   <h3 className="text-2xl font-black text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,1)] tracking-wide font-outfit uppercase">Mythique</h3>
                   <p className="text-xs text-red-200/70 mt-2 font-medium">Légendaire ou Mythique</p>
+                  <p className="text-[10px] text-red-400 font-bold mt-1 bg-red-500/20 rounded-full px-2 py-0.5 inline-block">Il n'en reste que 3 !</p>
                 </div>
                 <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
                   <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
@@ -800,6 +846,94 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
           </div>
         </div>
       )}
+
+      {/* FOMO Rates Modal */}
+      {showRatesModal && (
+        <div 
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300"
+          onClick={() => setShowRatesModal(false)}
+        >
+          <div 
+            className="relative w-full max-w-4xl bg-[#0f0f16] border border-white/10 rounded-3xl p-8 shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-slide-up overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-transparent to-transparent pointer-events-none" />
+            
+            <button 
+              onClick={() => setShowRatesModal(false)}
+              className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-50 bg-white/5 hover:bg-red-500/20 p-2 rounded-full border border-white/10"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h3 className="text-3xl font-outfit font-black text-white mb-2 relative z-10 flex items-center gap-3">
+              <Search className="w-8 h-8 text-indigo-400" /> Taux d'Obtention (Drop Rates)
+            </h3>
+            <p className="text-white/50 mb-8 relative z-10">Consultez vos chances d'obtenir les cartes les plus rares.</p>
+
+            <div className="relative z-10 overflow-x-auto rounded-xl border border-white/10">
+              <table className="w-full text-left text-sm whitespace-nowrap">
+                <thead className="bg-black/60 uppercase text-white/50 border-b border-white/10">
+                  <tr>
+                    <th className="px-6 py-4 font-bold">Rareté</th>
+                    <th className="px-6 py-4 font-bold text-blue-400">Standard</th>
+                    <th className="px-6 py-4 font-bold text-purple-400">Premium</th>
+                    <th className="px-6 py-4 font-bold text-yellow-400">Légendaire</th>
+                    <th className="px-6 py-4 font-bold text-red-400">Mythique</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 bg-black/30 font-medium text-white">
+                  <tr className="hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 text-gray-400">Commune</td>
+                    <td className="px-6 py-4">70%</td>
+                    <td className="px-6 py-4">45%</td>
+                    <td className="px-6 py-4">25%</td>
+                    <td className="px-6 py-4 opacity-30">0%</td>
+                  </tr>
+                  <tr className="hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 text-blue-400">Rare</td>
+                    <td className="px-6 py-4">20%</td>
+                    <td className="px-6 py-4">35%</td>
+                    <td className="px-6 py-4">40%</td>
+                    <td className="px-6 py-4 opacity-30">0%</td>
+                  </tr>
+                  <tr className="hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 text-purple-400">Épique</td>
+                    <td className="px-6 py-4">8%</td>
+                    <td className="px-6 py-4">15%</td>
+                    <td className="px-6 py-4">25%</td>
+                    <td className="px-6 py-4">75%</td>
+                  </tr>
+                  <tr className="hover:bg-white/5 transition-colors">
+                    <td className="px-6 py-4 text-yellow-400 font-bold">Légendaire</td>
+                    <td className="px-6 py-4">2%</td>
+                    <td className="px-6 py-4">5%</td>
+                    <td className="px-6 py-4 text-yellow-400">10%</td>
+                    <td className="px-6 py-4 text-yellow-400">20%</td>
+                  </tr>
+                  <tr className="hover:bg-white/5 transition-colors bg-red-900/10">
+                    <td className="px-6 py-4 text-red-500 font-black">Mythique</td>
+                    <td className="px-6 py-4 opacity-30">0%</td>
+                    <td className="px-6 py-4 opacity-30">0%</td>
+                    <td className="px-6 py-4 opacity-30">0%</td>
+                    <td className="px-6 py-4 text-red-500 font-black">5%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="mt-8 text-center relative z-10">
+              <button 
+                onClick={() => { setShowRatesModal(false); setSelectedBoxType('mythic'); }}
+                className="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.7)] hover:-translate-y-1"
+              >
+                Tenter la Mythique (5% !)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
