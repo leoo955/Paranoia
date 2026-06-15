@@ -160,6 +160,15 @@ export default function AdminPage() {
     fetchCards();
     fetchTemplates();
     fetchUsers();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        document.getElementById('save-card-btn')?.click();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -218,8 +227,8 @@ export default function AdminPage() {
     }
   };
 
-  const handleCreateCard = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreateCard = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!cardPlayerId) {
       setCardError("Veuillez sélectionner un joueur.");
       return;
@@ -370,6 +379,12 @@ export default function AdminPage() {
       setCharPosX(50); setCharPosY(50); setCharScale(100);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDuplicateCard = (card: any) => {
+    startEditCard(card);
+    setEditingCardId(null);
+    setCardTitle(card.title ? `${card.title} (Copie)` : "");
   };
   
   const cancelEdit = () => {
@@ -1033,8 +1048,11 @@ export default function AdminPage() {
 
                 {cardError && <p className="text-red-400 text-sm">{cardError}</p>}
                 <div className="flex gap-2 mt-4">
-                  <button type="submit" disabled={creatingCard} className="btn-primary flex-1 flex items-center gap-2 justify-center">
-                    <Sparkles className="w-4 h-4" /> {creatingCard ? "Chargement..." : (editingCardId ? "Sauvegarder" : "Créer la Carte")}
+                  <button id="save-card-btn" type="submit" disabled={creatingCard} className="btn-primary flex-1 flex flex-col items-center gap-1 justify-center py-2">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" /> {creatingCard ? "Chargement..." : (editingCardId ? "Sauvegarder" : "Créer la Carte")}
+                    </div>
+                    <span className="text-[10px] opacity-70 font-normal">Raccourci: Ctrl + S</span>
                   </button>
                   {editingCardId && (
                     <button type="button" onClick={cancelEdit} className="btn-secondary px-4">
@@ -1113,6 +1131,12 @@ export default function AdminPage() {
                           className="text-indigo-400 hover:text-indigo-300 underline"
                         >
                           Éditer
+                        </button>
+                        <button 
+                          onClick={() => handleDuplicateCard(card)}
+                          className="text-green-400 hover:text-green-300 underline"
+                        >
+                          Dupliquer
                         </button>
                         <button 
                           onClick={() => handleDeleteCard(card.id)}
