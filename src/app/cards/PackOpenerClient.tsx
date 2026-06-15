@@ -205,8 +205,6 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
           {/* The Drawn Card Reveal */}
           {showReveal && drawnCard && (
             <div className="z-10 flex flex-col items-center animate-slide-up relative mt-8">
-              <div className="absolute inset-0 bg-white/20 blur-[100px] rounded-full w-[150%] h-[150%] -left-[25%] -top-[25%] pointer-events-none"></div>
-              
               <div className="relative z-10 transform transition-transform hover:scale-110 duration-500 animate-epic-reveal">
                 <CardDisplay card={drawnCard} size="lg" />
               </div>
