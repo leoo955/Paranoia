@@ -1,4 +1,8 @@
-"use client";
+import os
+
+file_path = r"c:\Users\leoo9\Documents\Projet\Paranoia\src\app\cards\PackOpenerClient.tsx"
+
+new_code = '''"use client";
 
 import { useState, useMemo } from "react";
 import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers } from "lucide-react";
@@ -16,7 +20,8 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
   const [drawnCard, setDrawnCard] = useState<TradingCard | null>(null);
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
-
+  
+  // UI States
   const [activeTab, setActiveTab] = useState<"opener" | "collection">("opener");
   const [searchQuery, setSearchQuery] = useState("");
   const [rarityFilter, setRarityFilter] = useState("ALL");
@@ -26,7 +31,8 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
       alert("Vous devez être connecté pour ouvrir un booster.");
       return;
     }
-
+    
+    // Check if user has this box
     const userBox = boxes.find(b => b.boxType === selectedBoxType);
     if (!userBox || userBox.amount <= 0) {
       alert(`Vous ne possédez aucune Box ${selectedBoxType}.`);
@@ -50,7 +56,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
       }
 
       setDrawnCard(data.drawnCard);
-
+      // Consume a box locally to update UI fast
       setBoxes(prev => prev.map(b => b.boxType === selectedBoxType ? { ...b, amount: b.amount - 1 } : b));
 
       setTimeout(() => {
@@ -65,6 +71,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
     }
   };
 
+  // Group inventory by tradingCardId for Stacking
   const groupedInventory = inventory.reduce((acc, curr) => {
     const id = curr.tradingCard.id;
     if (!acc[id]) {
@@ -77,6 +84,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
     return acc;
   }, {} as Record<string, { card: TradingCard, count: number, latestObtained: Date }>);
 
+  // Convert to array and filter/sort
   const stackedItems = useMemo(() => {
     return Object.values(groupedInventory)
       .filter(item => {
@@ -94,13 +102,13 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
 
   return (
     <div className="w-full">
-
+      {/* TABS HEADER */}
       <div className="flex gap-4 mb-8 border-b border-[var(--color-border-color)] pb-4">
         <button 
           onClick={() => setActiveTab("opener")}
           className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'opener' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
         >
-          <PackageOpen className="w-5 h-5" /> Ouvrir des Box
+          <PackageOpen className="w-5 h-5" /> Autel d'Invocation
         </button>
         <button 
           onClick={() => setActiveTab("collection")}
@@ -110,13 +118,14 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
         </button>
       </div>
 
+      {/* BOOSTER OPENING TAB */}
       {activeTab === "opener" && (
         <div className="bg-[#0f0f16] border border-indigo-500/20 rounded-3xl p-8 lg:p-16 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0f0f16] to-[#0f0f16] pointer-events-none" />
           
-          <h2 className="text-4xl lg:text-5xl font-outfit font-black text-white mb-4 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Ouvrir des Box</h2>
+          <h2 className="text-4xl lg:text-5xl font-outfit font-black text-white mb-4 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Autel d'Invocation</h2>
           <p className="text-[var(--color-text-secondary)] mb-12 max-w-xl z-10 text-lg">
-            Sélectionnez une box et ouvrez-la pour obtenir de nouvelles cartes !
+            Sélectionnez une relique et invoquez la puissance des joueurs. Quelle sera votre prochaine carte ?
           </p>
 
           {!showReveal && (
@@ -127,11 +136,11 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 ${selectedBoxType === "standard" ? "bg-blue-900/20 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-blue-500/50 opacity-70"}`}
               >
                 <div className="w-20 h-20 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/50">
-                  <img src="/StandardB.png" alt="Standard" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
+                  <PackageOpen className="w-10 h-10 text-blue-400" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-blue-300">Box Standard</h3>
-                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-blue-500/50 underline-offset-2">Toutes les raretés disponibles</p>
+                  <p className="text-sm text-[var(--color-text-secondary)] mt-1">Gouttes communes</p>
                 </div>
                 <div className="mt-2 px-4 py-1 rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
                   x{ownedStandard} possédé{ownedStandard > 1 ? 's' : ''}
@@ -144,11 +153,11 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 ${selectedBoxType === "premium" ? "bg-purple-900/20 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-purple-500/50 opacity-70"}`}
               >
                 <div className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/50">
-                  <img src="/PreniumB.png" alt="Premium" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.6)]" />
+                  <Sparkles className="w-10 h-10 text-purple-400" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-purple-300">Box Premium</h3>
-                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-purple-500/50 underline-offset-2">Commune et Peu Commune exclues</p>
+                  <p className="text-sm text-[var(--color-text-secondary)] mt-1">Chances élevées (Epic/Leg)</p>
                 </div>
                 <div className="mt-2 px-4 py-1 rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
                   x{ownedPremium} possédé{ownedPremium > 1 ? 's' : ''}
@@ -161,11 +170,11 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 ${selectedBoxType === "mythic" ? "bg-red-900/20 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-red-500/50 opacity-70"}`}
               >
                 <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/50">
-                  <img src="/MythiqueB.png" alt="Mythique" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.6)]" />
+                  <Sparkles className="w-10 h-10 text-red-400" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-red-400 drop-shadow-[0_0_5px_rgba(239,68,68,0.8)]">Box Mythique</h3>
-                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-red-500/50 underline-offset-2">Rare et inférieur exclues</p>
+                  <p className="text-sm text-[var(--color-text-secondary)] mt-1">Légendaire Garanti</p>
                 </div>
                 <div className="mt-2 px-4 py-1 rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
                   x{ownedMythic} possédé{ownedMythic > 1 ? 's' : ''}
@@ -182,7 +191,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 className={`relative cursor-pointer transition-transform hover:scale-105 active:scale-95 outline-none group ${isOpening ? "animate-shake animate-booster-flash pointer-events-none" : ""}`}
               >
                 <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${selectedBoxType === 'standard' ? 'bg-blue-500' : selectedBoxType === 'premium' ? 'bg-purple-500' : 'bg-red-500'}`}></div>
-                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className="w-64 h-auto relative z-10 drop-shadow-2xl transition-all duration-300 transform hover:scale-110" />
+                <img src="/Nouveau_projet_2.png" alt="Booster Pack" className="w-64 h-auto relative z-10 drop-shadow-2xl" />
                 
                 {/* Floating particles effect on hover */}
                 <div className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -194,7 +203,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                   onClick={openPack}
                   className={`mt-10 px-12 py-4 rounded-full font-black text-xl tracking-widest uppercase transition-all hover:scale-105 shadow-xl border-2 ${selectedBoxType === 'standard' ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.6)]' : selectedBoxType === 'premium' ? 'bg-purple-600 border-purple-400 text-white hover:bg-purple-500 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)]' : 'bg-red-600 border-red-400 text-white hover:bg-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]'}`}
                 >
-                  OUVRIR
+                  INVOQUER
                 </button>
               )}
             </div>
@@ -222,9 +231,10 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
         </div>
       )}
 
+      {/* COLLECTION TAB */}
       {activeTab === "collection" && (
         <div className="animate-fade-in">
-
+          {/* Filters Bar */}
           <div className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl p-4 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-40 shadow-xl backdrop-blur-md bg-opacity-90">
             <div className="flex items-center gap-4 w-full md:w-auto">
               <h2 className="text-xl font-outfit font-bold text-white whitespace-nowrap">
@@ -272,7 +282,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
               <h3 className="text-2xl font-bold text-white mb-2">Aucune carte trouvée</h3>
               <p className="text-[var(--color-text-secondary)] max-w-md">
                 {inventory.length === 0 
-                  ? "Vous ne possédez aucune carte pour le moment. Allez dans l'Ouvrir des Box pour ouvrir des boosters !" 
+                  ? "Vous ne possédez aucune carte pour le moment. Allez dans l'Autel d'Invocation pour ouvrir des boosters !" 
                   : "Aucune carte ne correspond à vos filtres actuels."}
               </p>
               {inventory.length > 0 && (
@@ -311,6 +321,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
         </div>
       )}
 
+      {/* Fullscreen Card Modal with Info Pane */}
       {selectedCard && (
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300"
@@ -388,3 +399,9 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
     </div>
   );
 }
+'''
+
+with open(file_path, "w", encoding="utf-8") as f:
+    f.write(new_code)
+
+print("PackOpenerClient successfully refactored!")

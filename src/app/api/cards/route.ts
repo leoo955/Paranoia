@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     if (!session || !user || user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const { title, playerName, playerId, rarity, level, category, proba, description, customBackground, customBadges, characterPosition, imageUrl, attributes } = await req.json();
+    const { title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, attributes } = await req.json();
     if (!playerId || !rarity || !level) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         playerId,
         rarity,
         level,
-        category: category || "Standard",
+        edition: edition || "Standard",
         proba: validProba,
         description: description || "",
         imageUrl: imageUrl || null,
@@ -75,7 +75,7 @@ export async function PUT(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id, title, playerName, playerId, rarity, level, category, proba, description, customBackground, customBadges, characterPosition, imageUrl, attributes } = await req.json();
+    const { id, title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, attributes } = await req.json();
 
     if (!id || !playerId || !rarity || !level) {
       return new NextResponse("Missing required fields", { status: 400 });
@@ -95,7 +95,7 @@ export async function PUT(req: Request) {
         playerId,
         rarity,
         level,
-        category: category || "Standard",
+        edition: edition || "Standard",
         proba: validProba,
         description: description || "",
         imageUrl: imageUrl || null,

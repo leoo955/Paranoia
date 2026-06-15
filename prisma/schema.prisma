@@ -60,6 +60,7 @@ model User {
   createdCards  TradingCard[]
   inventory     UserCard[]
   applications  Application[]
+  boxes         UserBox[]
 }
 
 model Topic {
@@ -130,7 +131,7 @@ model TradingCard {
   characterPosition String @default("{\"x\":50,\"y\":50,\"scale\":100}") // JSON stored as text
   rarity      String   @default("COMMON")
   level       String   @default("Normal")
-  category    String   @default("Standard")
+  edition     String   @default("Standard")
   proba       Float    @default(100)
   attributes  String   @default("{}") // JSON stored as text
   template    String   @default("classic")
@@ -173,9 +174,19 @@ model Player {
   cards         TradingCard[]
 }
 
-model Category {
+model Edition {
   id        String   @id @default(cuid())
   name      String   @unique
   iconUrl   String?
   createdAt DateTime @default(now())
+}
+
+model UserBox {
+  id        String   @id @default(cuid())
+  userId    String
+  boxType   String   // Ex: "standard", "premium", "mythic"
+  amount    Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, boxType])
 }

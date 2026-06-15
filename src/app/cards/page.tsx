@@ -17,7 +17,9 @@ export default async function CardsPage() {
   // @ts-ignore
   const userId = session?.user?.id;
 
+
   let inventory: any[] = [];
+  let userBoxes: any[] = [];
   if (userId) {
     inventory = await prisma.userCard.findMany({
       where: { userId },
@@ -28,7 +30,11 @@ export default async function CardsPage() {
       },
       orderBy: { obtainedAt: 'desc' }
     });
+    userBoxes = await prisma.userBox.findMany({
+      where: { userId }
+    });
   }
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-slide-up">
@@ -43,7 +49,7 @@ export default async function CardsPage() {
         </Link>
       </div>
 
-      <PackOpenerClient initialInventory={inventory} isLoggedIn={!!userId} />
+      <PackOpenerClient initialInventory={inventory} initialBoxes={userBoxes} isLoggedIn={!!userId} />
     </div>
   );
 }

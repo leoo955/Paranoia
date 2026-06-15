@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Users, LayoutList, Trash2, ShieldAlert, Sparkles } from "lucide-react";
+import { Plus, Users, LayoutList, Trash2, ShieldAlert, Sparkles, Layers, PackageOpen } from "lucide-react";
 import CardDisplay from "@/components/cards/CardDisplay";
 
 type Player = {
@@ -47,7 +47,7 @@ export default function AdminPage() {
   
   // New Full Art & Color States
   const [isFullArt, setIsFullArt] = useState(false);
-  const [cardCategory, setCardCategory] = useState("Standard");
+  const [cardEdition, setCardEdition] = useState("Standard");
   const [cardEffect, setCardEffect] = useState("");
   const [titleColor, setTitleColor] = useState("");
   const [descColor, setDescColor] = useState("");
@@ -67,9 +67,53 @@ export default function AdminPage() {
   const [draggingItem, setDraggingItem] = useState<{type: string, id: string} | null>(null);
   
   const [templates, setTemplates] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [newCatName, setNewCatName] = useState("");
-  const [newCatIconUrl, setNewCatIconUrl] = useState("");
+  const [editions, setEditions] = useState<any[]>([]);
+  const [newEditionName, setNewEditionName] = useState("");
+  const [newEditionIconUrl, setNewEditionIconUrl] = useState("");
+
+  const [godCardId, setGodCardId] = useState("");
+  const [godPlayerId, setGodPlayerId] = useState("");
+  const [godBoxType, setGodBoxType] = useState("standard");
+  const [godBoxAmount, setGodBoxAmount] = useState(1);
+
+  const handleGodAction = async (action: string) => {
+    if (action.includes("ALL") && !window.confirm(`Êtes-vous sûr de vouloir exécuter l'action ${action} ? C'est irréversible !`)) return;
+    try {
+      const user = appUsers.find(u => u.id === godPlayerId);
+      const minecraftName = user ? user.minecraftName : null;
+      const res = await fetch("/api/admin/cards/manage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, cardId: godCardId, minecraftName, userId: godPlayerId })
+      });
+      if (res.ok) alert("Action exécutée avec succès !");
+      else alert(await res.text());
+    } catch (e) {
+      alert("Erreur");
+    }
+  };
+
+  const handleGiveBox = async () => {
+    if (!godPlayerId) return alert("Sélectionnez un utilisateur");
+    try {
+      const res = await fetch("/api/admin/cards/manage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          action: "GIVE_BOX", 
+          userId: godPlayerId, // godPlayerId is now the User ID
+          boxType: godBoxType,
+          amount: godBoxAmount,
+          cardId: "box" // dummy value to pass validation
+        })
+      });
+      if (res.ok) alert(`Box ${godBoxType} (x${godBoxAmount}) donnée avec succès !`);
+      else alert(await res.text());
+    } catch (e) {
+      alert("Erreur lors de l'attribution de la box");
+    }
+  };
+
   const [uploadingBg, setUploadingBg] = useState(false);
   const [uploadingSkin, setUploadingSkin] = useState(false);
   const [uploadingFrame, setUploadingFrame] = useState(false);
@@ -139,10 +183,10 @@ export default function AdminPage() {
   };
 
   
-  const fetchCategories = async () => {
+  const fetchEditions = async () => {
     try {
-      const res = await fetch("/api/categories");
-      if (res.ok) setCategories(await res.json());
+      const res = await fetch("/api/editions");
+      if (res.ok) setEditions(await res.json());
     } catch (e) {
       console.error(e);
     }
@@ -173,7 +217,7 @@ export default function AdminPage() {
     fetchPlayers();
     fetchCards();
     fetchTemplates();
-    fetchCategories();
+    fetchEditions();
     fetchUsers();
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -263,7 +307,7 @@ export default function AdminPage() {
         playerId: cardPlayerId,
         rarity: cardRarity,
         level: cardLevel,
-        category: cardCategory,
+        edition: cardEdition,
         proba: cardProba,
         description: cardDesc,
         customBackground: cardCustomBg,
@@ -308,7 +352,7 @@ export default function AdminPage() {
         setCardRarity("COMMON");
         setCardLevel("Normal");
         setCardProba(100);
-    setCardCategory("Standard");
+    setCardEdition("Standard");
         setCardDesc("");
         setCardTitle("");
         setCardCustomBg("");
@@ -345,7 +389,7 @@ export default function AdminPage() {
     setCardProba(card.proba ?? 100);
     setCardDesc(card.description || "");
     setCardTitle(card.title || "");
-    setCardCategory(card.category || "Standard");
+    setCardEdition(card.edition || "Standard");
     setCardCustomBg(card.customBackground || "");
     setCardImageUrl(card.imageUrl || "");
     
@@ -411,7 +455,7 @@ export default function AdminPage() {
     setCardRarity("COMMON");
     setCardLevel("Normal");
     setCardProba(100);
-    setCardCategory("Standard");
+    setCardEdition("Standard");
     setCardDesc("");
     setCardTitle("");
     setCardCustomBg("");
@@ -568,7 +612,7 @@ export default function AdminPage() {
           customBadges: cardCustomBadges,
           characterPosition: { x: charPosX, y: charPosY, scale: charScale },
           level: cardLevel,
-        category: cardCategory,
+        edition: cardEdition,
           attributes: {
             borderColor: cardBorderColor,
             cardBgColor,
@@ -595,7 +639,7 @@ export default function AdminPage() {
       if (res.ok) {
         alert("Template sauvegardé !");
         fetchTemplates();
-    fetchCategories();
+    fetchEditions();
       }
     } catch (e) {
       console.error(e);
@@ -641,22 +685,22 @@ export default function AdminPage() {
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
     } catch {}
   };
-  const handleCreateCategory = async (e: React.FormEvent) => {
+  const handleCreateEdition = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCatName) return;
+    if (!newEditionName) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/categories", {
+      const res = await fetch("/api/editions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newCatName.trim(), iconUrl: newCatIconUrl.trim() }),
+        body: JSON.stringify({ name: newEditionName.trim(), iconUrl: newEditionIconUrl.trim() }),
       });
       if (res.ok) {
-        setNewCatName("");
-        setNewCatIconUrl("");
-        fetchCategories();
+        setNewEditionName("");
+        setNewEditionIconUrl("");
+        fetchEditions();
       } else {
-        alert("Erreur lors de la création de la catégorie.");
+        alert("Erreur lors de la création de l'édition.");
       }
     } catch (err) {
       console.error(err);
@@ -665,11 +709,11 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) return;
+  const handleDeleteEdition = async (id: string) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette édition ?")) return;
     try {
-      const res = await fetch(`/api/categories?id=${id}`, { method: "DELETE" });
-      if (res.ok) fetchCategories();
+      const res = await fetch(`/api/editions?id=${id}`, { method: "DELETE" });
+      if (res.ok) fetchEditions();
       else alert("Erreur lors de la suppression.");
     } catch (e) {
       console.error(e);
@@ -726,7 +770,7 @@ export default function AdminPage() {
         <p className="text-[var(--color-text-secondary)]">Gestion de la base de données du SMP.</p>
       </div>
 
-      <div className="flex gap-4 mb-8 border-b border-[var(--color-border-color)] pb-4">
+      <div className="flex flex-wrap gap-4 mb-8 border-b border-[var(--color-border-color)] pb-4">
         <button 
           onClick={() => setActiveTab("players")}
           className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'players' ? 'bg-[var(--color-accent-purple)] text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
@@ -738,12 +782,6 @@ export default function AdminPage() {
           className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'cards' ? 'bg-[var(--color-accent-purple)] text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
         >
           <Sparkles className="w-5 h-5" /> Cartes
-        </button>
-        <button 
-          onClick={() => setActiveTab("categories")}
-          className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'categories' ? 'bg-[var(--color-accent-purple)] text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
-        >
-          <Layers className="w-5 h-5" /> Catégories
         </button>
         <button 
           onClick={() => setActiveTab("moderation")}
@@ -800,61 +838,7 @@ export default function AdminPage() {
         )}
 
         
-        {activeTab === "categories" && (
-          <div className="space-y-8 animate-fade-in">
-            <div className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl p-6">
-              <h2 className="text-2xl font-bold font-outfit text-white mb-6">Ajouter une Catégorie</h2>
-              <form onSubmit={handleCreateCategory}>
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Nom de la Catégorie *</label>
-                    <input 
-                      type="text" 
-                      value={newCatName} 
-                      onChange={(e) => setNewCatName(e.target.value)} 
-                      className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
-                      placeholder="Ex: Saison 1, Staff, Event..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-[var(--color-text-secondary)] mb-1">URL de l'icône (Optionnel)</label>
-                    <input 
-                      type="text" 
-                      value={newCatIconUrl} 
-                      onChange={(e) => setNewCatIconUrl(e.target.value)} 
-                      className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
-                      placeholder="https://imgur.com/...png"
-                    />
-                  </div>
-                </div>
-                <button type="submit" disabled={loading} className="btn-primary mt-4 w-full">
-                  {loading ? "Création..." : "Créer la catégorie"}
-                </button>
-              </form>
-            </div>
-
-            <div className="pt-8 border-t border-[var(--color-border-color)]">
-              <h2 className="text-2xl font-bold font-outfit text-white mb-6">Catégories Enregistrées ({categories.length})</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {categories.map(cat => (
-                  <div key={cat.id} className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg p-4 flex items-center justify-between group">
-                    <div className="flex items-center gap-3">
-                      {cat.iconUrl ? (
-                        <img src={cat.iconUrl} alt={cat.name} className="w-8 h-8 object-contain" />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs">🗂️</div>
-                      )}
-                      <span className="font-bold text-white">{cat.name}</span>
-                    </div>
-                    <button onClick={() => handleDeleteCategory(cat.id)} className="text-[var(--color-text-secondary)] hover:text-red-500 transition-colors p-2 opacity-0 group-hover:opacity-100">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+        
 
         {activeTab === "cards" && (
           <div className="space-y-8">
@@ -918,14 +902,14 @@ export default function AdminPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Catégorie / Collection</label>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Édition</label>
                   <select 
-                    value={cardCategory}
-                    onChange={(e) => setCardCategory(e.target.value)}
+                    value={cardEdition}
+                    onChange={(e) => setCardEdition(e.target.value)}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
                   >
                     <option value="Standard">Standard</option>
-                    {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                    {editions.map(ed => <option key={ed.id} value={ed.name}>{ed.name}</option>)}
                   </select>
                 </div>
                 <div>
@@ -1221,7 +1205,7 @@ export default function AdminPage() {
                     title: cardTitle || players.find(p => p.id === cardPlayerId)?.minecraftName || "Joueur Inconnu",
                     rarity: cardRarity,
                     level: cardLevel,
-        category: cardCategory,
+        edition: cardEdition,
                     description: cardDesc || "Description de la carte...",
                     customBackground: cardCustomBg,
                     imageUrl: cardImageUrl,
@@ -1258,6 +1242,31 @@ export default function AdminPage() {
             </div>
             </div>
 
+            <div className="pt-8 border-t border-[var(--color-border-color)] mb-8">
+              <h2 className="text-2xl font-bold font-outfit text-white mb-6">Gérer les Éditions</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-[var(--color-bg-elevated)] p-6 rounded-xl border border-[var(--color-border-color)]">
+                  <h3 className="text-lg font-bold text-white mb-4">Créer une Édition</h3>
+                  <form onSubmit={handleCreateEdition} className="flex gap-2">
+                    <input type="text" value={newEditionName} onChange={e => setNewEditionName(e.target.value)} placeholder="Nom de l'édition..." className="flex-1 bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]" />
+                    <button type="submit" disabled={loading} className="btn-primary px-4 py-2">Créer</button>
+                  </form>
+                </div>
+                <div className="bg-[var(--color-bg-elevated)] p-6 rounded-xl border border-[var(--color-border-color)]">
+                  <h3 className="text-lg font-bold text-white mb-4">Éditions Existantes ({editions.length})</h3>
+                  <div className="max-h-40 overflow-y-auto space-y-2">
+                    {editions.map(ed => (
+                      <div key={ed.id} className="flex justify-between items-center bg-[var(--color-bg-primary)] p-2 rounded-lg border border-[var(--color-border-color)]">
+                        <span className="text-white">{ed.name}</span>
+                        <button onClick={() => handleDeleteEdition(ed.id)} className="text-red-400 hover:text-red-300 text-sm">Supprimer</button>
+                      </div>
+                    ))}
+                    {editions.length === 0 && <p className="text-[var(--color-text-secondary)] text-sm">Aucune édition.</p>}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="pt-8 border-t border-[var(--color-border-color)]">
               <h2 className="text-2xl font-bold font-outfit text-white mb-6">Cartes Créées ({cards.length})</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -1268,10 +1277,10 @@ export default function AdminPage() {
                       <div>
                         <span className="font-bold text-white block">{card.title}</span>
                         <span className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1 mt-1">
-                          {categories.find(c => c.name === card.category)?.iconUrl && (
-                            <img src={categories.find(c => c.name === card.category)?.iconUrl} alt="icon" className="w-3 h-3 object-contain" />
+                          {editions.find(e => e.name === card.edition)?.iconUrl && (
+                            <img src={editions.find(e => e.name === card.edition)?.iconUrl} alt="icon" className="w-3 h-3 object-contain" />
                           )}
-                          {card.category} • {card.rarity} • {card.level}
+                          {card.edition} • {card.rarity} • {card.level}
                         </span>
                       </div>
                     </div>
@@ -1314,6 +1323,76 @@ export default function AdminPage() {
 
         {activeTab === "moderation" && (
           <div className="space-y-6">
+
+            {/* Card Manager / God Mode inside Moderation */}
+            <div className="bg-[var(--color-bg-elevated)] border border-red-500/50 rounded-xl p-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-purple-600"></div>
+              <h2 className="text-2xl font-bold font-outfit text-white mb-6 flex items-center gap-2">
+                <ShieldAlert className="text-red-500" /> Card Manager
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Sélectionner une Carte</label>
+                  <select value={godCardId} onChange={e => setGodCardId(e.target.value)} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-red-500">
+                    <option value="">-- Choisir une carte --</option>
+                    {cards.map(c => <option key={c.id} value={c.id}>{c.title} ({c.rarity})</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Sélectionner un Joueur (pour action ciblée)</label>
+                  <select value={godPlayerId} onChange={e => setGodPlayerId(e.target.value)} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-red-500">
+                    <option value="">-- Choisir un utilisateur --</option>
+                    {appUsers.filter(u => u.minecraftName).map(u => <option key={u.id} value={u.id}>{u.name} ({u.minecraftName})</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <button onClick={() => handleGodAction("GIVE")} disabled={!godCardId || !godPlayerId} className="bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all hover:scale-105">
+                  <Sparkles className="w-6 h-6" /> Donner la Carte
+                </button>
+                <button onClick={() => handleGodAction("REMOVE")} disabled={!godCardId || !godPlayerId} className="bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all hover:scale-105">
+                  <Trash2 className="w-6 h-6" /> Retirer la Carte
+                </button>
+                <button onClick={() => handleGodAction("GIVE_ALL")} disabled={!godCardId} className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all hover:scale-105">
+                  <Users className="w-6 h-6" /> Give All (Serveur)
+                </button>
+                <button onClick={() => handleGodAction("WIPE_ALL")} disabled={!godCardId} className="bg-red-700 hover:bg-red-600 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all hover:scale-105 shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                  <ShieldAlert className="w-6 h-6" /> WIPE ALL
+                </button>
+              
+                <button onClick={() => handleGodAction("WIPE_PLAYER")} disabled={!godPlayerId} className="bg-red-900 hover:bg-red-800 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all hover:scale-105 border border-red-500/30">
+                  <ShieldAlert className="w-6 h-6" /> Wipe Inventaire
+                </button>
+</div>
+            </div>
+
+            {/* Box Management */}
+            <div className="bg-[var(--color-bg-elevated)] border border-purple-500/30 rounded-xl p-6">
+              <h2 className="text-2xl font-bold font-outfit text-white mb-6">Distribution de Box</h2>
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Type de Box</label>
+                  <select value={godBoxType} onChange={e => setGodBoxType(e.target.value)} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-purple-500">
+                    <option value="standard">Box Standard</option>
+                    <option value="premium">Box Premium</option>
+                    <option value="mythic">Box Mythique</option>
+                  </select>
+                </div>
+                <div className="w-24">
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Quantité</label>
+                  <input type="number" min="1" value={godBoxAmount} onChange={e => setGodBoxAmount(parseInt(e.target.value))} className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none" />
+                </div>
+                <button onClick={handleGiveBox} disabled={!godPlayerId} className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-2 px-6 rounded-lg h-[42px]">
+                  Give Box
+                </button>
+              </div>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-4">Note: Pour automatiser ceci via le bot Discord, le bot doit appeler POST /api/bot/give-box avec le secret configuré.</p>
+            </div>
+
+            <div className="h-px bg-[var(--color-border-color)] my-8"></div>
+
             <h2 className="text-2xl font-bold font-outfit text-white mb-6">Gestion des Utilisateurs</h2>
             <p className="text-[var(--color-text-secondary)] mb-4">Gérez les rôles des utilisateurs connectés (MEMBER, MODERATOR, ADMIN).</p>
             
