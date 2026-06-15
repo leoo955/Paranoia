@@ -106,22 +106,22 @@
     100% { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes booster-shake-glow {
-    0% { transform: translate(0, 0) rotate(0deg) scale(1); filter: brightness(1) drop-shadow(0 0 0px rgba(255,255,255,0)); }
-    10% { transform: translate(-2px, -2px) rotate(-2deg) scale(1.02); }
-    20% { transform: translate(2px, -2px) rotate(2deg) scale(1.04); }
-    30% { transform: translate(-2px, 2px) rotate(-2deg) scale(1.06); }
-    40% { transform: translate(2px, 2px) rotate(2deg) scale(1.08); filter: brightness(1.2) drop-shadow(0 0 20px rgba(255,255,255,0.3)); }
-    50% { transform: translate(-3px, -3px) rotate(-3deg) scale(1.1); }
-    60% { transform: translate(3px, -3px) rotate(3deg) scale(1.12); }
-    70% { transform: translate(-3px, 3px) rotate(-3deg) scale(1.14); filter: brightness(1.5) drop-shadow(0 0 40px rgba(255,255,255,0.6)); }
-    80% { transform: translate(3px, 3px) rotate(3deg) scale(1.16); }
-    90% { transform: translate(-4px, -4px) rotate(-4deg) scale(1.18); filter: brightness(3) drop-shadow(0 0 60px rgba(255,255,255,0.8)); }
-    100% { transform: translate(0, 0) rotate(0deg) scale(2); filter: brightness(10) drop-shadow(0 0 150px rgba(255,255,255,1)); opacity: 0; }
+  @keyframes center-booster {
+    0% { transform: scale(0.5) translateY(100px); opacity: 0; }
+    15% { transform: scale(1) translateY(0); opacity: 1; filter: brightness(1); }
+    30% { transform: scale(1.05) rotate(2deg); filter: drop-shadow(0 0 10px white) brightness(1.2); }
+    40% { transform: scale(1.05) rotate(-2deg); filter: drop-shadow(0 0 20px white) brightness(1.3); }
+    50% { transform: scale(1.1) rotate(4deg); filter: drop-shadow(0 0 30px white) brightness(1.5); }
+    60% { transform: scale(1.1) rotate(-4deg); filter: drop-shadow(0 0 40px white) brightness(1.7); }
+    70% { transform: scale(1.2) rotate(6deg); filter: drop-shadow(0 0 60px white) brightness(2); }
+    80% { transform: scale(1.2) rotate(-6deg); filter: drop-shadow(0 0 80px white) brightness(2.5); }
+    90% { transform: scale(1.4) rotate(0deg); filter: drop-shadow(0 0 120px white) brightness(3); opacity: 1; }
+    95% { transform: scale(2); filter: brightness(5); opacity: 0; }
+    100% { transform: scale(2); opacity: 0; }
   }
 
   .animate-booster-open {
-    animation: booster-shake-glow 1.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+    animation: center-booster 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
   @keyframes epic-card-reveal {

@@ -178,19 +178,22 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
 
           {!showReveal && (
             <div className="z-10 flex flex-col items-center mt-4">
-              <button 
-                onClick={openPack} 
-                disabled={isOpening}
-                className={`relative cursor-pointer transition-transform hover:scale-105 active:scale-95 outline-none group ${isOpening ? "animate-booster-open pointer-events-none" : ""}`}
-              >
-                <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${selectedBoxType === 'standard' ? 'bg-blue-500' : selectedBoxType === 'premium' ? 'bg-purple-500' : 'bg-red-500'}`}></div>
-                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className="w-64 h-auto relative z-10 drop-shadow-2xl transition-all duration-300 transform hover:scale-110" />
-                
-                {/* Floating particles effect on hover */}
-                <div className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Sparkles className={`w-32 h-32 animate-ping ${selectedBoxType === 'standard' ? 'text-blue-400' : selectedBoxType === 'premium' ? 'text-purple-400' : 'text-red-400'}`} />
-                </div>
-              </button>
+              {/* Only show the normal booster if NOT opening */}
+              {!isOpening && (
+                <button 
+                  onClick={openPack} 
+                  className="relative cursor-pointer transition-transform hover:scale-105 active:scale-95 outline-none group"
+                >
+                  <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${selectedBoxType === 'standard' ? 'bg-blue-500' : selectedBoxType === 'premium' ? 'bg-purple-500' : 'bg-red-500'}`}></div>
+                  <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className="w-64 h-auto relative z-10 drop-shadow-2xl transition-all duration-300 transform hover:scale-110" />
+                  
+                  {/* Floating particles effect on hover */}
+                  <div className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Sparkles className={`w-32 h-32 animate-ping ${selectedBoxType === 'standard' ? 'text-blue-400' : selectedBoxType === 'premium' ? 'text-purple-400' : 'text-red-400'}`} />
+                  </div>
+                </button>
+              )}
+              
               {!isOpening && (
                 <button 
                   onClick={openPack}
@@ -199,6 +202,15 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                   OUVRIR
                 </button>
               )}
+            </div>
+          )}
+          
+          {/* Cinematic Opening Overlay */}
+          {isOpening && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md">
+              <div className="animate-booster-open">
+                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className="w-80 h-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]" />
+              </div>
             </div>
           )}
 
