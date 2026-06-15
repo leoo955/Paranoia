@@ -213,7 +213,7 @@ export default function CardDisplay({
     attrs = typeof card.attributes === 'string' ? JSON.parse(card.attributes) : (card.attributes || {});
   } catch (e) {}
 
-  const isPremiumLayout = attrs.isFullArt || card.level === "Netherite" || card.level === "Diamond" || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
+  const isPremiumLayout = attrs.isFullArt || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
 
   // Full Art no longer overrides default positions rigidly, positions are managed by Admin state
   const titlePos = attrs.titlePos || { x: 50, y: 75, scale: 100 };
