@@ -588,25 +588,35 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
       {activeTab === "catalogue" && (
         <div className="animate-fade-in">
           <div className="flex flex-col gap-16">
-            {Array.from(new Set(allCards.map(c => c.edition || 'Standard'))).sort().map(edition => {
-              const cardsOfEdition = allCards.filter(c => (c.edition || 'Standard') === edition);
-              if (cardsOfEdition.length === 0) return null;
+            {['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'].map(rarity => {
+              const cardsOfRarity = allCards.filter(c => c.rarity === rarity);
+              if (cardsOfRarity.length === 0) return null;
 
-              // Check owned cards for this edition
-              const ownedCount = cardsOfEdition.filter(c => inventory.some(i => i.tradingCard?.id === c.id)).length;
+              // Check owned cards for this rarity
+              const ownedCount = cardsOfRarity.filter(c => inventory.some(i => i.tradingCard?.id === c.id)).length;
 
               return (
-                <div key={edition}>
-                  <h2 className="text-3xl font-bold mb-6 text-white flex items-center gap-3 border-b border-white/10 pb-4">
-                    <BookOpen className="text-indigo-500 w-8 h-8" />
-                    Édition: {edition}
-                    <span className="text-sm font-normal text-[var(--color-text-secondary)] bg-white/5 px-3 py-1 rounded-full ml-4 border border-white/10">
-                      {ownedCount} / {cardsOfEdition.length} possédées
+                <div key={rarity}>
+                  <h2 className={`text-3xl font-bold mb-6 flex items-center gap-3 border-b border-white/10 pb-4 ${
+                    rarity === 'MYTHIC' ? 'text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]' :
+                    rarity === 'LEGENDARY' ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]' :
+                    rarity === 'EPIC' ? 'text-purple-400' :
+                    rarity === 'RARE' ? 'text-blue-400' :
+                    rarity === 'UNCOMMON' ? 'text-green-400' : 'text-gray-400'
+                  }`}>
+                    <Sparkles className="w-8 h-8" />
+                    {rarity === 'MYTHIC' ? 'Mythique' : 
+                     rarity === 'LEGENDARY' ? 'Légendaire' : 
+                     rarity === 'EPIC' ? 'Épique' : 
+                     rarity === 'RARE' ? 'Rare' : 
+                     rarity === 'UNCOMMON' ? 'Peu Commune' : 'Commune'}
+                    <span className="text-sm font-normal text-[var(--color-text-secondary)] bg-white/5 px-3 py-1 rounded-full ml-4 border border-white/10 drop-shadow-none">
+                      {ownedCount} / {cardsOfRarity.length} possédées
                     </span>
                   </h2>
                   
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                    {cardsOfEdition.map(card => {
+                    {cardsOfRarity.map(card => {
                       const isOwned = inventory.some(i => i.tradingCard?.id === card.id);
                       return (
                         <div key={card.id} className={`relative group perspective-1000 ${!isOwned ? 'opacity-50 grayscale hover:grayscale-0 transition-all duration-500' : ''}`}>
