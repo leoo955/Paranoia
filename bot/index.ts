@@ -286,8 +286,9 @@ client.on('interactionCreate', async (interaction: Interaction) => {
           );
 
         await interaction.reply({ content: 'Panel créé avec succès !', ephemeral: true });
-        if (interaction.channel?.isTextBased()) {
-          await interaction.channel.send({ embeds: [embed], components: [row] });
+        const channel = interaction.channel;
+        if (channel && 'send' in channel) {
+          await (channel as any).send({ embeds: [embed], components: [row] });
         }
       } catch (error) {
         console.error("Ticket setup error:", error);
