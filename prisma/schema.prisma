@@ -172,3 +172,10 @@ model Player {
 
   cards         TradingCard[]
 }
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  iconUrl   String?
+  createdAt DateTime @default(now())
+}

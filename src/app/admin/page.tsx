@@ -67,6 +67,9 @@ export default function AdminPage() {
   const [draggingItem, setDraggingItem] = useState<{type: string, id: string} | null>(null);
   
   const [templates, setTemplates] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [newCatName, setNewCatName] = useState("");
+  const [newCatIconUrl, setNewCatIconUrl] = useState("");
   const [uploadingBg, setUploadingBg] = useState(false);
   const [uploadingSkin, setUploadingSkin] = useState(false);
   const [uploadingFrame, setUploadingFrame] = useState(false);
@@ -135,6 +138,16 @@ export default function AdminPage() {
     }
   };
 
+  
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("/api/categories");
+      if (res.ok) setCategories(await res.json());
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const fetchTemplates = async () => {
     try {
       const res = await fetch("/api/templates");
@@ -160,6 +173,7 @@ export default function AdminPage() {
     fetchPlayers();
     fetchCards();
     fetchTemplates();
+    fetchCategories();
     fetchUsers();
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -530,6 +544,18 @@ export default function AdminPage() {
     }
   };
 
+  
+  const handleDeleteTemplate = async (id: string) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce template ?")) return;
+    try {
+      const res = await fetch(`/api/templates?id=${id}`, { method: "DELETE" });
+      if (res.ok) fetchTemplates();
+      else alert("Erreur lors de la suppression.");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleSaveTemplate = async () => {
     const name = window.prompt("Nom du template ?");
     if (!name) return;
@@ -569,6 +595,7 @@ export default function AdminPage() {
       if (res.ok) {
         alert("Template sauvegardé !");
         fetchTemplates();
+    fetchCategories();
       }
     } catch (e) {
       console.error(e);
@@ -732,6 +759,63 @@ export default function AdminPage() {
           </div>
         )}
 
+        
+        {activeTab === "categories" && (
+          <div className="space-y-8 animate-fade-in">
+            <div className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl p-6">
+              <h2 className="text-2xl font-bold font-outfit text-white mb-6">Ajouter une Catégorie</h2>
+              <form onSubmit={handleCreateCategory}>
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Nom de la Catégorie *</label>
+                    <input 
+                      type="text" 
+                      value={newCatName} 
+                      onChange={(e) => setNewCatName(e.target.value)} 
+                      className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
+                      placeholder="Ex: Saison 1, Staff, Event..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[var(--color-text-secondary)] mb-1">URL de l'icône (Optionnel)</label>
+                    <input 
+                      type="text" 
+                      value={newCatIconUrl} 
+                      onChange={(e) => setNewCatIconUrl(e.target.value)} 
+                      className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
+                      placeholder="https://imgur.com/...png"
+                    />
+                  </div>
+                </div>
+                <button type="submit" disabled={loading} className="btn-primary mt-4 w-full">
+                  {loading ? "Création..." : "Créer la catégorie"}
+                </button>
+              </form>
+            </div>
+
+            <div className="pt-8 border-t border-[var(--color-border-color)]">
+              <h2 className="text-2xl font-bold font-outfit text-white mb-6">Catégories Enregistrées ({categories.length})</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {categories.map(cat => (
+                  <div key={cat.id} className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg p-4 flex items-center justify-between group">
+                    <div className="flex items-center gap-3">
+                      {cat.iconUrl ? (
+                        <img src={cat.iconUrl} alt={cat.name} className="w-8 h-8 object-contain" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs">🗂️</div>
+                      )}
+                      <span className="font-bold text-white">{cat.name}</span>
+                    </div>
+                    <button onClick={() => handleDeleteCategory(cat.id)} className="text-[var(--color-text-secondary)] hover:text-red-500 transition-colors p-2 opacity-0 group-hover:opacity-100">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === "cards" && (
           <div className="space-y-8">
             <div>
@@ -745,10 +829,18 @@ export default function AdminPage() {
               <div className="mb-6 bg-black/40 p-4 rounded-lg border border-[var(--color-border-color)] flex gap-4 items-center">
                 <div className="flex-1">
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Appliquer un Template</label>
-                  <select onChange={(e) => handleApplyTemplate(e.target.value)} className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]">
-                    <option value="">-- Choisir un template --</option>
-                    {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                  </select>
+                  <div className="flex gap-2">
+                    <select id="templateSelect" onChange={(e) => handleApplyTemplate(e.target.value)} className="flex-1 bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]">
+                      <option value="">-- Choisir un template --</option>
+                      {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                    </select>
+                    <button type="button" onClick={() => {
+                      const sel = document.getElementById("templateSelect") as HTMLSelectElement;
+                      if (sel && sel.value) handleDeleteTemplate(sel.value);
+                    }} className="bg-red-500/20 hover:bg-red-500/40 text-red-400 p-2 rounded-lg border border-red-500/30">
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
                 <div className="flex-1">
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1 opacity-0">-</label>
@@ -787,13 +879,14 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Catégorie / Collection</label>
-                  <input 
-                    type="text" 
-                    value={cardCategory} 
-                    onChange={e => setCardCategory(e.target.value)} 
-                    placeholder="Saison 1, Holographique, Staff..."
+                  <select 
+                    value={cardCategory}
+                    onChange={(e) => setCardCategory(e.target.value)}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
-                  />
+                  >
+                    <option value="Standard">Standard</option>
+                    {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Rareté</label>
@@ -1134,7 +1227,12 @@ export default function AdminPage() {
                       <img src={`https://render.crafty.gg/3d/bust/${card.title}`} alt={card.title} className="w-10 h-10 object-contain" />
                       <div>
                         <span className="font-bold text-white block">{card.title}</span>
-                        <span className="text-xs text-[var(--color-text-secondary)] block">{card.category} • {card.rarity} • {card.level}</span>
+                        <span className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1 mt-1">
+                          {categories.find(c => c.name === card.category)?.iconUrl && (
+                            <img src={categories.find(c => c.name === card.category)?.iconUrl} alt="icon" className="w-3 h-3 object-contain" />
+                          )}
+                          {card.category} • {card.rarity} • {card.level}
+                        </span>
                       </div>
                     </div>
                     {card.description && (
