@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const session = await getServerSession(authOptions);
   
+  // @ts-ignore
   if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "MODERATOR")) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
@@ -37,6 +38,7 @@ export async function GET() {
 export async function PUT(req: Request) {
   const session = await getServerSession(authOptions);
   
+  // @ts-ignore
   if (!session?.user || session.user.role !== "ADMIN") {
     return new NextResponse("Seul un ADMIN peut modifier les rôles", { status: 401 });
   }
@@ -54,6 +56,7 @@ export async function PUT(req: Request) {
     }
 
     // Protect against removing the last admin (basic check, could be improved)
+    // @ts-ignore
     if (userId === session.user.id && role !== "ADMIN") {
       return new NextResponse("Vous ne pouvez pas retirer votre propre rôle Admin", { status: 400 });
     }
