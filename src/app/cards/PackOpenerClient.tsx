@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers } from "lucide-react";
+import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CardDisplay from "@/components/cards/CardDisplay";
 
 type Player = { id: string; minecraftName: string };
-type TradingCard = { id: string; title: string; rarity: string; level: string; description: string; player: Player | null };
+type TradingCard = { id: string; title: string; rarity: string; level: string; edition: string; description: string | null; player: Player | null };
 type UserCard = { id: string; obtainedAt: Date; tradingCard: TradingCard };
 
 const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: number, boxType: string }) => {
@@ -54,7 +54,7 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
   );
 };
 
-export default function PackOpenerClient({ initialInventory, initialBoxes, initialCoins, isLoggedIn }: { initialInventory: UserCard[], initialBoxes?: any[], initialCoins: number, isLoggedIn: boolean }) {
+export default function PackOpenerClient({ initialInventory, initialBoxes, initialCoins, isLoggedIn, allCards = [] }: { initialInventory: UserCard[], initialBoxes?: any[], initialCoins: number, isLoggedIn: boolean, allCards?: TradingCard[] }) {
   const [inventory, setInventory] = useState<UserCard[]>(initialInventory);
   const [boxes, setBoxes] = useState<any[]>(initialBoxes || []);
   const [coins, setCoins] = useState<number>(initialCoins || 0);
@@ -171,18 +171,27 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
     }
   };
 
-  const groupedInventory = inventory.reduce((acc, curr) => {
-    if (!curr || !curr.tradingCard) return acc;
-    const id = curr.tradingCard.id;
-    if (!acc[id]) {
-      acc[id] = { card: curr.tradingCard, count: 0, latestObtained: curr.obtainedAt || new Date() };
-    }
-    acc[id].count += 1;
-    if (curr.obtainedAt && new Date(curr.obtainedAt) > new Date(acc[id].latestObtained)) {
-      acc[id].latestObtained = curr.obtainedAt;
-    }
+  const groupedInventory = useMemo(() => {
+    const acc: Record<string, { card: TradingCard, count: number, latestObtained: Date }> = {};
+    
+    // Initialiser avec toutes les cartes publiées (count = 0)
+    allCards.forEach(card => {
+      acc[card.id] = { card, count: 0, latestObtained: new Date(0) };
+    });
+
+    inventory.forEach(curr => {
+      if (!curr || !curr.tradingCard) return;
+      const id = curr.tradingCard.id;
+      if (!acc[id]) {
+        acc[id] = { card: curr.tradingCard, count: 0, latestObtained: curr.obtainedAt || new Date(0) };
+      }
+      acc[id].count += 1;
+      if (curr.obtainedAt && new Date(curr.obtainedAt) > new Date(acc[id].latestObtained)) {
+        acc[id].latestObtained = curr.obtainedAt;
+      }
+    });
     return acc;
-  }, {} as Record<string, { card: TradingCard, count: number, latestObtained: Date }>);
+  }, [inventory, allCards]);
 
   const stackedItems = useMemo(() => {
     return Object.values(groupedInventory)
@@ -498,7 +507,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
             </div>
           </div>
 
-          {/* Grid */}
+          {/* Render Sections */}
           {stackedItems.length === 0 ? (
             <div className="text-center py-24 bg-[var(--color-bg-elevated)] rounded-2xl border border-dashed border-[var(--color-border-color)] flex flex-col items-center">
               <div className="w-20 h-20 bg-black/30 rounded-full flex items-center justify-center mb-4 border border-white/5">
@@ -506,41 +515,104 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Aucune carte trouvée</h3>
               <p className="text-[var(--color-text-secondary)] max-w-md">
-                {inventory.length === 0 
-                  ? "Vous ne possédez aucune carte pour le moment. Allez dans l'Ouvrir des Box pour ouvrir des boosters !" 
-                  : "Aucune carte ne correspond à vos filtres actuels."}
+                Aucune carte ne correspond à vos filtres actuels.
               </p>
-              {inventory.length > 0 && (
-                <button onClick={() => {setSearchQuery(""); setRarityFilter("ALL");}} className="mt-6 text-[var(--color-accent-purple)] hover:text-white underline transition-colors">
-                  Réinitialiser les filtres
-                </button>
-              )}
+              <button onClick={() => {setSearchQuery(""); setRarityFilter("ALL");}} className="mt-6 text-[var(--color-accent-purple)] hover:text-white underline transition-colors">
+                Réinitialiser les filtres
+              </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-              {stackedItems.map(item => {
-                const card = item.card;
-                return (
-                  <div key={card.id} className="relative group perspective-1000">
-                    <div 
-                      onClick={() => setSelectedCard(card)}
-                      className="cursor-pointer transition-all duration-500 transform-style-3d group-hover:scale-105 group-hover:-translate-y-4 group-hover:shadow-[0_20px_30px_rgba(0,0,0,0.5)] rounded-xl"
-                    >
-                      <CardDisplay card={card} size="md" />
-                      
-                      {/* Glow effect underneath on hover */}
-                      <div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-transparent to-black/80 opacity-0 group-hover:opacity-100 transition-opacity blur-md"></div>
-                    </div>
-
-                    {/* Stacking Badge */}
-                    {item.count > 1 && (
-                      <div className="absolute -top-3 -right-3 z-50 bg-red-600 text-white font-black text-sm px-2.5 py-1 rounded-full border-2 border-[#111118] shadow-[0_0_10px_rgba(220,38,38,0.6)] animate-pulse-glow">
-                        x{item.count}
+            <div className="flex flex-col gap-16">
+              
+              {/* Catalogue par Rareté */}
+              <div>
+                <h3 className="text-3xl font-outfit font-black text-white mb-8 border-b border-white/10 pb-4">Catalogue par Rareté</h3>
+                {['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'].map(rarity => {
+                  const cardsOfRarity = stackedItems.filter(item => item.card.rarity === rarity);
+                  if (cardsOfRarity.length === 0) return null;
+                  
+                  return (
+                    <div key={rarity} className="mb-12">
+                      <h4 className={`text-2xl font-bold mb-6 flex items-center gap-2 ${
+                        rarity === 'MYTHIC' ? 'text-red-500' :
+                        rarity === 'LEGENDARY' ? 'text-yellow-500' :
+                        rarity === 'EPIC' ? 'text-purple-500' :
+                        rarity === 'RARE' ? 'text-blue-500' :
+                        rarity === 'UNCOMMON' ? 'text-green-500' :
+                        'text-gray-400'
+                      }`}>
+                        {rarity === 'MYTHIC' ? 'Mythique' :
+                         rarity === 'LEGENDARY' ? 'Légendaire' :
+                         rarity === 'EPIC' ? 'Épique' :
+                         rarity === 'RARE' ? 'Rare' :
+                         rarity === 'UNCOMMON' ? 'Peu Commune' : 'Commune'}
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                        {cardsOfRarity.map(item => (
+                          <div key={item.card.id} className={`relative group perspective-1000 ${item.count === 0 ? 'opacity-50 grayscale hover:grayscale-0 transition-all duration-500' : ''}`}>
+                            <div 
+                              onClick={() => setSelectedCard(item.card)}
+                              className="cursor-pointer transition-all duration-500 transform-style-3d group-hover:scale-105 group-hover:-translate-y-4 group-hover:shadow-[0_20px_30px_rgba(0,0,0,0.5)] rounded-xl"
+                            >
+                              <CardDisplay card={item.card} size="md" />
+                              {item.count === 0 && (
+                                <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center backdrop-blur-[1px]">
+                                  <Lock className="w-10 h-10 text-white/50" />
+                                </div>
+                              )}
+                            </div>
+                            {item.count > 1 && (
+                              <div className="absolute -top-3 -right-3 z-50 bg-red-600 text-white font-black text-sm px-2.5 py-1 rounded-full border-2 border-[#111118] shadow-[0_0_10px_rgba(220,38,38,0.6)] animate-pulse-glow">
+                                x{item.count}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Catalogue par Édition */}
+              <div className="pt-8 border-t border-white/10">
+                <h3 className="text-3xl font-outfit font-black text-white mb-8 border-b border-white/10 pb-4">Catalogue par Édition</h3>
+                {Array.from(new Set(stackedItems.map(item => item.card.edition || 'Standard'))).sort().map(edition => {
+                  const cardsOfEdition = stackedItems.filter(item => (item.card.edition || 'Standard') === edition);
+                  if (cardsOfEdition.length === 0) return null;
+                  
+                  return (
+                    <div key={edition} className="mb-12">
+                      <h4 className="text-2xl font-bold mb-6 text-[var(--color-text-secondary)] flex items-center gap-2">
+                        Édition: <span className="text-white">{edition}</span>
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                        {cardsOfEdition.map(item => (
+                          <div key={`${edition}-${item.card.id}`} className={`relative group perspective-1000 ${item.count === 0 ? 'opacity-50 grayscale hover:grayscale-0 transition-all duration-500' : ''}`}>
+                            <div 
+                              onClick={() => setSelectedCard(item.card)}
+                              className="cursor-pointer transition-all duration-500 transform-style-3d group-hover:scale-105 group-hover:-translate-y-4 group-hover:shadow-[0_20px_30px_rgba(0,0,0,0.5)] rounded-xl"
+                            >
+                              <CardDisplay card={item.card} size="md" />
+                              {item.count === 0 && (
+                                <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center backdrop-blur-[1px]">
+                                  <Lock className="w-10 h-10 text-white/50" />
+                                </div>
+                              )}
+                            </div>
+                            {item.count > 1 && (
+                              <div className="absolute -top-3 -right-3 z-50 bg-red-600 text-white font-black text-sm px-2.5 py-1 rounded-full border-2 border-[#111118] shadow-[0_0_10px_rgba(220,38,38,0.6)] animate-pulse-glow">
+                                x{item.count}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
             </div>
           )}
         </div>

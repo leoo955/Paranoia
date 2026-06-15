@@ -42,6 +42,11 @@ export default async function CardsPage() {
     });
   }
 
+  const allCards = await prisma.tradingCard.findMany({
+    where: { isPublished: true },
+    include: { player: true },
+    orderBy: { rarity: 'desc' }
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-slide-up">
@@ -52,7 +57,13 @@ export default async function CardsPage() {
         </div>
       </div>
 
-      <PackOpenerClient initialInventory={inventory} initialBoxes={userBoxes} initialCoins={paraCoins} isLoggedIn={!!userId} />
+      <PackOpenerClient 
+        initialInventory={inventory} 
+        initialBoxes={userBoxes} 
+        initialCoins={paraCoins} 
+        isLoggedIn={!!userId} 
+        allCards={allCards}
+      />
     </div>
   );
 }
