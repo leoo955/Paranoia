@@ -25,7 +25,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
 
   const openPack = async () => {
     if (!isLoggedIn) {
-      alert("Vous devez être connecté pour ouvrir un booster.");
+      alert("Vous devez être connecté pour ouvrir des boosters.");
       return;
     }
 
@@ -35,6 +35,9 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
       return;
     }
     
+    // S'assurer qu'on est bien en haut de page pour que l'animation et le reveal soient parfaits
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     setIsOpening(true);
     setDrawnCards([]);
     setShowReveal(false);
