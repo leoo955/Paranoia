@@ -641,6 +641,40 @@ export default function AdminPage() {
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
     } catch {}
   };
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCatName) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newCatName.trim(), iconUrl: newCatIconUrl.trim() }),
+      });
+      if (res.ok) {
+        setNewCatName("");
+        setNewCatIconUrl("");
+        fetchCategories();
+      } else {
+        alert("Erreur lors de la création de la catégorie.");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) return;
+    try {
+      const res = await fetch(`/api/categories?id=${id}`, { method: "DELETE" });
+      if (res.ok) fetchCategories();
+      else alert("Erreur lors de la suppression.");
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleAddPlayer = async (e: React.FormEvent) => {
     e.preventDefault();
