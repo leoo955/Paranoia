@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers } from "lucide-react";
+import { useRouter } from "next/navigation";
 import CardDisplay from "@/components/cards/CardDisplay";
 
 type Player = { id: string; minecraftName: string };
@@ -20,6 +21,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
   const [activeTab, setActiveTab] = useState<"opener" | "collection">("opener");
   const [searchQuery, setSearchQuery] = useState("");
   const [rarityFilter, setRarityFilter] = useState("ALL");
+  const router = useRouter();
 
   const openPack = async () => {
     if (!isLoggedIn) {
@@ -56,6 +58,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
         setShowReveal(true);
         setIsOpening(false);
         setInventory(prev => [data.userCard, ...prev]);
+        router.refresh();
       }, 1400);
 
     } catch (error: any) {
@@ -221,7 +224,9 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
           
           {/* Flash Overlay when booster bursts */}
           {isOpening && (
-            <div className="fixed inset-0 z-[100] bg-white pointer-events-none animate-flash-screen"></div>
+            <div className="fixed inset-0 z-[100] pointer-events-none animate-flash-burst flex items-center justify-center">
+              <div className="w-[150vw] h-[150vw] bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,rgba(255,255,255,0.8)_30%,transparent_70%)] rounded-full mix-blend-screen"></div>
+            </div>
           )}
         </div>
       )}
