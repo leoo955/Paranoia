@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "bot": "tsx bot/index.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
@@ -16,6 +17,8 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@prisma/client": "^5.22.0",
     "clsx": "^2.1.1",
+    "discord.js": "^14.26.4",
+    "dotenv": "^17.4.2",
     "lucide-react": "^1.18.0",
     "next": "16.2.9",
     "next-auth": "^4.24.14",
@@ -35,6 +38,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
+    "tsx": "^4.22.4",
     "typescript": "^5"
   }
 }

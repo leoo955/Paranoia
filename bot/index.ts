@@ -1,0 +1,258 @@
+import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction } from 'discord.js';
+import { PrismaClient } from '@prisma/client';
+import * as dotenv from 'dotenv';
+import path from 'path';
+
+// Load env from the Next.js project root
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+const prisma = new PrismaClient();
+const token = process.env.DISCORD_TOKEN;
+const clientId = process.env.DISCORD_CLIENT_ID;
+
+if (!token || !clientId) {
+  console.error("Missing DISCORD_TOKEN or DISCORD_CLIENT_ID in .env");
+  process.exit(1);
+}
+
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds]
+});
+
+const commands = [
+  new SlashCommandBuilder()
+    .setName('trade')
+    .setDescription('Échanger une carte avec un autre joueur')
+    .addUserOption(option => 
+      option.setName('utilisateur')
+        .setDescription('Le joueur avec qui vous voulez échanger')
+        .setRequired(true))
+    .addStringOption(option => 
+      option.setName('carte_offerte')
+        .setDescription('La carte que vous offrez (tapez pour chercher)')
+        .setAutocomplete(true)
+        .setRequired(true))
+    .addStringOption(option => 
+      option.setName('carte_demandée')
+        .setDescription('La carte que vous demandez (tapez pour chercher)')
+        .setAutocomplete(true)
+        .setRequired(true))
+];
+
+client.once('ready', async () => {
+  console.log(`Bot logged in as ${client.user?.tag}`);
+  
+  const rest = new REST({ version: '10' }).setToken(token);
+  try {
+    console.log('Started refreshing application (/) commands.');
+    await rest.put(
+      Routes.applicationCommands(clientId),
+      { body: commands },
+    );
+    console.log('Successfully reloaded application (/) commands.');
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+client.on('interactionCreate', async (interaction: Interaction) => {
+  if (interaction.isAutocomplete()) {
+    try {
+      const focusedOption = interaction.options.getFocused(true);
+      
+      let discordIdToSearch = '';
+      if (focusedOption.name === 'carte_offerte') {
+        discordIdToSearch = interaction.user.id;
+      } else if (focusedOption.name === 'carte_demandée') {
+        const targetUser = interaction.options.get('utilisateur')?.value as string;
+        if (!targetUser) return await interaction.respond([]);
+        discordIdToSearch = targetUser;
+      }
+
+      if (!discordIdToSearch) return await interaction.respond([]);
+
+      // Fetch user from DB
+      const user = await prisma.user.findUnique({
+        where: { discordId: discordIdToSearch }
+      });
+
+      if (!user) {
+        return await interaction.respond([]);
+      }
+
+      // Fetch inventory
+      const inventory = await prisma.userCard.findMany({
+        where: { userId: user.id },
+        include: { tradingCard: { include: { player: true } } }
+      });
+
+      // Filter based on input
+      const search = focusedOption.value.toLowerCase();
+      
+      // Group by card to avoid duplicates if they have multiple of the same
+      const uniqueCards = new Map();
+      for (const item of inventory) {
+        const c = item.tradingCard;
+        const name = `${c.title} (${c.rarity})`;
+        if (!uniqueCards.has(c.id)) {
+          uniqueCards.set(c.id, { id: c.id, name, count: 1 });
+        } else {
+          uniqueCards.get(c.id).count++;
+        }
+      }
+
+      const choices = Array.from(uniqueCards.values())
+        .filter(c => c.name.toLowerCase().includes(search))
+        .slice(0, 25)
+        .map(c => ({
+          name: `${c.name} (x${c.count})`,
+          value: c.id // The tradingCardId
+        }));
+
+      await interaction.respond(choices);
+    } catch (error) {
+      console.error("Autocomplete error:", error);
+    }
+  }
+
+  if (interaction.isChatInputCommand()) {
+    if (interaction.commandName === 'trade') {
+      try {
+        const targetUser = interaction.options.getUser('utilisateur');
+        const offeredCardId = interaction.options.getString('carte_offerte');
+        const requestedCardId = interaction.options.getString('carte_demandée');
+
+        if (!targetUser || !offeredCardId || !requestedCardId) {
+          return await interaction.reply({ content: 'Paramètres manquants.', ephemeral: true });
+        }
+
+        if (targetUser.id === interaction.user.id) {
+          return await interaction.reply({ content: 'Vous ne pouvez pas échanger avec vous-même !', ephemeral: true });
+        }
+
+        const proposer = await prisma.user.findUnique({ where: { discordId: interaction.user.id } });
+        const receiver = await prisma.user.findUnique({ where: { discordId: targetUser.id } });
+
+        if (!proposer) return await interaction.reply({ content: 'Vous n\'êtes pas enregistré sur Paranoia.', ephemeral: true });
+        if (!receiver) return await interaction.reply({ content: 'Ce joueur n\'est pas enregistré sur Paranoia.', ephemeral: true });
+
+        // Check if proposer actually has the offered card
+        const proposerCard = await prisma.userCard.findFirst({
+          where: { userId: proposer.id, tradingCardId: offeredCardId },
+          include: { tradingCard: true }
+        });
+
+        if (!proposerCard) {
+          return await interaction.reply({ content: 'Vous ne possédez pas ou plus la carte que vous proposez !', ephemeral: true });
+        }
+
+        // Check if receiver actually has the requested card
+        const receiverCard = await prisma.userCard.findFirst({
+          where: { userId: receiver.id, tradingCardId: requestedCardId },
+          include: { tradingCard: true }
+        });
+
+        if (!receiverCard) {
+          return await interaction.reply({ content: 'Le joueur ciblé ne possède pas ou plus la carte que vous demandez !', ephemeral: true });
+        }
+
+        const embed = new EmbedBuilder()
+          .setTitle('Proposition d\'échange')
+          .setColor('#a855f7')
+          .setDescription(`<@${interaction.user.id}> propose un échange à <@${targetUser.id}> !`)
+          .addFields(
+            { name: 'Il/Elle offre :', value: `${proposerCard.tradingCard.title} (${proposerCard.tradingCard.rarity})`, inline: true },
+            { name: 'Il/Elle demande :', value: `${receiverCard.tradingCard.title} (${receiverCard.tradingCard.rarity})`, inline: true }
+          );
+
+        const row = new ActionRowBuilder<ButtonBuilder>()
+          .addComponents(
+            new ButtonBuilder()
+              .setCustomId(`trade_accept_${proposer.id}_${receiver.id}_${proposerCard.id}_${receiverCard.id}`)
+              .setLabel('Accepter')
+              .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+              .setCustomId(`trade_decline_${proposer.id}_${receiver.id}`)
+              .setLabel('Refuser')
+              .setStyle(ButtonStyle.Danger)
+          );
+
+        await interaction.reply({
+          content: `<@${targetUser.id}>, vous avez une proposition de trade !`,
+          embeds: [embed],
+          components: [row]
+        });
+
+      } catch (error) {
+        console.error("Trade command error:", error);
+        await interaction.reply({ content: "Une erreur est survenue.", ephemeral: true });
+      }
+    }
+  }
+
+  if (interaction.isButton()) {
+    try {
+      if (interaction.customId.startsWith('trade_')) {
+        const parts = interaction.customId.split('_');
+        const action = parts[1]; // accept or decline
+        const proposerId = parts[2];
+        const receiverId = parts[3];
+        const proposerCardId = parts[4]; // userCard id (uuid)
+        const receiverCardId = parts[5]; // userCard id (uuid)
+
+        // Find the discord ID of the receiver to make sure only they can click
+        const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
+        if (!receiver || receiver.discordId !== interaction.user.id) {
+          return await interaction.reply({ content: 'Ce bouton ne vous est pas destiné !', ephemeral: true });
+        }
+
+        if (action === 'decline') {
+          const embed = new EmbedBuilder()
+            .setTitle('Échange annulé')
+            .setColor('#dc2626')
+            .setDescription(`<@${interaction.user.id}> a refusé l'échange.`);
+            
+          return await interaction.update({ embeds: [embed], components: [], content: '' });
+        }
+
+        if (action === 'accept') {
+          // Verify both cards still exist and belong to their respective owners
+          const pCard = await prisma.userCard.findFirst({ where: { id: proposerCardId, userId: proposerId }, include: { tradingCard: true } });
+          const rCard = await prisma.userCard.findFirst({ where: { id: receiverCardId, userId: receiverId }, include: { tradingCard: true } });
+
+          if (!pCard || !rCard) {
+            return await interaction.reply({ content: 'Une des cartes n\'est plus disponible (déjà échangée ?).', ephemeral: true });
+          }
+
+          // Swap
+          await prisma.$transaction([
+            prisma.userCard.update({
+              where: { id: pCard.id },
+              data: { userId: receiverId }
+            }),
+            prisma.userCard.update({
+              where: { id: rCard.id },
+              data: { userId: proposerId }
+            })
+          ]);
+
+          const embed = new EmbedBuilder()
+            .setTitle('Échange réussi ! 🎉')
+            .setColor('#22c55e')
+            .setDescription('Les cartes ont été transférées avec succès dans vos inventaires respectifs.')
+            .addFields(
+              { name: 'Nouveau propriétaire :', value: `La carte ${pCard.tradingCard.title} appartient maintenant à <@${interaction.user.id}>.` },
+              { name: 'Nouveau propriétaire :', value: `La carte ${rCard.tradingCard.title} appartient maintenant au proposeur.` }
+            );
+
+          await interaction.update({ embeds: [embed], components: [], content: '' });
+        }
+      }
+    } catch (error) {
+      console.error("Button error:", error);
+      await interaction.reply({ content: "Une erreur est survenue lors de l'échange.", ephemeral: true });
+    }
+  }
+});
+
+client.login(token);
