@@ -247,4 +247,24 @@
     mix-blend-mode: screen;
     opacity: 0.6;
   }
+
+  @keyframes sparkle-drift {
+    0% { background-position: 0 0, 0 0; }
+    100% { background-position: 200px 200px, -200px -200px; }
+  }
+  .effect-paillettes {
+    background-image: 
+      radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(2px 2px at 50px 160px, rgba(255,255,255,0.8), rgba(0,0,0,0)),
+      radial-gradient(1.5px 1.5px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.9), rgba(0,0,0,0)),
+      radial-gradient(1px 1px at 160px 120px, #ffffff, rgba(0,0,0,0)),
+      radial-gradient(2px 2px at 180px 190px, rgba(255,255,255,0.7), rgba(0,0,0,0));
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    animation: sparkle-drift 15s infinite linear;
+    mix-blend-mode: color-dodge;
+    opacity: 0.7;
+  }
 }

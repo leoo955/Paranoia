@@ -410,7 +410,7 @@ export default function CardDisplay({
       {/* Special Effects Overlay */}
       {attrs.effect && attrs.effect !== "none" && (
         <div 
-          className={`absolute inset-0 pointer-events-none rounded-xl z-50 ${attrs.effect === 'holo' ? 'effect-holo' : attrs.effect === 'shiny' ? 'effect-shiny' : attrs.effect === 'glitch' ? 'effect-glitch' : ''}`}
+          className={`absolute inset-0 pointer-events-none rounded-xl z-50 ${attrs.effect === 'holo' ? 'effect-holo' : attrs.effect === 'shiny' ? 'effect-shiny' : attrs.effect === 'glitch' ? 'effect-glitch' : attrs.effect === 'paillettes' ? 'effect-paillettes' : ''}`}
           style={{ transform: 'translateZ(40px)' }}
         ></div>
       )}

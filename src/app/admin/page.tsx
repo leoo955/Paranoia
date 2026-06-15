@@ -952,6 +952,7 @@ export default function AdminPage() {
                       <option value="holo">Holographique</option>
                       <option value="shiny">Shiny (Foil)</option>
                       <option value="glitch">Glitch</option>
+                      <option value="paillettes">Paillettes (Glitter)</option>
                     </select>
                   </div>
 
