@@ -407,6 +407,14 @@ export default function CardDisplay({
         <img src={attrs.frameUrl} alt="Card Frame" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
       )}
 
+      {/* Special Effects Overlay */}
+      {attrs.effect && attrs.effect !== "none" && (
+        <div 
+          className={`absolute inset-0 pointer-events-none rounded-xl z-50 ${attrs.effect === 'holo' ? 'effect-holo' : attrs.effect === 'shiny' ? 'effect-shiny' : attrs.effect === 'glitch' ? 'effect-glitch' : ''}`}
+          style={{ transform: 'translateZ(40px)' }}
+        ></div>
+      )}
+
     </InteractiveCard>
     </div>
   );

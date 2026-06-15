@@ -46,7 +46,9 @@ export default function AdminPage() {
   const [showLevelIcon, setShowLevelIcon] = useState(true);
   
   // New Full Art & Color States
-  const [isFullArt, setIsFullArt] = useState(false);
+  const [isFullArt,
+          effect: cardEffect, setIsFullArt] = useState(false);
+  const [cardEffect, setCardEffect] = useState("");
   const [titleColor, setTitleColor] = useState("");
   const [descColor, setDescColor] = useState("");
   const [levelColor, setLevelColor] = useState("");
@@ -255,6 +257,7 @@ export default function AdminPage() {
           levelBadgePos,
           levelBadgeUrl,
           isFullArt,
+          effect: cardEffect,
           titleColor,
           descColor,
           levelColor,
@@ -287,7 +290,7 @@ export default function AdminPage() {
         setCardImageUrl("");
         setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
         setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
-        setIsFullArt(false); setTitleColor(""); setDescColor(""); setLevelColor("");
+        setIsFullArt(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
         setCardFrameUrl("");
         setCardCustomBadges([]);
         setCharPosX(50);
@@ -330,6 +333,8 @@ export default function AdminPage() {
       setCardFrameUrl(attrs.frameUrl || "");
       
       setIsFullArt(attrs.isFullArt || false);
+      setCardEffect(attrs.effect || "");
+      setCardEffect(attrs.effect || "");
       setTitleColor(attrs.titleColor || "");
       setDescColor(attrs.descColor || "");
       setLevelColor(attrs.levelColor || "");
@@ -345,7 +350,7 @@ export default function AdminPage() {
     } catch {
       setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
       setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
-      setIsFullArt(false); setTitleColor(""); setDescColor(""); setLevelColor("");
+      setIsFullArt(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
       setCardFrameUrl("");
       setTitlePos({ x: 50, y: 75, scale: 100 }); setDescPos({ x: 50, y: 92, scale: 100 }); setRarityBadgePos({ x: 15, y: 65, scale: 100 }); setLevelTextPos({ x: 50, y: 82, scale: 100 });
       setLevelBadgePos({ x: 10, y: 8, scale: 100 });
@@ -529,6 +534,7 @@ export default function AdminPage() {
             levelBadgePos,
             levelBadgeUrl,
             isFullArt,
+          effect: cardEffect,
             titleColor,
             descColor,
             levelColor,
@@ -569,6 +575,8 @@ export default function AdminPage() {
       setRarityBadgeColor(attrs.rarityBadgeColor || "");
       setCardFrameUrl(attrs.frameUrl || "");
       setIsFullArt(attrs.isFullArt || false);
+      setCardEffect(attrs.effect || "");
+      setCardEffect(attrs.effect || "");
       setTitleColor(attrs.titleColor || "");
       setDescColor(attrs.descColor || "");
       setLevelColor(attrs.levelColor || "");
@@ -933,6 +941,21 @@ export default function AdminPage() {
                     Activer le Mode "Full Art" (Layout Personnalisé)
                   </label>
 
+                  
+                  <div className="mb-4">
+                    <label className="block text-sm font-bold text-[var(--color-text-secondary)] mb-2">Effet Spécial (Holo/Shiny)</label>
+                    <select
+                      value={cardEffect}
+                      onChange={(e) => setCardEffect(e.target.value)}
+                      className="w-full bg-[#111118] border border-[var(--color-border-color)] rounded-md px-4 py-2 text-white focus:outline-none focus:border-[var(--color-accent-purple)]"
+                    >
+                      <option value="">Aucun effet</option>
+                      <option value="holo">Holographique</option>
+                      <option value="shiny">Shiny (Foil)</option>
+                      <option value="glitch">Glitch</option>
+                    </select>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
                       <input type="checkbox" checked={showTitle} onChange={(e) => setShowTitle(e.target.checked)} className="rounded" /> Afficher Pseudo
@@ -1047,6 +1070,7 @@ export default function AdminPage() {
                       levelBadgePos,
                       levelBadgeUrl,
                       isFullArt,
+          effect: cardEffect,
                       titleColor,
                       descColor,
                       levelColor,

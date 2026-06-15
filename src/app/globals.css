@@ -207,4 +207,41 @@
   .animate-shimmer-foil {
     animation: shimmer-foil 4s infinite linear;
   }
+
+  /* Special Effects */
+  @keyframes holo-shimmer {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+  }
+  .effect-holo {
+    background: linear-gradient(115deg, rgba(255,0,0,0.3) 0%, rgba(255,154,0,0.3) 10%, rgba(208,222,33,0.3) 20%, rgba(79,220,74,0.3) 30%, rgba(63,218,216,0.3) 40%, rgba(47,201,226,0.3) 50%, rgba(28,127,238,0.3) 60%, rgba(95,21,242,0.3) 70%, rgba(186,12,248,0.3) 80%, rgba(251,7,217,0.3) 90%, rgba(255,0,0,0.3) 100%);
+    background-size: 200% 200%;
+    animation: holo-shimmer 4s infinite linear;
+    mix-blend-mode: color-dodge;
+  }
+
+  @keyframes shiny-shimmer {
+    0% { transform: translateX(-150%) skewX(-45deg); }
+    100% { transform: translateX(150%) skewX(-45deg); }
+  }
+  .effect-shiny {
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4) 50%, transparent);
+    animation: shiny-shimmer 3s infinite linear;
+    mix-blend-mode: overlay;
+    width: 200%;
+  }
+
+  @keyframes glitch-anim {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+  }
+  .effect-glitch {
+    box-shadow: 4px 0 10px rgba(255,0,0,0.6), -4px 0 10px rgba(0,255,255,0.6);
+    animation: glitch-anim 0.3s infinite;
+    mix-blend-mode: color-dodge;
+  }
 }
