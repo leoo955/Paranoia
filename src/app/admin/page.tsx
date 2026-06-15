@@ -876,6 +876,12 @@ export default function AdminPage() {
 
               <div className="flex flex-col lg:flex-row gap-12">
                 <form onSubmit={handleCreateCard} className="space-y-4 flex-1 max-w-md">
+                <details open className="group bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl overflow-hidden">
+                  <summary className="cursor-pointer font-bold font-outfit text-white p-4 bg-black/20 hover:bg-black/40 transition-colors flex justify-between items-center select-none">
+                    Informations Générales
+                    <span className="text-xl group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div className="p-4 space-y-4">
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Pseudo affiché (Optionnel)</label>
                   <input 
@@ -943,6 +949,15 @@ export default function AdminPage() {
                     <option value="Netherite" className="bg-[var(--color-bg-elevated)] text-white">Netherite</option>
                   </select>
                 </div>
+                  </div>
+                </details>
+
+                <details className="group bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl overflow-hidden">
+                  <summary className="cursor-pointer font-bold font-outfit text-white p-4 bg-black/20 hover:bg-black/40 transition-colors flex justify-between items-center select-none">
+                    Apparence & Design
+                    <span className="text-xl group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div className="p-4 space-y-4">
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Fond Custom (Image)</label>
                   <div className="flex gap-2">
@@ -1068,7 +1083,16 @@ export default function AdminPage() {
                   />
                 </div>
                 
-                <div className="pt-4 border-t border-[var(--color-border-color)]">
+                  </div>
+                </details>
+
+                <details className="group bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl overflow-hidden">
+                  <summary className="cursor-pointer font-bold font-outfit text-white p-4 bg-black/20 hover:bg-black/40 transition-colors flex justify-between items-center select-none">
+                    Options Avancées (Full Art, Badges)
+                    <span className="text-xl group-open:rotate-180 transition-transform">▼</span>
+                  </summary>
+                  <div className="p-4 space-y-4">
+                <div>
                   <h4 className="text-sm font-bold text-white mb-4">Mode Full Art & Visibilité</h4>
                   
                   <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-[var(--color-accent-purple)] font-bold">
@@ -1143,7 +1167,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[var(--color-border-color)]">
+                <div>
                   <div className="flex justify-between items-center mb-4">
                     <label className="block text-sm font-bold text-white">Badges Flottants</label>
                     <button type="button" onClick={() => setCardCustomBadges([...cardCustomBadges, { id: Math.random().toString(36).substr(2, 9), url: '', x: 50, y: 50, size: 64 }])} className="text-xs bg-[var(--color-accent-purple)] text-white px-3 py-1 rounded hover:bg-purple-500">
@@ -1178,6 +1202,9 @@ export default function AdminPage() {
                     {cardCustomBadges.length === 0 && <p className="text-xs text-[var(--color-text-muted)] italic">Aucun badge ajouté. Cliquez sur Ajouter pour insérer un badge flottant.</p>}
                   </div>
                 </div>
+
+                  </div>
+                </details>
 
                 {cardError && <p className="text-red-400 text-sm">{cardError}</p>}
                 <div className="flex gap-2 mt-4">
