@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { upload } from "@vercel/blob/client";
 import { Plus, Users, LayoutList, Trash2, ShieldAlert, Sparkles } from "lucide-react";
 import CardDisplay from "@/components/cards/CardDisplay";
 
@@ -362,15 +361,23 @@ export default function AdminPage() {
     if (!file) return;
 
     setUploadingBg(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      const newBlob = await upload(file.name, file, {
-        access: 'public',
-        handleUploadUrl: '/api/upload',
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
       });
-      setCardCustomBg(newBlob.url);
+
+      if (res.ok) {
+        const data = await res.json();
+        setCardCustomBg(data.url);
+      } else {
+        alert("Erreur lors de l'upload");
+      }
     } catch (err) {
-      console.error(err);
-      alert("Erreur lors de l'upload du fond");
+      alert("Erreur de connexion");
     } finally {
       setUploadingBg(false);
     }
@@ -381,15 +388,23 @@ export default function AdminPage() {
     if (!file) return;
 
     setUploadingSkin(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      const newBlob = await upload(file.name, file, {
-        access: 'public',
-        handleUploadUrl: '/api/upload',
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
       });
-      setCardImageUrl(newBlob.url);
+      if (res.ok) {
+        const data = await res.json();
+        setCardImageUrl(data.url);
+      } else {
+        alert("Erreur lors de l'upload du skin");
+      }
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de l'upload du skin");
+      alert("Erreur de connexion");
     } finally {
       setUploadingSkin(false);
     }
@@ -400,15 +415,23 @@ export default function AdminPage() {
     if (!file) return;
 
     setUploadingFrame(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      const newBlob = await upload(file.name, file, {
-        access: 'public',
-        handleUploadUrl: '/api/upload',
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
       });
-      setCardFrameUrl(newBlob.url);
+      if (res.ok) {
+        const data = await res.json();
+        setCardFrameUrl(data.url);
+      } else {
+        alert("Erreur lors de l'upload du cadre");
+      }
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de l'upload du cadre");
+      alert("Erreur de connexion");
     } finally {
       setUploadingFrame(false);
     }
@@ -418,15 +441,23 @@ export default function AdminPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      const newBlob = await upload(file.name, file, {
-        access: 'public',
-        handleUploadUrl: '/api/upload',
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
       });
-      setLevelBadgeUrl(newBlob.url);
+      if (res.ok) {
+        const data = await res.json();
+        setLevelBadgeUrl(data.url);
+      } else {
+        alert("Erreur lors de l'upload du badge custom");
+      }
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de l'upload du badge custom");
+      alert("Erreur de connexion");
     }
   };
 

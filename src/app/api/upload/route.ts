@@ -1,49 +1,44 @@
-import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
 
-export async function POST(request: Request): Promise<NextResponse> {
+export async function POST(req: Request) {
   try {
-    const body = (await request.json()) as HandleUploadBody;
+    const session = await getServerSession(authOptions);
+    const user = session?.user as any;
 
-    const jsonResponse = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async (pathname, clientPayload) => {
-        const session = await getServerSession(authOptions);
-        const user = session?.user as any;
+    if (!session || !user || user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
 
-        // Vérifications ultra-détaillées pour comprendre pourquoi ça crashe
-        if (!process.env.BLOB_READ_WRITE_TOKEN) {
-          throw new Error('CRITICAL_ERROR: process.env.BLOB_READ_WRITE_TOKEN est manquant sur le serveur !');
-        }
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
 
-        if (!session) {
-          throw new Error('AUTH_ERROR: Vous n\'êtes pas connecté (session NextAuth introuvable dans la requête).');
-        }
+    if (!file) {
+      return new NextResponse("No file received.", { status: 400 });
+    }
 
-        if (!user || user.role !== "ADMIN") {
-          throw new Error('AUTH_ERROR: Vous devez être ADMIN pour faire ça.');
-        }
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
-        return {
-          allowedContentTypes: ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'],
-          tokenPayload: JSON.stringify({ userId: user.id }),
-        };
-      },
-      onUploadCompleted: async ({ blob, tokenPayload }) => {
-        // Here you could log or save to DB if needed
-        console.log('Upload completed:', blob.url);
-      },
-    });
+    const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
+    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    
+    // Ensure directory exists
+    try {
+      await mkdir(uploadDir, { recursive: true });
+    } catch (e) {
+      // Ignore if exists
+    }
 
-    return NextResponse.json(jsonResponse);
+    const path = join(uploadDir, filename);
+    await writeFile(path, buffer);
+
+    return NextResponse.json({ url: `/uploads/${filename}` });
   } catch (error) {
-    console.error("Upload Error:", error);
-    return NextResponse.json(
-      { error: (error as Error).message },
-      { status: 400 } // Vercel Blob webhook will retry on non-200 responses
-    );
+    console.error("Error uploading file:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }
