@@ -4,10 +4,10 @@ import { prisma } from "@/lib/db";
 import { authOptions } from "@/lib/auth";
 
 const PRICES: Record<string, number> = {
-  standard: 100,
+  standard: 150,
   premium: 250,
-  legendary: 500,
-  mythic: 1000
+  legendary: 400,
+  mythic: 750
 };
 
 export async function POST(req: Request) {

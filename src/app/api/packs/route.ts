@@ -50,42 +50,58 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No cards available in the database yet!" }, { status: 404 });
     }
 
-    let totalWeight = 0;
-    const weightedCards = cards.map(c => {
-      let weight = c.proba ?? 100;
+    const DROP_RATES: Record<string, Record<string, number>> = {
+      standard: { COMMON: 40, UNCOMMON: 30, RARE: 20, EPIC: 8, LEGENDARY: 2, MYTHIC: 0 },
+      premium: { COMMON: 20, UNCOMMON: 25, RARE: 35, EPIC: 15, LEGENDARY: 5, MYTHIC: 0 },
+      legendary: { COMMON: 10, UNCOMMON: 15, RARE: 40, EPIC: 25, LEGENDARY: 10, MYTHIC: 0 },
+      mythic: { COMMON: 0, UNCOMMON: 0, RARE: 0, EPIC: 75, LEGENDARY: 20, MYTHIC: 5 }
+    };
+
+    const CARDS_PER_PACK: Record<string, number> = {
+      standard: 3,
+      premium: 4,
+      legendary: 4,
+      mythic: 5
+    };
+
+    const currentType = boxType || "standard";
+    const rates = DROP_RATES[currentType] || DROP_RATES["standard"];
+    const numCards = CARDS_PER_PACK[currentType] || 3;
+
+    // Group cards by rarity
+    const cardsByRarity: Record<string, typeof cards> = {
+      COMMON: cards.filter(c => c.rarity === "COMMON"),
+      UNCOMMON: cards.filter(c => c.rarity === "UNCOMMON"),
+      RARE: cards.filter(c => c.rarity === "RARE"),
+      EPIC: cards.filter(c => c.rarity === "EPIC"),
+      LEGENDARY: cards.filter(c => c.rarity === "LEGENDARY"),
+      MYTHIC: cards.filter(c => c.rarity === "MYTHIC")
+    };
+
+    // Helper to get random card based on rarity weight
+    const drawCard = () => {
+      let rand = Math.random() * 100;
+      let selectedRarity = "COMMON";
       
-      // Modifier selon la box
-      if (boxType === "premium") {
-        if (c.rarity === "COMMON" || c.rarity === "UNCOMMON") weight = 0;
-      } else if (boxType === "legendary") {
-        if (c.rarity === "COMMON" || c.rarity === "UNCOMMON" || c.rarity === "RARE") weight = 0;
-      } else if (boxType === "mythic") {
-        if (c.rarity === "COMMON" || c.rarity === "UNCOMMON" || c.rarity === "RARE" || c.rarity === "EPIC") weight = 0;
-      }
-
-      totalWeight += weight;
-      return { card: c, weight };
-    });
-
-    if (totalWeight <= 0) {
-      return NextResponse.json({ error: `La box ${boxType} ne contient aucune carte disponible dans la base de données.` }, { status: 400 });
-    }
-
-    let drawnCards = [];
-    
-    // Draw 3 cards
-    for (let i = 0; i < 3; i++) {
-      let random = Math.random() * totalWeight;
-      let drawnCard = weightedCards[0].card;
-      for (const item of weightedCards) {
-        if (item.weight === 0) continue;
-        if (random < item.weight) {
-          drawnCard = item.card;
+      for (const [rarity, prob] of Object.entries(rates)) {
+        if (rand < prob) {
+          selectedRarity = rarity;
           break;
         }
-        random -= item.weight;
+        rand -= prob;
       }
-      drawnCards.push(drawnCard);
+
+      // If no cards exist for that rarity, fallback to a lower one
+      const pool = cardsByRarity[selectedRarity] && cardsByRarity[selectedRarity].length > 0 
+        ? cardsByRarity[selectedRarity] 
+        : cards; 
+
+      return pool[Math.floor(Math.random() * pool.length)];
+    };
+
+    let drawnCards = [];
+    for (let i = 0; i < numCards; i++) {
+      drawnCards.push(drawCard());
     }
 
     const rarityWeight: Record<string, number> = {
