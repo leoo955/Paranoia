@@ -740,6 +740,12 @@ export default function AdminPage() {
           <Sparkles className="w-5 h-5" /> Cartes
         </button>
         <button 
+          onClick={() => setActiveTab("categories")}
+          className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'categories' ? 'bg-[var(--color-accent-purple)] text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
+        >
+          <Layers className="w-5 h-5" /> Catégories
+        </button>
+        <button 
           onClick={() => setActiveTab("moderation")}
           className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'moderation' ? 'bg-red-500 text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
         >
