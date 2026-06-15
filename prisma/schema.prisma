@@ -48,9 +48,12 @@ model User {
   emailVerified DateTime?
   image         String?
   discordId     String?   @unique
-  minecraftName String?
-  role          String    @default("MEMBER")
-  createdAt     DateTime  @default(now())
+  minecraftName      String?
+  minecraftUuid      String?   @unique
+  mcVerificationCode String?   @unique
+  isMcVerified       Boolean   @default(false)
+  role               String    @default("MEMBER")
+  createdAt          DateTime  @default(now())
 
   accounts      Account[]
   sessions      Session[]
