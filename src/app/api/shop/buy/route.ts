@@ -19,28 +19,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Montant invalide" }, { status: 400 });
     }
 
-    // Since this is a mockup shop without real payment processing, we just give the coins
-    let economy = await prisma.userEconomy.findUnique({
-      where: { userId }
+    const userDB = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        paraCoins: {
+          increment: amount
+        }
+      }
     });
 
-    if (!economy) {
-      economy = await prisma.userEconomy.create({
-        data: {
-          userId,
-          paraCoins: amount
-        }
-      });
-    } else {
-      economy = await prisma.userEconomy.update({
-        where: { userId },
-        data: {
-          paraCoins: economy.paraCoins + amount
-        }
-      });
-    }
-
-    return NextResponse.json({ success: true, newBalance: economy.paraCoins });
+    return NextResponse.json({ success: true, newBalance: userDB.paraCoins });
   } catch (error) {
     console.error("[SHOP_BUY_ERROR]", error);
     return NextResponse.json({ error: "Erreur interne" }, { status: 500 });

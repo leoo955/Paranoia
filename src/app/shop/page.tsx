@@ -14,10 +14,11 @@ export default async function ShopPage() {
   
   let balance = 0;
   if (userId) {
-    const economy = await prisma.userEconomy.findUnique({
-      where: { userId }
+    const userDB = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { paraCoins: true }
     });
-    balance = economy?.paraCoins || 0;
+    balance = userDB?.paraCoins || 0;
   }
 
   return (
