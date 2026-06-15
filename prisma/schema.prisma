@@ -130,6 +130,7 @@ model TradingCard {
   characterPosition String @default("{\"x\":50,\"y\":50,\"scale\":100}") // JSON stored as text
   rarity      String   @default("COMMON")
   level       String   @default("Normal")
+  category    String   @default("Standard")
   proba       Float    @default(100)
   attributes  String   @default("{}") // JSON stored as text
   template    String   @default("classic")

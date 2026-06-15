@@ -47,6 +47,7 @@ export default function AdminPage() {
   
   // New Full Art & Color States
   const [isFullArt, setIsFullArt] = useState(false);
+  const [cardCategory, setCardCategory] = useState("Standard");
   const [cardEffect, setCardEffect] = useState("");
   const [titleColor, setTitleColor] = useState("");
   const [descColor, setDescColor] = useState("");
@@ -248,6 +249,7 @@ export default function AdminPage() {
         playerId: cardPlayerId,
         rarity: cardRarity,
         level: cardLevel,
+        category: cardCategory,
         proba: cardProba,
         description: cardDesc,
         customBackground: cardCustomBg,
@@ -292,6 +294,7 @@ export default function AdminPage() {
         setCardRarity("COMMON");
         setCardLevel("Normal");
         setCardProba(100);
+    setCardCategory("Standard");
         setCardDesc("");
         setCardTitle("");
         setCardCustomBg("");
@@ -328,6 +331,7 @@ export default function AdminPage() {
     setCardProba(card.proba ?? 100);
     setCardDesc(card.description || "");
     setCardTitle(card.title || "");
+    setCardCategory(card.category || "Standard");
     setCardCustomBg(card.customBackground || "");
     setCardImageUrl(card.imageUrl || "");
     
@@ -393,6 +397,7 @@ export default function AdminPage() {
     setCardRarity("COMMON");
     setCardLevel("Normal");
     setCardProba(100);
+    setCardCategory("Standard");
     setCardDesc("");
     setCardTitle("");
     setCardCustomBg("");
@@ -537,6 +542,7 @@ export default function AdminPage() {
           customBadges: cardCustomBadges,
           characterPosition: { x: charPosX, y: charPosY, scale: charScale },
           level: cardLevel,
+        category: cardCategory,
           attributes: {
             borderColor: cardBorderColor,
             cardBgColor,
@@ -778,6 +784,16 @@ export default function AdminPage() {
                       <option key={p.id} value={p.id} className="bg-[var(--color-bg-elevated)] text-white">{p.minecraftName}</option>
                     ))}
                   </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Catégorie / Collection</label>
+                  <input 
+                    type="text" 
+                    value={cardCategory} 
+                    onChange={e => setCardCategory(e.target.value)} 
+                    placeholder="Saison 1, Holographique, Staff..."
+                    className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Rareté</label>
@@ -1072,6 +1088,7 @@ export default function AdminPage() {
                     title: cardTitle || players.find(p => p.id === cardPlayerId)?.minecraftName || "Joueur Inconnu",
                     rarity: cardRarity,
                     level: cardLevel,
+        category: cardCategory,
                     description: cardDesc || "Description de la carte...",
                     customBackground: cardCustomBg,
                     imageUrl: cardImageUrl,
@@ -1117,7 +1134,7 @@ export default function AdminPage() {
                       <img src={`https://render.crafty.gg/3d/bust/${card.title}`} alt={card.title} className="w-10 h-10 object-contain" />
                       <div>
                         <span className="font-bold text-white block">{card.title}</span>
-                        <span className="text-xs text-[var(--color-text-secondary)] block">{card.rarity} • {card.level}</span>
+                        <span className="text-xs text-[var(--color-text-secondary)] block">{card.category} • {card.rarity} • {card.level}</span>
                       </div>
                     </div>
                     {card.description && (
