@@ -314,7 +314,7 @@ export default function CardDisplay({
               <img 
                 src={card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || card.title}`} 
                 alt={card.title} 
-                className={`h-full object-contain drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : ''}`}
+                className={`h-[85%] object-contain drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : ''}`}
                 onMouseDown={(e) => handleMouseDown(e, 'character')}
                 onWheel={(e) => handleWheel(e, 'character')}
               />
