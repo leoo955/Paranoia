@@ -222,6 +222,7 @@ export default function CardDisplay({
   const levelTextPos = attrs.levelTextPos || { x: 50, y: 82, scale: 100 };
   const textPos = attrs.textPos; // Fallback for old cards
   const levelBadgePos = attrs.levelBadgePos || { x: 10, y: 8, scale: 100 };
+  const editionBadgePos = attrs.editionBadgePos || { x: 88, y: 8, scale: 100 };
 
   const handleMouseDown = (e: React.MouseEvent, type: string, id: string = "") => {
     if (!isEditing || !onUpdateElement) return;
@@ -281,6 +282,22 @@ export default function CardDisplay({
               left: `${levelBadgePos.x}%`,
               top: `${levelBadgePos.y}%`,
               transform: `translate(-50%, -50%) scale(${levelBadgePos.scale / 100}) translateZ(${translateZ})` 
+            }}
+          />
+        )}
+
+        {/* Edition Badge Top Right (Inside the 3D effect) */}
+        {attrs.editionBadgeUrl && (
+          <img 
+            src={attrs.editionBadgeUrl} 
+            alt="Edition" 
+            className={`absolute ${size === "lg" ? "w-20 h-20" : size === "md" ? "w-12 h-12" : "w-10 h-10"} object-contain z-40 ${isEditing ? 'cursor-grab active:cursor-grabbing animate-none hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.6)]'}`} 
+            onMouseDown={(e) => handleMouseDown(e, 'editionBadge')}
+            onWheel={(e) => handleWheel(e, 'editionBadge')}
+            style={{ 
+              left: `${editionBadgePos.x}%`,
+              top: `${editionBadgePos.y}%`,
+              transform: `translate(-50%, -50%) scale(${editionBadgePos.scale / 100}) translateZ(${translateZ})` 
             }}
           />
         )}

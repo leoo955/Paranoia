@@ -64,6 +64,7 @@ export default function AdminPage() {
   const [levelTextPos, setLevelTextPos] = useState({ x: 50, y: 82, scale: 100 });
   const [levelBadgePos, setLevelBadgePos] = useState({ x: 10, y: 8, scale: 100 });
   const [levelBadgeUrl, setLevelBadgeUrl] = useState("");
+  const [editionBadgeUrl, setEditionBadgeUrl] = useState("");
   const [draggingItem, setDraggingItem] = useState<{type: string, id: string} | null>(null);
   
   const [templates, setTemplates] = useState<any[]>([]);
@@ -324,6 +325,7 @@ export default function AdminPage() {
           titlePos, descPos, rarityBadgePos, levelTextPos,
           levelBadgePos,
           levelBadgeUrl,
+          editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
           isFullArt,
           effect: cardEffect,
           titleColor,
@@ -368,6 +370,7 @@ export default function AdminPage() {
         setTitlePos({ x: 50, y: 75, scale: 100 }); setDescPos({ x: 50, y: 92, scale: 100 }); setRarityBadgePos({ x: 15, y: 65, scale: 100 }); setLevelTextPos({ x: 50, y: 82, scale: 100 });
         setLevelBadgePos({ x: 10, y: 8, scale: 100 });
         setLevelBadgeUrl("");
+      setEditionBadgeUrl("");
         setEditingCardId(null);
         fetchCards();
       } else {
@@ -417,6 +420,7 @@ export default function AdminPage() {
       setTitlePos(attrs.titlePos || { x: 50, y: 75, scale: 100 }); setDescPos(attrs.descPos || { x: 50, y: 92, scale: 100 }); setRarityBadgePos(attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 }); setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
       setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
+      setEditionBadgeUrl(attrs.editionBadgeUrl || "");
     } catch {
       setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
       setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
@@ -425,6 +429,7 @@ export default function AdminPage() {
       setTitlePos({ x: 50, y: 75, scale: 100 }); setDescPos({ x: 50, y: 92, scale: 100 }); setRarityBadgePos({ x: 15, y: 65, scale: 100 }); setLevelTextPos({ x: 50, y: 82, scale: 100 });
       setLevelBadgePos({ x: 10, y: 8, scale: 100 });
       setLevelBadgeUrl("");
+      setEditionBadgeUrl("");
     }
 
     try {
@@ -470,6 +475,7 @@ export default function AdminPage() {
     setTitlePos({ x: 50, y: 75, scale: 100 }); setDescPos({ x: 50, y: 92, scale: 100 }); setRarityBadgePos({ x: 15, y: 65, scale: 100 }); setLevelTextPos({ x: 50, y: 82, scale: 100 });
     setLevelBadgePos({ x: 10, y: 8, scale: 100 });
     setLevelBadgeUrl("");
+      setEditionBadgeUrl("");
   };
 
   const handleBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -623,6 +629,7 @@ export default function AdminPage() {
             titlePos, descPos, rarityBadgePos, levelTextPos,
             levelBadgePos,
             levelBadgeUrl,
+          editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
             isFullArt,
           effect: cardEffect,
             titleColor,
@@ -683,6 +690,7 @@ export default function AdminPage() {
       setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
       setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
+      setEditionBadgeUrl(attrs.editionBadgeUrl || "");
     } catch {}
   };
   const handleCreateEdition = async (e: React.FormEvent) => {
@@ -922,7 +930,13 @@ export default function AdminPage() {
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Rareté</label>
                   <select 
                     value={cardRarity}
-                    onChange={(e) => setCardRarity(e.target.value)}
+                    onChange={(e) => {
+                      const newRarity = e.target.value;
+                      setCardRarity(newRarity);
+                      if (newRarity !== 'LEGENDARY' && newRarity !== 'MYTHIC') {
+                        setIsFullArt(false);
+                      }
+                    }}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
                     disabled={creatingCard}
                   >
@@ -1060,6 +1074,35 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge d'Édition (Image)</label>
+                  <div className="flex gap-2 mb-4">
+                    <input 
+                      type="text"
+                      value={editionBadgeUrl}
+                      onChange={(e) => setEditionBadgeUrl(e.target.value)}
+                      className="flex-1 bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
+                      placeholder="URL (ou laisse vide pour défaut de l'édition)"
+                      disabled={creatingCard}
+                    />
+                    <label className="bg-[var(--color-bg-elevated)] hover:bg-[var(--color-border-color)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 cursor-pointer flex items-center justify-center transition-colors">
+                      Upload
+                      <input type="file" accept="image/png, image/jpeg, image/gif" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        try {
+                          const res = await fetch("/api/upload", { method: "POST", body: formData });
+                          if (res.ok) {
+                            const data = await res.json();
+                            setEditionBadgeUrl(data.url);
+                          }
+                        } catch (err) {}
+                      }} />
+                    </label>
+                  </div>
+                </div>
+                <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Probabilité d'obtention (%)</label>
                   <input 
                     type="number"
@@ -1096,7 +1139,7 @@ export default function AdminPage() {
                   <h4 className="text-sm font-bold text-white mb-4">Mode Full Art & Visibilité</h4>
                   
                   <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-[var(--color-accent-purple)] font-bold">
-                    <input type="checkbox" checked={isFullArt} onChange={(e) => {
+                    <input type="checkbox" disabled={cardRarity !== 'LEGENDARY' && cardRarity !== 'MYTHIC'} checked={isFullArt} onChange={(e) => {
                       const checked = e.target.checked;
                       setIsFullArt(checked);
                       if (checked) {
@@ -1109,7 +1152,7 @@ export default function AdminPage() {
                         setLevelTextPos({ x: 50, y: 82, scale: 100 });
                       }
                     }} className="rounded border-gray-600 bg-gray-700" />
-                    Activer le Mode "Full Art" (Layout Personnalisé)
+                    Activer le Mode "Full Art" (Mythique/Légendaire uniquement)
                   </label>
 
                   
@@ -1248,6 +1291,7 @@ export default function AdminPage() {
                       titlePos, descPos, rarityBadgePos, levelTextPos,
                       levelBadgePos,
                       levelBadgeUrl,
+          editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
                       isFullArt,
           effect: cardEffect,
                       titleColor,
