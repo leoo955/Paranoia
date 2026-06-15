@@ -23,6 +23,8 @@ export async function GET() {
         role: true,
         createdAt: true,
         image: true,
+        paraCoins: true,
+        boxes: true,
       },
       orderBy: { createdAt: 'desc' }
     });

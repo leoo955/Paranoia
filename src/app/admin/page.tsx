@@ -123,6 +123,11 @@ export default function AdminPage() {
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [appUsers, setAppUsers] = useState<any[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
+  const [selectedUserEconomy, setSelectedUserEconomy] = useState<any>(null);
+  const [economyActionAmount, setEconomyActionAmount] = useState<number>(1);
+  const [economyActionType, setEconomyActionType] = useState<"add_coins" | "remove_coins" | "add_booster" | "remove_booster">("add_coins");
+  const [economyBoxType, setEconomyBoxType] = useState<string>("standard");
+  const [isUpdatingEconomy, setIsUpdatingEconomy] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -136,6 +141,36 @@ export default function AdminPage() {
       console.error("Failed to fetch users:", error);
     } finally {
       setLoadingUsers(false);
+    }
+  };
+
+  const handleEconomyAction = async () => {
+    if (!selectedUserEconomy) return;
+    setIsUpdatingEconomy(true);
+    try {
+      const res = await fetch("/api/admin/users/economy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: selectedUserEconomy.id,
+          action: economyActionType,
+          amount: economyActionAmount,
+          boxType: economyBoxType,
+        }),
+      });
+      
+      if (res.ok) {
+        alert("Action effectuée avec succès !");
+        setSelectedUserEconomy(null);
+        fetchUsers();
+      } else {
+        const msg = await res.text();
+        alert("Erreur: " + msg);
+      }
+    } catch (err) {
+      alert("Erreur de connexion");
+    } finally {
+      setIsUpdatingEconomy(false);
     }
   };
 
@@ -1508,7 +1543,7 @@ export default function AdminPage() {
                             {user.role}
                           </span>
                         </td>
-                        <td className="p-4">
+                        <td className="p-4 flex gap-2 items-center">
                           <select 
                             value={user.role}
                             onChange={(e) => handleRoleChange(user.id, e.target.value)}
@@ -1518,6 +1553,12 @@ export default function AdminPage() {
                             <option value="MODERATOR">MODERATOR</option>
                             <option value="ADMIN">ADMIN</option>
                           </select>
+                          <button 
+                            onClick={() => setSelectedUserEconomy(user)}
+                            className="bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white px-3 py-1 rounded text-sm transition-colors"
+                          >
+                            Économie
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -1530,6 +1571,91 @@ export default function AdminPage() {
                 </table>
               </div>
             )}
+
+            {/* Modal for Economy Management */}
+            {selectedUserEconomy && (
+              <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+                <div className="bg-[#12121a] border border-indigo-500/30 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+                  <h3 className="text-xl font-bold text-white mb-4">
+                    Gérer l'économie : {selectedUserEconomy.name}
+                  </h3>
+                  
+                  <div className="flex gap-4 mb-4">
+                    <div className="bg-black/30 p-3 rounded-lg flex-1 border border-white/5">
+                      <p className="text-xs text-[var(--color-text-secondary)]">PARA Coins</p>
+                      <p className="text-xl font-bold text-white">{selectedUserEconomy.paraCoins || 0}</p>
+                    </div>
+                    <div className="bg-black/30 p-3 rounded-lg flex-1 border border-white/5">
+                      <p className="text-xs text-[var(--color-text-secondary)]">Boosters (S / P / M)</p>
+                      <div className="flex gap-3 text-sm text-white mt-1 font-bold">
+                        <span className="text-blue-400">{selectedUserEconomy.boxes?.find((b: any) => b.boxType === 'standard')?.amount || 0}</span>
+                        <span className="text-purple-400">{selectedUserEconomy.boxes?.find((b: any) => b.boxType === 'premium')?.amount || 0}</span>
+                        <span className="text-red-400">{selectedUserEconomy.boxes?.find((b: any) => b.boxType === 'mythic')?.amount || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Action</label>
+                      <select 
+                        value={economyActionType}
+                        onChange={(e) => setEconomyActionType(e.target.value as any)}
+                        className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none"
+                      >
+                        <option value="add_coins">Ajouter PARA Coins</option>
+                        <option value="remove_coins">Retirer PARA Coins</option>
+                        <option value="add_booster">Ajouter Booster</option>
+                        <option value="remove_booster">Retirer Booster</option>
+                      </select>
+                    </div>
+
+                    {(economyActionType === "add_booster" || economyActionType === "remove_booster") && (
+                      <div>
+                        <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Type de Booster</label>
+                        <select 
+                          value={economyBoxType}
+                          onChange={(e) => setEconomyBoxType(e.target.value)}
+                          className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none"
+                        >
+                          <option value="standard">Standard</option>
+                          <option value="premium">Premium</option>
+                          <option value="mythic">Mythique</option>
+                        </select>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Quantité</label>
+                      <input 
+                        type="number" 
+                        min="1" 
+                        value={economyActionAmount} 
+                        onChange={(e) => setEconomyActionAmount(parseInt(e.target.value))} 
+                        className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 mt-6">
+                    <button 
+                      onClick={() => setSelectedUserEconomy(null)}
+                      className="flex-1 bg-transparent border border-[var(--color-border-color)] hover:bg-white/5 text-white font-bold py-2 rounded-lg"
+                    >
+                      Annuler
+                    </button>
+                    <button 
+                      onClick={handleEconomyAction}
+                      disabled={isUpdatingEconomy}
+                      className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg disabled:opacity-50"
+                    >
+                      {isUpdatingEconomy ? "En cours..." : "Confirmer"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
       </div>
