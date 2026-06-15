@@ -17,6 +17,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
   const [drawnCards, setDrawnCards] = useState<TradingCard[]>([]);
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
+  const [openingGlow, setOpeningGlow] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<"opener" | "collection">("opener");
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,6 +42,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
     setIsOpening(true);
     setDrawnCards([]);
     setShowReveal(false);
+    setOpeningGlow(null);
 
     try {
       const res = await fetch("/api/packs", {
@@ -52,6 +54,26 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
       
       if (!res.ok) {
         throw new Error(data.error || "Une erreur est survenue.");
+      }
+
+      const rarityWeight: Record<string, number> = {
+        'COMMON': 1, 'UNCOMMON': 2, 'RARE': 3, 'EPIC': 4, 'LEGENDARY': 5, 'MYTHIC': 6
+      };
+      
+      let bestCardRarity = 'COMMON';
+      let maxWeight = 0;
+      if (data.drawnCards) {
+        data.drawnCards.forEach((c: any) => {
+          const weight = rarityWeight[c.rarity] || 0;
+          if (weight > maxWeight) {
+            maxWeight = weight;
+            bestCardRarity = c.rarity;
+          }
+        });
+      }
+      
+      if (['MYTHIC', 'LEGENDARY', 'EPIC'].includes(bestCardRarity)) {
+        setOpeningGlow(bestCardRarity);
       }
 
       setBoxes(prev => prev.map(b => b.boxType === selectedBoxType ? { ...b, amount: b.amount - 1 } : b));
@@ -211,9 +233,26 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
           
           {/* Cinematic Opening Overlay */}
           {isOpening && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md">
-              <div className="animate-booster-open">
-                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className="w-80 h-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]" />
+            <div className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 ${
+              openingGlow === 'MYTHIC' ? 'bg-red-900/60' : 
+              openingGlow === 'LEGENDARY' ? 'bg-yellow-900/60' : 
+              openingGlow === 'EPIC' ? 'bg-purple-900/60' : 
+              'bg-black/90'
+            }`}>
+              <div className="animate-booster-open relative flex items-center justify-center">
+                {openingGlow && (
+                   <div className={`absolute inset-0 z-0 animate-pulse-glow blur-2xl ${
+                     openingGlow === 'MYTHIC' ? 'bg-red-500/80 shadow-[0_0_100px_rgba(239,68,68,1)]' :
+                     openingGlow === 'LEGENDARY' ? 'bg-yellow-400/80 shadow-[0_0_100px_rgba(250,204,21,1)]' :
+                     'bg-purple-500/80 shadow-[0_0_100px_rgba(168,85,247,1)]'
+                   }`} />
+                )}
+                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-80 h-auto relative z-10 transition-all duration-700 ${
+                  openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_60px_rgba(239,68,68,1)] scale-105' :
+                  openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_60px_rgba(250,204,21,1)] scale-105' :
+                  openingGlow === 'EPIC' ? 'drop-shadow-[0_0_60px_rgba(168,85,247,1)]' :
+                  'drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]'
+                }`} />
               </div>
             </div>
           )}
