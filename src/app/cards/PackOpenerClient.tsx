@@ -68,12 +68,13 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
   };
 
   const groupedInventory = inventory.reduce((acc, curr) => {
+    if (!curr || !curr.tradingCard) return acc;
     const id = curr.tradingCard.id;
     if (!acc[id]) {
-      acc[id] = { card: curr.tradingCard, count: 0, latestObtained: curr.obtainedAt };
+      acc[id] = { card: curr.tradingCard, count: 0, latestObtained: curr.obtainedAt || new Date() };
     }
     acc[id].count += 1;
-    if (new Date(curr.obtainedAt) > new Date(acc[id].latestObtained)) {
+    if (curr.obtainedAt && new Date(curr.obtainedAt) > new Date(acc[id].latestObtained)) {
       acc[id].latestObtained = curr.obtainedAt;
     }
     return acc;
