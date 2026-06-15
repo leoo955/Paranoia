@@ -9,6 +9,45 @@ type Player = { id: string; minecraftName: string };
 type TradingCard = { id: string; title: string; rarity: string; level: string; description: string; player: Player | null };
 type UserCard = { id: string; obtainedAt: Date; tradingCard: TradingCard };
 
+const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: number, boxType: string }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  return (
+    <div 
+      className="relative z-10 transform transition-transform hover:scale-105 duration-500 animate-epic-reveal cursor-pointer group" 
+      style={{ animationDelay: `${index * 0.4}s`, animationFillMode: 'both', perspective: '1000px', width: '16rem', height: '24rem' }}
+      onClick={() => setIsFlipped(true)}
+    >
+      <div 
+        className="w-full h-full relative transition-transform duration-700" 
+        style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)' }}
+      >
+        {/* Front */}
+        <div className="absolute inset-0 pointer-events-none" style={{ backfaceVisibility: 'hidden' }}>
+          <CardDisplay card={card} size="lg" />
+        </div>
+        
+        {/* Back */}
+        <div 
+          className="absolute inset-0 w-full h-full rounded-2xl border-2 border-[var(--color-border-color)] flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]" 
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: 'linear-gradient(135deg, #0a0a0f 0%, #16161f 100%)' }}
+        >
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-multiply pointer-events-none"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-0 pointer-events-none"></div>
+          
+          <div className="relative z-10 flex flex-col items-center pointer-events-none">
+            <img src={boxType === "standard" ? "/StandardB.png" : boxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} className="w-24 h-auto opacity-80 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" alt="Booster Back" />
+            <div className="mt-6 text-white/40 font-black tracking-[0.3em] text-sm">PARANOIA</div>
+          </div>
+          
+          {/* Subtle shine on hover */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function PackOpenerClient({ initialInventory, initialBoxes, isLoggedIn }: { initialInventory: UserCard[], initialBoxes?: any[], isLoggedIn: boolean }) {
   const [inventory, setInventory] = useState<UserCard[]>(initialInventory);
   const [boxes, setBoxes] = useState<any[]>(initialBoxes || []);
@@ -291,13 +330,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
 
               <div className="flex flex-row justify-center items-center gap-4 md:gap-8 flex-wrap">
                 {drawnCards.map((card, i) => (
-                  <div 
-                    key={i} 
-                    className="relative z-10 transform transition-transform hover:scale-110 duration-500 animate-epic-reveal" 
-                    style={{ animationDelay: `${i * 0.4}s`, animationFillMode: 'both' }}
-                  >
-                    <CardDisplay card={card} size="lg" />
-                  </div>
+                  <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} />
                 ))}
               </div>
               
