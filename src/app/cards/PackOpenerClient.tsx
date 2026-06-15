@@ -49,15 +49,14 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
         throw new Error(data.error || "Une erreur est survenue.");
       }
 
-      setDrawnCard(data.drawnCard);
-
       setBoxes(prev => prev.map(b => b.boxType === selectedBoxType ? { ...b, amount: b.amount - 1 } : b));
 
       setTimeout(() => {
-        setIsOpening(false);
+        setDrawnCard(data.drawnCard);
         setShowReveal(true);
+        setIsOpening(false);
         setInventory(prev => [data.userCard, ...prev]);
-      }, 2500); // Wait 2.5s for the epic animation
+      }, 1400);
 
     } catch (error: any) {
       alert(error.message);
@@ -179,7 +178,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
               <button 
                 onClick={openPack} 
                 disabled={isOpening}
-                className={`relative cursor-pointer transition-transform hover:scale-105 active:scale-95 outline-none group ${isOpening ? "animate-shake animate-booster-flash pointer-events-none" : ""}`}
+                className={`relative cursor-pointer transition-transform hover:scale-105 active:scale-95 outline-none group ${isOpening ? "animate-booster-open pointer-events-none" : ""}`}
               >
                 <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${selectedBoxType === 'standard' ? 'bg-blue-500' : selectedBoxType === 'premium' ? 'bg-purple-500' : 'bg-red-500'}`}></div>
                 <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className="w-64 h-auto relative z-10 drop-shadow-2xl transition-all duration-300 transform hover:scale-110" />
@@ -205,7 +204,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
             <div className="z-10 flex flex-col items-center animate-slide-up relative mt-8">
               <div className="absolute inset-0 bg-white/20 blur-[100px] rounded-full w-[150%] h-[150%] -left-[25%] -top-[25%] pointer-events-none"></div>
               
-              <div className="relative z-10 transform transition-transform hover:scale-110 duration-500">
+              <div className="relative z-10 transform transition-transform hover:scale-110 duration-500 animate-epic-reveal">
                 <CardDisplay card={drawnCard} size="lg" />
               </div>
               
@@ -218,6 +217,11 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 </button>
               </div>
             </div>
+          )}
+          
+          {/* Flash Overlay when booster bursts */}
+          {isOpening && (
+            <div className="fixed inset-0 z-[100] bg-white pointer-events-none animate-flash-screen"></div>
           )}
         </div>
       )}

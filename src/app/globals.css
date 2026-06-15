@@ -106,32 +106,42 @@
     100% { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes violent-shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    10% { transform: translate(-2px, -2px) rotate(-2deg); }
-    20% { transform: translate(-4px, 0px) rotate(2deg); }
-    30% { transform: translate(4px, 2px) rotate(0deg); }
-    40% { transform: translate(2px, -2px) rotate(2deg); }
-    50% { transform: translate(-2px, 2px) rotate(-2deg); }
-    60% { transform: translate(-4px, 2px) rotate(0deg); }
-    70% { transform: translate(4px, 2px) rotate(-2deg); }
-    80% { transform: translate(-2px, -2px) rotate(2deg); }
-    90% { transform: translate(2px, 2px) rotate(0deg); }
-    100% { transform: translate(2px, -2px) rotate(-2deg); }
+  @keyframes booster-shake-glow {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); filter: brightness(1) drop-shadow(0 0 0px rgba(255,255,255,0)); }
+    10% { transform: translate(-2px, -2px) rotate(-2deg) scale(1.02); }
+    20% { transform: translate(2px, -2px) rotate(2deg) scale(1.04); }
+    30% { transform: translate(-2px, 2px) rotate(-2deg) scale(1.06); }
+    40% { transform: translate(2px, 2px) rotate(2deg) scale(1.08); filter: brightness(1.2) drop-shadow(0 0 20px rgba(255,255,255,0.3)); }
+    50% { transform: translate(-3px, -3px) rotate(-3deg) scale(1.1); }
+    60% { transform: translate(3px, -3px) rotate(3deg) scale(1.12); }
+    70% { transform: translate(-3px, 3px) rotate(-3deg) scale(1.14); filter: brightness(1.5) drop-shadow(0 0 40px rgba(255,255,255,0.6)); }
+    80% { transform: translate(3px, 3px) rotate(3deg) scale(1.16); }
+    90% { transform: translate(-4px, -4px) rotate(-4deg) scale(1.18); filter: brightness(3) drop-shadow(0 0 60px rgba(255,255,255,0.8)); }
+    100% { transform: translate(0, 0) rotate(0deg) scale(2); filter: brightness(10) drop-shadow(0 0 150px rgba(255,255,255,1)); opacity: 0; }
   }
 
-  .animate-shake {
-    animation: violent-shake 0.3s infinite;
+  .animate-booster-open {
+    animation: booster-shake-glow 1.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
   }
 
-  @keyframes booster-flash {
-    0% { filter: brightness(1) drop-shadow(0 0 0 rgba(255,255,255,0)); }
-    80% { filter: brightness(2) drop-shadow(0 0 50px rgba(255,255,255,0.8)); opacity: 1; transform: scale(1.1); }
-    100% { filter: brightness(5) drop-shadow(0 0 100px rgba(255,255,255,1)); opacity: 0; transform: scale(1.5); }
+  @keyframes epic-card-reveal {
+    0% { transform: scale(0) rotateY(180deg) translateY(100px); opacity: 0; filter: brightness(5); }
+    50% { transform: scale(1.2) rotateY(90deg) translateY(-20px); opacity: 1; filter: brightness(2); }
+    100% { transform: scale(1) rotateY(0deg) translateY(0); opacity: 1; filter: brightness(1); }
   }
 
-  .animate-booster-flash {
-    animation: booster-flash 0.8s ease-out forwards;
+  .animate-epic-reveal {
+    animation: epic-card-reveal 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+  
+  @keyframes flash-screen {
+    0% { opacity: 0; }
+    85% { opacity: 0; }
+    95% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .animate-flash-screen {
+    animation: flash-screen 1.5s ease-out forwards;
   }
 
   
