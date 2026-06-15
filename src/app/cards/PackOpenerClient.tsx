@@ -265,31 +265,32 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
           </p>
 
           {!showReveal && (
-            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 z-10">
+            <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 z-10">
               {/* Standard Box */}
               <div 
                 onClick={() => setSelectedBoxType("standard")}
-                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 cursor-pointer ${selectedBoxType === "standard" ? "bg-blue-900/20 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-blue-500/50 opacity-70"}`}
+                className={`p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "standard" ? "bg-blue-900/30 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-blue-500/50 opacity-80 hover:opacity-100"}`}
               >
-                <div className="w-20 h-20 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/50">
-                  <img src="/StandardB.png" alt="Standard" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="w-24 h-24 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
+                  <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
+                  <img src="/StandardB.png" alt="Standard" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] relative z-10" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-blue-300">Booster Standard</h3>
-                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-blue-500/50 underline-offset-2">Toutes les raretés disponibles</p>
+                <div className="relative z-10 text-center">
+                  <h3 className="text-2xl font-black text-blue-300 drop-shadow-md tracking-wide font-outfit uppercase">Standard</h3>
+                  <p className="text-xs text-blue-200/70 mt-2 font-medium">Toutes les raretés</p>
                 </div>
-                <div className="mt-2 w-full flex flex-col gap-2">
-                  <div className="px-4 py-1 mx-auto rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
-                    x{ownedStandard} possédé{ownedStandard > 1 ? 's' : ''}
+                <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
+                  <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
+                    x{ownedStandard} en stock
                   </div>
                   {ownedStandard === 0 && (
                     <button 
                       onClick={(e) => { e.stopPropagation(); buyBooster("standard", 100); }}
                       disabled={isBuying}
-                      className="flex items-center justify-center gap-2 w-full py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold text-white transition-colors disabled:opacity-50"
+                      className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl font-bold text-white transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.6)]"
                     >
-                      <span>Acheter</span>
-                      <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 100</span>
+                      <span className="flex items-center gap-1.5"><img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> 100</span>
                     </button>
                   )}
                 </div>
@@ -298,27 +299,58 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
               {/* Premium Box */}
               <div 
                 onClick={() => setSelectedBoxType("premium")}
-                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 cursor-pointer ${selectedBoxType === "premium" ? "bg-purple-900/20 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-purple-500/50 opacity-70"}`}
+                className={`p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "premium" ? "bg-purple-900/30 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-purple-500/50 opacity-80 hover:opacity-100"}`}
               >
-                <div className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/50">
-                  <img src="/PreniumB.png" alt="Premium" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.6)]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="w-24 h-24 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
+                  <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
+                  <img src="/PreniumB.png" alt="Premium" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.6)] relative z-10" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-purple-300">Booster Premium</h3>
-                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-purple-500/50 underline-offset-2">Commune et Peu Commune exclues</p>
+                <div className="relative z-10 text-center">
+                  <h3 className="text-2xl font-black text-purple-300 drop-shadow-md tracking-wide font-outfit uppercase">Premium</h3>
+                  <p className="text-xs text-purple-200/70 mt-2 font-medium">Mini. Rare garanti</p>
                 </div>
-                <div className="mt-2 w-full flex flex-col gap-2">
-                  <div className="px-4 py-1 mx-auto rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
-                    x{ownedPremium} possédé{ownedPremium > 1 ? 's' : ''}
+                <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
+                  <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
+                    x{ownedPremium} en stock
                   </div>
                   {ownedPremium === 0 && (
                     <button 
                       onClick={(e) => { e.stopPropagation(); buyBooster("premium", 250); }}
                       disabled={isBuying}
-                      className="flex items-center justify-center gap-2 w-full py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-white transition-colors disabled:opacity-50"
+                      className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 rounded-xl font-bold text-white transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)]"
                     >
-                      <span>Acheter</span>
-                      <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 250</span>
+                      <span className="flex items-center gap-1.5"><img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> 250</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Legendary Box */}
+              <div 
+                onClick={() => setSelectedBoxType("legendary")}
+                className={`p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "legendary" ? "bg-amber-900/30 border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-amber-500/50 opacity-80 hover:opacity-100"}`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="w-24 h-24 rounded-full bg-amber-500/20 flex items-center justify-center border border-amber-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
+                  <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
+                  <img src="/StandardB.png" alt="Legendary" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] hue-rotate-180 brightness-150 relative z-10" />
+                </div>
+                <div className="relative z-10 text-center">
+                  <h3 className="text-2xl font-black text-amber-400 drop-shadow-md tracking-wide font-outfit uppercase">Légendaire</h3>
+                  <p className="text-xs text-amber-200/70 mt-2 font-medium">Mini. Épique garanti</p>
+                </div>
+                <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
+                  <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
+                    x{ownedLegendary} en stock
+                  </div>
+                  {ownedLegendary === 0 && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); buyBooster("legendary", 500); }}
+                      disabled={isBuying}
+                      className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 rounded-xl font-bold text-white transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(245,158,11,0.3)] hover:shadow-[0_0_25px_rgba(245,158,11,0.6)]"
+                    >
+                      <span className="flex items-center gap-1.5"><img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> 500</span>
                     </button>
                   )}
                 </div>
@@ -327,27 +359,28 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
               {/* Mythic Box */}
               <div 
                 onClick={() => setSelectedBoxType("mythic")}
-                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 cursor-pointer ${selectedBoxType === "mythic" ? "bg-red-900/20 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-red-500/50 opacity-70"}`}
+                className={`p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "mythic" ? "bg-red-900/30 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-red-500/50 opacity-80 hover:opacity-100"}`}
               >
-                <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/50">
-                  <img src="/MythiqueB.png" alt="Mythique" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.6)]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
+                  <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
+                  <img src="/MythiqueB.png" alt="Mythique" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] relative z-10 animate-pulse-glow" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-red-400 drop-shadow-[0_0_5px_rgba(239,68,68,0.8)]">Booster Mythique</h3>
-                  <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-red-500/50 underline-offset-2">Rare et inférieur exclues</p>
+                <div className="relative z-10 text-center">
+                  <h3 className="text-2xl font-black text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,1)] tracking-wide font-outfit uppercase">Mythique</h3>
+                  <p className="text-xs text-red-200/70 mt-2 font-medium">Légendaire ou Mythique</p>
                 </div>
-                <div className="mt-2 w-full flex flex-col gap-2">
-                  <div className="px-4 py-1 mx-auto rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
-                    x{ownedMythic} possédé{ownedMythic > 1 ? 's' : ''}
+                <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
+                  <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
+                    x{ownedMythic} en stock
                   </div>
                   {ownedMythic === 0 && (
                     <button 
-                      onClick={(e) => { e.stopPropagation(); buyBooster("mythic", 500); }}
+                      onClick={(e) => { e.stopPropagation(); buyBooster("mythic", 1000); }}
                       disabled={isBuying}
-                      className="flex items-center justify-center gap-2 w-full py-2 bg-red-600 hover:bg-red-500 rounded-lg font-bold text-white transition-colors disabled:opacity-50"
+                      className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 rounded-xl font-bold text-white transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(239,68,68,0.4)] hover:shadow-[0_0_25px_rgba(239,68,68,0.8)]"
                     >
-                      <span>Acheter</span>
-                      <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 500</span>
+                      <span className="flex items-center gap-1.5"><img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> 1000</span>
                     </button>
                   )}
                 </div>
