@@ -171,13 +171,15 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
                   <>
                     <ShoppingCart className="w-5 h-5" />
                     <span className="flex flex-col items-start leading-tight">
-                      <span className="text-xs text-white/60 line-through decoration-red-500/80 decoration-2">
-                        {pkg.oldPrice}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-white/50 line-through decoration-white/40">
+                          {pkg.oldPrice}
+                        </span>
+                        <span className="text-[10px] font-black text-green-300 bg-green-500/20 px-1.5 py-0.5 rounded border border-green-500/30 uppercase tracking-widest shadow-[0_0_10px_rgba(34,197,94,0.2)]">
+                          -10%
+                        </span>
+                      </div>
                       <span>Acheter {pkg.price}</span>
-                    </span>
-                    <span className="absolute -top-3 -right-3 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-[#111118] shadow-[0_0_10px_rgba(220,38,38,0.5)] rotate-12 animate-pulse-glow">
-                      -10%
                     </span>
                   </>
                 )}
