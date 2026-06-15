@@ -402,7 +402,7 @@ export default function CardDisplay({
       )}
 
       {/* Description */}
-      {attrs.showDesc !== false && (
+      {attrs.showDesc !== false && card.description && (
         <div 
           className={`absolute z-30 flex justify-center items-center pt-2 ${!attrs.titlePos && !attrs.textPos ? 'border-t border-white/10' : ''} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
           onMouseDown={(e) => handleMouseDown(e, 'desc')}
@@ -415,7 +415,7 @@ export default function CardDisplay({
           }}
         >
           <span className="text-xs font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center" style={{ color: attrs.descColor || 'white' }}>
-            {card.description || "Collection"}
+            {card.description}
           </span>
         </div>
       )}

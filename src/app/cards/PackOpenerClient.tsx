@@ -14,7 +14,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
   const [boxes, setBoxes] = useState<any[]>(initialBoxes || []);
   const [selectedBoxType, setSelectedBoxType] = useState<string>("standard");
   const [isOpening, setIsOpening] = useState(false);
-  const [drawnCard, setDrawnCard] = useState<TradingCard | null>(null);
+  const [drawnCards, setDrawnCards] = useState<TradingCard[]>([]);
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
 
@@ -36,7 +36,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
     }
     
     setIsOpening(true);
-    setDrawnCard(null);
+    setDrawnCards([]);
     setShowReveal(false);
 
     try {
@@ -54,10 +54,10 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
       setBoxes(prev => prev.map(b => b.boxType === selectedBoxType ? { ...b, amount: b.amount - 1 } : b));
 
       setTimeout(() => {
-        setDrawnCard(data.drawnCard);
+        setDrawnCards(data.drawnCards);
         setShowReveal(true);
         setIsOpening(false);
-        setInventory(prev => [data.userCard, ...prev]);
+        setInventory(prev => [...data.userCards, ...prev]);
         router.refresh();
       }, 1400);
 
@@ -214,11 +214,19 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
             </div>
           )}
 
-          {/* The Drawn Card Reveal */}
-          {showReveal && drawnCard && (
-            <div className="z-10 flex flex-col items-center animate-slide-up relative mt-8">
-              <div className="relative z-10 transform transition-transform hover:scale-110 duration-500 animate-epic-reveal">
-                <CardDisplay card={drawnCard} size="lg" />
+          {/* The Drawn Cards Reveal */}
+          {showReveal && drawnCards.length > 0 && (
+            <div className="z-10 flex flex-col items-center animate-slide-up relative mt-8 w-full max-w-5xl mx-auto">
+              <div className="flex flex-row justify-center items-center gap-4 md:gap-8 flex-wrap">
+                {drawnCards.map((card, i) => (
+                  <div 
+                    key={i} 
+                    className="relative z-10 transform transition-transform hover:scale-110 duration-500 animate-epic-reveal" 
+                    style={{ animationDelay: `${i * 0.4}s`, animationFillMode: 'both' }}
+                  >
+                    <CardDisplay card={card} size="lg" />
+                  </div>
+                ))}
               </div>
               
               <div className="mt-12 flex gap-4 z-10">

@@ -69,31 +69,55 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: `La box ${boxType} ne contient aucune carte disponible dans la base de données.` }, { status: 400 });
     }
 
-    let random = Math.random() * totalWeight;
-    let drawnCard = weightedCards[0].card;
-    for (const item of weightedCards) {
-      if (item.weight === 0) continue;
-      if (random < item.weight) {
-        drawnCard = item.card;
-        break;
+    let drawnCards = [];
+    
+    // Draw 3 cards
+    for (let i = 0; i < 3; i++) {
+      let random = Math.random() * totalWeight;
+      let drawnCard = weightedCards[0].card;
+      for (const item of weightedCards) {
+        if (item.weight === 0) continue;
+        if (random < item.weight) {
+          drawnCard = item.card;
+          break;
+        }
+        random -= item.weight;
       }
-      random -= item.weight;
+      drawnCards.push(drawnCard);
     }
 
-    // Create a UserCard for the user
-    const userCard = await prisma.userCard.create({
-      data: {
-        userId: userId,
-        tradingCardId: drawnCard.id,
-      },
-      include: {
-        tradingCard: {
-          include: { player: true }
-        }
-      }
-    });
+    const rarityWeight: Record<string, number> = {
+      'COMMON': 1,
+      'UNCOMMON': 2,
+      'RARE': 3,
+      'EPIC': 4,
+      'LEGENDARY': 5,
+      'MYTHIC': 6
+    };
 
-    return NextResponse.json({ drawnCard: userCard.tradingCard, userCard });
+    // Sort so the best card is last
+    drawnCards.sort((a, b) => (rarityWeight[a.rarity] || 0) - (rarityWeight[b.rarity] || 0));
+
+    const userCards = [];
+    for (const card of drawnCards) {
+      const userCard = await prisma.userCard.create({
+        data: {
+          userId: userId,
+          tradingCardId: card.id,
+        },
+        include: {
+          tradingCard: {
+            include: { player: true }
+          }
+        }
+      });
+      userCards.push(userCard);
+    }
+
+    return NextResponse.json({ 
+      drawnCards: userCards.map(uc => uc.tradingCard), 
+      userCards 
+    });
   } catch (error) {
     console.error("Pack Opening Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
