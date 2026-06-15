@@ -16,7 +16,7 @@ export default function StorePage() {
       <div className="relative z-10 max-w-6xl mx-auto">
         <div className="text-center mb-16 animate-slide-up">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-sm font-bold border border-indigo-500/20 mb-6">
-            <ShieldCheck className="w-4 h-4" /> Boutique Sécurisée par Tebex
+            <ShieldCheck className="w-4 h-4" /> Boutique Sécurisée
           </div>
           <h1 className="text-4xl md:text-6xl font-black font-outfit text-white mb-6 uppercase tracking-wider">
             Boutique <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">ParaCoins</span>
@@ -53,10 +53,10 @@ export default function StorePage() {
                 </li>
               </ul>
               
-              {/* Remplacer par le vrai lien Tebex */}
-              <a href="https://votre-boutique.tebex.io/package/123456" target="_blank" rel="noopener noreferrer" className="w-full btn-secondary text-center block py-3 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/10">
+              {/* Bouton d'achat générique */}
+              <button className="w-full btn-secondary text-center block py-3 text-indigo-400 border-indigo-500/30 hover:bg-indigo-500/10">
                 Acheter
-              </a>
+              </button>
             </div>
           </div>
 
@@ -93,10 +93,10 @@ export default function StorePage() {
                 </li>
               </ul>
               
-              {/* Remplacer par le vrai lien Tebex */}
-              <a href="https://votre-boutique.tebex.io/package/123457" target="_blank" rel="noopener noreferrer" className="w-full btn-primary text-center block py-4 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+              {/* Bouton d'achat générique */}
+              <button className="w-full btn-primary text-center block py-4 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]">
                 Acheter
-              </a>
+              </button>
             </div>
           </div>
 
@@ -125,18 +125,18 @@ export default function StorePage() {
                 </li>
               </ul>
               
-              {/* Remplacer par le vrai lien Tebex */}
-              <a href="https://votre-boutique.tebex.io/package/123458" target="_blank" rel="noopener noreferrer" className="w-full btn-secondary text-center block py-3 text-pink-400 border-pink-500/30 hover:bg-pink-500/10">
+              {/* Bouton d'achat générique */}
+              <button className="w-full btn-secondary text-center block py-3 text-pink-400 border-pink-500/30 hover:bg-pink-500/10">
                 Acheter
-              </a>
+              </button>
             </div>
           </div>
 
         </div>
         
         <div className="mt-16 text-center text-sm text-gray-500">
-          <p>Les paiements sont traités de manière sécurisée par Tebex Limited. Les ParaCoins sont crédités instantanément en jeu après validation du paiement.</p>
-          <p className="mt-2">Vous devrez renseigner votre pseudo Minecraft lors de la validation du panier pour que votre compte soit crédité sur ce site.</p>
+          <p>Les paiements sont traités de manière sécurisée. Les ParaCoins sont crédités sur votre compte.</p>
+          <p className="mt-2">Vous devrez être connecté pour que votre compte soit crédité sur ce site.</p>
         </div>
       </div>
     </div>
