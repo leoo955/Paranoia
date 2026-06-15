@@ -133,23 +133,55 @@ export default function PackOpenerClient({ initialInventory, isLoggedIn }: { ini
           </div>
         )}
       </div>
-      {/* Fullscreen Card Modal */}
+      {/* Fullscreen Card Modal with Info Pane */}
       {selectedCard && (
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200"
           onClick={() => setSelectedCard(null)}
         >
           <div 
-            className="relative max-w-sm w-full animate-slide-up"
+            className="relative w-full max-w-4xl flex flex-col md:flex-row items-center md:items-stretch gap-6 animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <button 
               onClick={() => setSelectedCard(null)}
-              className="absolute -top-12 right-0 md:-right-12 md:top-0 text-white hover:text-red-400 transition-colors z-50 bg-black/50 p-2 rounded-full border border-white/10"
+              className="absolute -top-12 right-0 md:-top-4 md:-right-12 text-white hover:text-red-400 transition-colors z-50 bg-black/50 p-2 rounded-full border border-white/10"
             >
               <X className="w-6 h-6" />
             </button>
-            <CardDisplay card={selectedCard} size="lg" />
+
+            {/* Card Side */}
+            <div className="flex-shrink-0 w-full max-w-[350px]">
+              <CardDisplay card={selectedCard} size="lg" />
+            </div>
+
+            {/* Info Pane Side */}
+            <div className="flex-1 w-full bg-[#1a1a2e] border border-[var(--color-border-color)] rounded-2xl p-6 flex flex-col shadow-2xl">
+              <h3 className="text-3xl font-outfit font-black text-white mb-2">{selectedCard.title}</h3>
+              
+              <div className="flex items-center gap-3 mb-6">
+                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${selectedCard.rarity === 'COMMON' ? 'bg-gray-500/20 text-gray-300 border-gray-500/50' : selectedCard.rarity === 'UNCOMMON' ? 'bg-green-500/20 text-green-300 border-green-500/50' : selectedCard.rarity === 'RARE' ? 'bg-blue-500/20 text-blue-300 border-blue-500/50' : selectedCard.rarity === 'EPIC' ? 'bg-purple-500/20 text-purple-300 border-purple-500/50' : selectedCard.rarity === 'LEGENDARY' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50' : 'bg-red-500/20 text-red-300 border-red-500/50'}`}>
+                  {selectedCard.rarity}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold border bg-blue-500/10 text-blue-300 border-blue-500/30">
+                  Niveau {selectedCard.level}
+                </span>
+              </div>
+
+              <div className="flex-1 bg-black/30 rounded-xl p-4 border border-white/5">
+                <h4 className="text-sm font-bold text-[var(--color-text-secondary)] mb-2 uppercase tracking-wider">Description</h4>
+                <p className="text-white whitespace-pre-wrap leading-relaxed">
+                  {selectedCard.description || "Aucune description pour cette carte."}
+                </p>
+              </div>
+
+              {selectedCard.player && (
+                <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+                  <span className="text-sm text-[var(--color-text-secondary)]">Joueur</span>
+                  <span className="text-sm font-bold text-white">{selectedCard.player.minecraftName}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
