@@ -251,7 +251,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                   openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' :
                   openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' :
                   openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' :
-                  'drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]'
+                  'drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]'
                 }`} />
               </div>
             </div>
@@ -286,7 +286,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
           {/* Flash Overlay when booster bursts */}
           {isOpening && (
             <div className="fixed inset-0 z-[100] pointer-events-none animate-flash-burst flex items-center justify-center">
-              <div className="w-[150vw] h-[150vw] bg-[radial-gradient(circle_at_center,rgba(255,255,255,1)_0%,rgba(255,255,255,0.8)_30%,transparent_70%)] rounded-full mix-blend-screen"></div>
+              <div className="w-[150vw] h-[150vw] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.4)_0%,rgba(255,255,255,0.1)_30%,transparent_70%)] rounded-full mix-blend-screen"></div>
             </div>
           )}
         </div>
