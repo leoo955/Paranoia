@@ -29,16 +29,22 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
         
         {/* Back */}
         <div 
-          className="absolute inset-0 w-full h-full rounded-2xl border-2 border-[var(--color-border-color)] flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]" 
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: 'linear-gradient(135deg, #0a0a0f 0%, #16161f 100%)' }}
+          className="absolute inset-0 w-full h-full rounded-2xl border-2 border-purple-500/30 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]" 
+          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: 'radial-gradient(circle at center, #1e1b4b 0%, #0a0a0f 100%)' }}
         >
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-multiply pointer-events-none"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-0 pointer-events-none"></div>
+          {/* Textures pour remplir toute la carte */}
+          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-60 mix-blend-screen pointer-events-none"></div>
           
-          <div className="relative z-10 flex flex-col items-center pointer-events-none">
-            <img src={boxType === "standard" ? "/StandardB.png" : boxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} className="w-24 h-auto opacity-80 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" alt="Booster Back" />
-            <div className="mt-6 text-white/40 font-black tracking-[0.3em] text-sm">PARANOIA</div>
+          {/* Cercle magique central */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-2 border-dashed border-purple-500/20 animate-[spin_20s_linear_infinite] pointer-events-none"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border border-purple-400/30 animate-[spin_15s_linear_infinite_reverse] pointer-events-none"></div>
+
+          <div className="relative z-10 flex flex-col items-center pointer-events-none w-full px-6">
+            <img src="/Paranoia_logo.png" className="w-full h-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
           </div>
+          
+          {/* Bordure interne façon carte de jeu */}
+          <div className="absolute inset-2 border-2 border-white/5 rounded-xl pointer-events-none"></div>
           
           {/* Subtle shine on hover */}
           <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
