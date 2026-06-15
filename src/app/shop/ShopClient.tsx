@@ -15,9 +15,10 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
       id: "pkg_100",
       amount: 100,
       price: "2,99€",
-      oldPrice: "3,49€",
       popular: false,
       title: "Pack Débutant",
+      baseAmount: 100,
+      bonusAmount: 0,
       color: "from-blue-600/40 to-indigo-600/10",
       glow: "bg-blue-500/20",
       border: "border-blue-500/40 hover:border-blue-400/80",
@@ -28,9 +29,10 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
       id: "pkg_500",
       amount: 500,
       price: "5,99€",
-      oldPrice: "6,99€",
       popular: true,
       title: "Pack Épique",
+      baseAmount: 450,
+      bonusAmount: 50,
       color: "from-purple-600/40 to-fuchsia-600/10",
       glow: "bg-purple-500/30",
       border: "border-purple-500/50 hover:border-purple-400",
@@ -41,9 +43,10 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
       id: "pkg_1000",
       amount: 1000,
       price: "9,99€",
-      oldPrice: "11,99€",
       popular: false,
       title: "Pack Légendaire",
+      baseAmount: 850,
+      bonusAmount: 150,
       color: "from-amber-500/40 to-orange-600/10",
       glow: "bg-amber-500/20",
       border: "border-amber-500/40 hover:border-amber-400/80",
@@ -130,7 +133,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
               {pkg.title}
             </div>
 
-            <div className={`w-32 h-32 mb-8 relative flex items-center justify-center`}>
+            <div className={`w-32 h-32 mb-4 relative flex items-center justify-center`}>
               <div className={`absolute inset-0 ${pkg.glow} rounded-full blur-2xl opacity-50 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700`}></div>
               <img 
                 src="/Paracoin.png" 
@@ -138,6 +141,15 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
                 className={`relative z-10 w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)] transition-transform duration-700 group-hover:scale-110 group-hover:rotate-12`}
               />
             </div>
+            
+            {pkg.bonusAmount > 0 && (
+              <div className="bg-gradient-to-r from-red-600 to-red-500 border border-red-400/50 text-white font-black text-sm px-4 py-1 rounded shadow-[0_0_15px_rgba(239,68,68,0.5)] mb-6 transform -rotate-2 group-hover:scale-110 transition-transform duration-300">
+                {pkg.baseAmount} + {pkg.bonusAmount} EN PLUS
+              </div>
+            )}
+            {pkg.bonusAmount === 0 && (
+              <div className="h-8 mb-6"></div> // spacer
+            )}
             
             <h3 className="text-5xl font-outfit font-black text-white mb-2 flex items-baseline gap-2 relative z-10 drop-shadow-lg">
               {pkg.amount}
@@ -161,7 +173,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out"></div>
               )}
               
-              <span className="relative z-10 flex items-center gap-3 text-lg">
+              <span className="relative z-10 flex items-center gap-2 text-lg">
                 {loadingPkg === pkg.id ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -170,17 +182,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
                 ) : (
                   <>
                     <ShoppingCart className="w-5 h-5" />
-                    <span className="flex flex-col items-start leading-tight">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-white/50 line-through decoration-white/40">
-                          {pkg.oldPrice}
-                        </span>
-                        <span className="text-[10px] font-black text-green-300 bg-green-500/20 px-1.5 py-0.5 rounded border border-green-500/30 uppercase tracking-widest shadow-[0_0_10px_rgba(34,197,94,0.2)]">
-                          -10%
-                        </span>
-                      </div>
-                      <span>Acheter {pkg.price}</span>
-                    </span>
+                    Acheter {pkg.price}
                   </>
                 )}
               </span>
