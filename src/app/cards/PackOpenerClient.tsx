@@ -39,8 +39,9 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-2 border-dashed border-purple-500/20 animate-[spin_20s_linear_infinite] pointer-events-none"></div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border border-purple-400/30 animate-[spin_15s_linear_infinite_reverse] pointer-events-none"></div>
 
-          <div className="relative z-10 flex flex-col items-center pointer-events-none w-full px-6">
-            <img src="/Paranoia_logo.png" className="w-full h-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
+          <div className="relative z-10 flex flex-col items-center justify-center pointer-events-none w-full">
+            {/* Nudged left slightly to account for logo's asymmetrical transparent padding */}
+            <img src="/Paranoia_logo.png" className="w-[85%] h-auto -translate-x-3 drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
           </div>
           
           {/* Bordure interne façon carte de jeu */}
@@ -334,7 +335,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 </div>
               )}
 
-              <div className="flex flex-row justify-center items-center gap-12 md:gap-24 lg:gap-32 flex-wrap w-full">
+              <div className="flex flex-row justify-center items-center gap-8 md:gap-16 lg:gap-20 flex-wrap w-full">
                 {drawnCards.map((card, i) => (
                   <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} />
                 ))}
