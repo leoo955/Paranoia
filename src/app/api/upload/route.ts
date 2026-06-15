@@ -1,35 +1,41 @@
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { put } from '@vercel/blob';
 
-export async function POST(req: Request) {
+export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const session = await getServerSession(authOptions);
-    const user = session?.user as any;
+    const body = (await request.json()) as HandleUploadBody;
 
-    if (!session || !user || user.role !== "ADMIN") {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
+    const jsonResponse = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (pathname, clientPayload) => {
+        const session = await getServerSession(authOptions);
+        const user = session?.user as any;
 
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
+        // Verify the user is authenticated and is an ADMIN
+        if (!session || !user || user.role !== "ADMIN") {
+          throw new Error('Unauthorized');
+        }
 
-    if (!file) {
-      return new NextResponse("No file received.", { status: 400 });
-    }
-
-    const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '')}`;
-
-    // Upload vers Vercel Blob (stockage officiel)
-    const blob = await put(filename, file, {
-      access: 'public',
+        return {
+          allowedContentTypes: ['image/jpeg', 'image/png', 'image/gif', 'video/mp4', 'video/webm'],
+          tokenPayload: JSON.stringify({ userId: user.id }),
+        };
+      },
+      onUploadCompleted: async ({ blob, tokenPayload }) => {
+        // Here you could log or save to DB if needed
+        console.log('Upload completed:', blob.url);
+      },
     });
 
-    // Retourne l'URL publique de Vercel Blob
-    return NextResponse.json({ url: blob.url });
+    return NextResponse.json(jsonResponse);
   } catch (error) {
-    console.error("Error uploading file:", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    console.error("Upload Error:", error);
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 400 } // Vercel Blob webhook will retry on non-200 responses
+    );
   }
 }
