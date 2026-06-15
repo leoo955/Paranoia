@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { Menu, X, MessageSquare, Trophy, FileText, Sparkles, Home, LogIn, LogOut, ShieldAlert } from "lucide-react";
+import { Menu, X, MessageSquare, Trophy, FileText, Sparkles, Home, LogIn, LogOut, ShieldAlert, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -14,6 +14,7 @@ const navLinks = [
   { name: "Tier List", href: "/tier-list", icon: Trophy },
   { name: "Trading Cards", href: "/cards", icon: Sparkles },
   { name: "Candidature", href: "/candidature", icon: FileText },
+  { name: "Boutique", href: "/shop", icon: ShoppingCart },
 ];
 
 export default function Navbar() {
