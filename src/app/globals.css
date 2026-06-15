@@ -125,9 +125,9 @@
   }
 
   @keyframes epic-card-reveal {
-    0% { transform: scale(0) rotateY(180deg) translateY(100px); opacity: 0; filter: brightness(5); }
-    50% { transform: scale(1.2) rotateY(90deg) translateY(-20px); opacity: 1; filter: brightness(2); }
-    100% { transform: scale(1) rotateY(0deg) translateY(0); opacity: 1; filter: brightness(1); }
+    0% { transform: scale(0) translateY(100px); opacity: 0; filter: brightness(3); }
+    60% { transform: scale(1.1) translateY(-20px); opacity: 1; filter: brightness(1.5); }
+    100% { transform: scale(1) translateY(0); opacity: 1; filter: brightness(1); }
   }
 
   .animate-epic-reveal {
