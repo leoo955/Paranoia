@@ -15,6 +15,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
       id: "pkg_100",
       amount: 100,
       price: "2,99€",
+      oldPrice: "3,49€",
       popular: false,
       title: "Pack Débutant",
       color: "from-blue-600/40 to-indigo-600/10",
@@ -27,6 +28,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
       id: "pkg_500",
       amount: 500,
       price: "5,99€",
+      oldPrice: "6,99€",
       popular: true,
       title: "Pack Épique",
       color: "from-purple-600/40 to-fuchsia-600/10",
@@ -39,6 +41,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
       id: "pkg_1000",
       amount: 1000,
       price: "9,99€",
+      oldPrice: "11,99€",
       popular: false,
       title: "Pack Légendaire",
       color: "from-amber-500/40 to-orange-600/10",
@@ -158,7 +161,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out"></div>
               )}
               
-              <span className="relative z-10 flex items-center gap-2 text-lg">
+              <span className="relative z-10 flex items-center gap-3 text-lg">
                 {loadingPkg === pkg.id ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -167,7 +170,15 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
                 ) : (
                   <>
                     <ShoppingCart className="w-5 h-5" />
-                    Acheter {pkg.price}
+                    <span className="flex flex-col items-start leading-tight">
+                      <span className="text-xs text-white/60 line-through decoration-red-500/80 decoration-2">
+                        {pkg.oldPrice}
+                      </span>
+                      <span>Acheter {pkg.price}</span>
+                    </span>
+                    <span className="absolute -top-3 -right-3 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-[#111118] shadow-[0_0_10px_rgba(220,38,38,0.5)] rotate-12 animate-pulse-glow">
+                      -10%
+                    </span>
                   </>
                 )}
               </span>
