@@ -14,9 +14,17 @@ export async function POST(request: Request): Promise<NextResponse> {
         const session = await getServerSession(authOptions);
         const user = session?.user as any;
 
-        // Verify the user is authenticated and is an ADMIN
-        if (!session || !user || user.role !== "ADMIN") {
-          throw new Error('Unauthorized');
+        // Vérifications ultra-détaillées pour comprendre pourquoi ça crashe
+        if (!process.env.BLOB_READ_WRITE_TOKEN) {
+          throw new Error('CRITICAL_ERROR: process.env.BLOB_READ_WRITE_TOKEN est manquant sur le serveur !');
+        }
+
+        if (!session) {
+          throw new Error('AUTH_ERROR: Vous n\'êtes pas connecté (session NextAuth introuvable dans la requête).');
+        }
+
+        if (!user || user.role !== "ADMIN") {
+          throw new Error('AUTH_ERROR: Vous devez être ADMIN pour faire ça.');
         }
 
         return {
