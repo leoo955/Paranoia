@@ -44,6 +44,13 @@ export default function AdminPage() {
   const [showRarityBadge, setShowRarityBadge] = useState(true);
   const [showLevelText, setShowLevelText] = useState(true);
   const [showLevelIcon, setShowLevelIcon] = useState(true);
+  
+  // New Full Art & Color States
+  const [isFullArt, setIsFullArt] = useState(false);
+  const [titleColor, setTitleColor] = useState("");
+  const [descColor, setDescColor] = useState("");
+  const [levelColor, setLevelColor] = useState("");
+
   const [cardFrameUrl, setCardFrameUrl] = useState("");
   const [cardCustomBadges, setCardCustomBadges] = useState<CustomBadge[]>([]);
   const [charPosX, setCharPosX] = useState(50);
@@ -239,13 +246,23 @@ export default function AdminPage() {
         characterPosition: { x: charPosX, y: charPosY, scale: charScale },
         attributes: {
           borderColor: cardBorderColor,
-      cardBgColor,
-      cardGlowColor,
+          cardBgColor,
+          cardGlowColor,
+          mainColor,
+          rarityBadgeColor,
           frameUrl: cardFrameUrl,
           titlePos, descPos, rarityBadgePos, levelTextPos,
           levelBadgePos,
-          levelBadgeUrl
-
+          levelBadgeUrl,
+          isFullArt,
+          titleColor,
+          descColor,
+          levelColor,
+          showTitle,
+          showDesc,
+          showRarityBadge,
+          showLevelText,
+          showLevelIcon
         }
       };
 
@@ -270,6 +287,7 @@ export default function AdminPage() {
         setCardImageUrl("");
         setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
         setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
+        setIsFullArt(false); setTitleColor(""); setDescColor(""); setLevelColor("");
         setCardFrameUrl("");
         setCardCustomBadges([]);
         setCharPosX(50);
@@ -305,13 +323,29 @@ export default function AdminPage() {
     try {
       const attrs = typeof card.attributes === 'string' ? JSON.parse(card.attributes) : (card.attributes || {});
       setCardBorderColor(attrs.borderColor || "");
+      setCardBgColor(attrs.cardBgColor || "");
+      setCardGlowColor(attrs.cardGlowColor || "");
+      setMainColor(attrs.mainColor || "");
+      setRarityBadgeColor(attrs.rarityBadgeColor || "");
       setCardFrameUrl(attrs.frameUrl || "");
+      
+      setIsFullArt(attrs.isFullArt || false);
+      setTitleColor(attrs.titleColor || "");
+      setDescColor(attrs.descColor || "");
+      setLevelColor(attrs.levelColor || "");
+      setShowTitle(attrs.showTitle !== false);
+      setShowDesc(attrs.showDesc !== false);
+      setShowRarityBadge(attrs.showRarityBadge !== false);
+      setShowLevelText(attrs.showLevelText !== false);
+      setShowLevelIcon(attrs.showLevelIcon !== false);
+
       setTitlePos(attrs.titlePos || { x: 50, y: 75, scale: 100 }); setDescPos(attrs.descPos || { x: 50, y: 92, scale: 100 }); setRarityBadgePos(attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 }); setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
       setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
     } catch {
       setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
-    setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
+      setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
+      setIsFullArt(false); setTitleColor(""); setDescColor(""); setLevelColor("");
       setCardFrameUrl("");
       setTitlePos({ x: 50, y: 75, scale: 100 }); setDescPos({ x: 50, y: 92, scale: 100 }); setRarityBadgePos({ x: 15, y: 65, scale: 100 }); setLevelTextPos({ x: 50, y: 82, scale: 100 });
       setLevelBadgePos({ x: 10, y: 8, scale: 100 });
@@ -833,6 +867,53 @@ export default function AdminPage() {
                 </div>
                 
                 <div className="pt-4 border-t border-[var(--color-border-color)]">
+                  <h4 className="text-sm font-bold text-white mb-4">Mode Full Art & Visibilité</h4>
+                  
+                  <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-[var(--color-accent-purple)] font-bold">
+                    <input type="checkbox" checked={isFullArt} onChange={(e) => setIsFullArt(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                    🚀 Activer le Mode "Full Art" (Layout Personnalisé)
+                  </label>
+
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <input type="checkbox" checked={showTitle} onChange={(e) => setShowTitle(e.target.checked)} className="rounded" /> Afficher Pseudo
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={titleColor} onChange={(e) => setTitleColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                      <span className="text-xs text-gray-400">Couleur Pseudo</span>
+                    </div>
+
+                    <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <input type="checkbox" checked={showRarityBadge} onChange={(e) => setShowRarityBadge(e.target.checked)} className="rounded" /> Afficher Rareté
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={rarityBadgeColor} onChange={(e) => setRarityBadgeColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                      <span className="text-xs text-gray-400">Couleur Rareté</span>
+                    </div>
+
+                    <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <input type="checkbox" checked={showLevelText} onChange={(e) => setShowLevelText(e.target.checked)} className="rounded" /> Afficher Niveau (Texte)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={levelColor} onChange={(e) => setLevelColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                      <span className="text-xs text-gray-400">Couleur Niveau</span>
+                    </div>
+
+                    <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <input type="checkbox" checked={showDesc} onChange={(e) => setShowDesc(e.target.checked)} className="rounded" /> Afficher Description
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={descColor} onChange={(e) => setDescColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                      <span className="text-xs text-gray-400">Couleur Description</span>
+                    </div>
+
+                    <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] col-span-2">
+                      <input type="checkbox" checked={showLevelIcon} onChange={(e) => setShowLevelIcon(e.target.checked)} className="rounded" /> Afficher Icône de Niveau (Top Left)
+                    </label>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-[var(--color-border-color)]">
                   <div className="flex justify-between items-center mb-4">
                     <label className="block text-sm font-bold text-white">Badges Flottants</label>
                     <button type="button" onClick={() => setCardCustomBadges([...cardCustomBadges, { id: Math.random().toString(36).substr(2, 9), url: '', x: 50, y: 50, size: 64 }])} className="text-xs bg-[var(--color-accent-purple)] text-white px-3 py-1 rounded hover:bg-purple-500">
@@ -898,12 +979,23 @@ export default function AdminPage() {
                     characterPosition: { x: charPosX, y: charPosY, scale: charScale },
                     attributes: JSON.stringify({ 
                       borderColor: cardBorderColor,
-      cardBgColor,
-      cardGlowColor, 
+                      cardBgColor,
+                      cardGlowColor, 
+                      mainColor,
+                      rarityBadgeColor,
                       frameUrl: cardFrameUrl,
                       titlePos, descPos, rarityBadgePos, levelTextPos,
                       levelBadgePos,
-                      levelBadgeUrl
+                      levelBadgeUrl,
+                      isFullArt,
+                      titleColor,
+                      descColor,
+                      levelColor,
+                      showTitle,
+                      showDesc,
+                      showRarityBadge,
+                      showLevelText,
+                      showLevelIcon
                     }),
                     player: {
                       minecraftName: players.find(p => p.id === cardPlayerId)?.minecraftName || ""

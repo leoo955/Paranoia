@@ -208,17 +208,18 @@ export default function CardDisplay({
     charPos = typeof card.characterPosition === 'string' ? JSON.parse(card.characterPosition) : (card.characterPosition || charPos);
   } catch (e) {}
 
-  const isPremiumLayout = card.level === "Netherite" || card.level === "Diamond" || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
-
   let attrs: any = {};
   try {
     attrs = typeof card.attributes === 'string' ? JSON.parse(card.attributes) : (card.attributes || {});
   } catch (e) {}
 
-  const titlePos = attrs.titlePos || { x: 50, y: 75, scale: 100 };
-  const descPos = attrs.descPos || { x: 50, y: 92, scale: 100 };
-  const rarityBadgePos = attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 };
-  const levelTextPos = attrs.levelTextPos || { x: 50, y: 82, scale: 100 };
+  const isPremiumLayout = attrs.isFullArt || card.level === "Netherite" || card.level === "Diamond" || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
+
+  // Full Art overrides default positions
+  const titlePos = attrs.isFullArt ? { x: 15, y: 8, scale: 100 } : (attrs.titlePos || { x: 50, y: 75, scale: 100 });
+  const descPos = attrs.isFullArt ? { x: 50, y: 85, scale: 100 } : (attrs.descPos || { x: 50, y: 92, scale: 100 });
+  const rarityBadgePos = attrs.isFullArt ? { x: 50, y: 8, scale: 100 } : (attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 });
+  const levelTextPos = attrs.isFullArt ? { x: 85, y: 8, scale: 100 } : (attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
   const textPos = attrs.textPos; // Fallback for old cards
   const levelBadgePos = attrs.levelBadgePos || { x: 10, y: 8, scale: 100 };
 
@@ -238,7 +239,8 @@ export default function CardDisplay({
 
   const combinedStyle = {
     ...((attrs.cardGlowColor || attrs.mainColor) ? { '--custom-glow-color': attrs.cardGlowColor || attrs.mainColor } as React.CSSProperties : {}),
-    ...(attrs.borderColor ? { borderColor: attrs.borderColor } : {})
+    ...(attrs.borderColor ? { borderColor: attrs.borderColor } : {}),
+    borderWidth: attrs.isFullArt ? '6px' : '2px', // Fun border logic
   };
 
   return (
@@ -324,7 +326,7 @@ export default function CardDisplay({
       )}
 
       {/* Background Gradient Fallback (only if not manually positioned) */}
-      {!attrs.titlePos && !attrs.textPos && (
+      {!attrs.titlePos && !attrs.textPos && !attrs.isFullArt && (
         <div className="absolute inset-x-0 bottom-0 min-h-[45%] bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10 rounded-b-xl pointer-events-none" />
       )}
 
@@ -356,7 +358,8 @@ export default function CardDisplay({
             transform: `translate(-50%, -50%) scale(${(attrs.textPos ? textPos.scale : titlePos.scale) / 100}) translateZ(30px)`,
             left: `${attrs.textPos ? textPos.x : titlePos.x}%`,
             top: `${attrs.textPos ? textPos.y - 12 : titlePos.y}%`,
-            width: '90%'
+            width: '90%',
+            color: attrs.titleColor || undefined
           }}
         >
           {card.title}
@@ -374,7 +377,7 @@ export default function CardDisplay({
             left: `${attrs.textPos ? textPos.x : levelTextPos.x}%`,
             top: `${attrs.textPos ? textPos.y - 5 : levelTextPos.y}%`,
             width: '90%',
-            color: attrs.mainColor || undefined
+            color: attrs.levelColor || attrs.mainColor || undefined
           }}
         >
           {card.level}
@@ -384,17 +387,17 @@ export default function CardDisplay({
       {/* Description */}
       {attrs.showDesc !== false && (
         <div 
-          className={`absolute z-30 flex justify-center items-center pt-2 ${!attrs.titlePos && !attrs.textPos ? 'border-t border-white/10' : ''} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+          className={`absolute z-30 flex justify-center items-center pt-2 ${!attrs.titlePos && !attrs.textPos ? 'border-t border-white/10' : ''} ${attrs.isFullArt ? 'border-4 border-double border-red-500/80 bg-red-900/40 rounded-xl px-2 py-4' : ''} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
           onMouseDown={(e) => handleMouseDown(e, 'desc')}
           onWheel={(e) => handleWheel(e, 'desc')}
           style={{
             transform: `translate(-50%, -50%) scale(${(attrs.textPos ? textPos.scale : descPos.scale) / 100}) translateZ(30px)`,
             left: `${attrs.textPos ? textPos.x : descPos.x}%`,
             top: `${attrs.textPos ? textPos.y + 10 : descPos.y}%`,
-            width: '90%'
+            width: attrs.isFullArt ? '95%' : '90%'
           }}
         >
-          <span className="text-xs font-bold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center">
+          <span className="text-xs font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center" style={{ color: attrs.descColor || 'white' }}>
             {card.description || "Collection"}
           </span>
         </div>
