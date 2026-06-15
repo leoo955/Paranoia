@@ -99,7 +99,7 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
   const isEpicOrLegendary = card.rarity === "EPIC" || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
   const isLegendary = card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
 
-  const hasVideoBg = card?.customBackground && (card.customBackground.endsWith('.mp4') || card.customBackground.endsWith('.webm'));
+  const hasVideoBg = card?.customBackground && (card.customBackground.includes('.mp4') || card.customBackground.includes('.webm'));
   const attrs = typeof card?.attributes === 'string' ? JSON.parse(card.attributes) : (card?.attributes || {});
 
   const combinedStyle = { 
