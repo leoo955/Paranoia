@@ -127,14 +127,21 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
       style={combinedStyle}
     >
       {hasVideoBg && (
-        <video 
-          src={card.customBackground} 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className="absolute inset-0 w-full h-full object-cover rounded-xl pointer-events-none z-0"
-        />
+        <div className="absolute inset-0 z-0 overflow-hidden rounded-xl">
+          <video 
+            src={card.customBackground} 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="w-full h-full object-cover pointer-events-none"
+            style={{
+              objectPosition: `${attrs.bgPosX ?? 50}% ${attrs.bgPosY ?? 50}%`,
+              transform: `scale(${(attrs.bgScale ?? 100) / 100})`,
+              transformOrigin: `${attrs.bgPosX ?? 50}% ${attrs.bgPosY ?? 50}%`
+            }}
+          />
+        </div>
       )}
       {/* Base Level Texture Overlay (gives depth to the gradient) */}
       <div className="absolute inset-0 z-0 mix-blend-multiply opacity-50 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none rounded-xl" />
