@@ -14,7 +14,7 @@ const navLinks = [
   { name: "Tier List", href: "/tier-list", icon: Trophy },
   { name: "Trading Cards", href: "/cards", icon: Sparkles },
   { name: "Candidature", href: "/candidature", icon: FileText },
-  { name: "Boutique", href: "/shop", icon: ShoppingCart },
+  { name: "Boutique", href: "/store", icon: ShoppingCart },
 ];
 
 export default function Navbar() {
