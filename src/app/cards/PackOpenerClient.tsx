@@ -212,34 +212,53 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
   return (
     <div className="w-full">
 
-      <div className="flex justify-between items-center mb-8 border-b border-[var(--color-border-color)] pb-4">
-        <div className="flex gap-4">
+      {/* Header HUD */}
+      <div className="relative mb-12 flex flex-col md:flex-row justify-between items-center gap-6 z-20">
+        
+        {/* Glowing backdrop for tabs */}
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-fuchsia-500/10 blur-3xl -z-10 rounded-full" />
+        
+        {/* Premium Tabs */}
+        <div className="flex gap-2 p-1.5 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
           <button 
             onClick={() => setActiveTab("opener")}
-            className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'opener' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
+            className={`relative flex items-center gap-3 px-8 py-3.5 font-bold rounded-xl transition-all duration-300 overflow-hidden ${activeTab === 'opener' ? 'text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}`}
           >
-            <PackageOpen className="w-5 h-5" /> Ouvrir des Boosters
+            {activeTab === 'opener' && <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/80 to-blue-600/80 shadow-[0_0_20px_rgba(79,70,229,0.5)]" />}
+            <PackageOpen className="w-5 h-5 relative z-10" /> 
+            <span className="relative z-10 tracking-wide">Boosters</span>
           </button>
+          
           <button 
             onClick={() => setActiveTab("collection")}
-            className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'collection' ? 'bg-[var(--color-accent-purple)] text-white shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
+            className={`relative flex items-center gap-3 px-8 py-3.5 font-bold rounded-xl transition-all duration-300 overflow-hidden ${activeTab === 'collection' ? 'text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}`}
           >
-            <Layers className="w-5 h-5" /> Ma Collection
+            {activeTab === 'collection' && <div className="absolute inset-0 bg-gradient-to-r from-purple-600/80 to-fuchsia-600/80 shadow-[0_0_20px_rgba(168,85,247,0.5)]" />}
+            <Layers className="w-5 h-5 relative z-10" /> 
+            <span className="relative z-10 tracking-wide">Collection</span>
           </button>
+
           <button 
             onClick={() => setActiveTab("catalogue")}
-            className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'catalogue' ? 'bg-[var(--color-accent-purple)] text-white shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
+            className={`relative flex items-center gap-3 px-8 py-3.5 font-bold rounded-xl transition-all duration-300 overflow-hidden ${activeTab === 'catalogue' ? 'text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}`}
           >
-            <BookOpen className="w-5 h-5" /> Catalogue
+            {activeTab === 'catalogue' && <div className="absolute inset-0 bg-gradient-to-r from-rose-600/80 to-red-600/80 shadow-[0_0_20px_rgba(225,29,72,0.5)]" />}
+            <BookOpen className="w-5 h-5 relative z-10" /> 
+            <span className="relative z-10 tracking-wide">Catalogue</span>
           </button>
         </div>
         
+        {/* Coin Balance Display */}
         {isLoggedIn && (
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-4 py-2 rounded-xl">
-              <img src="/Paracoin.png" alt="PARA Coins" className="w-6 h-6 object-contain drop-shadow-md" />
-              <span className="font-outfit font-bold text-white text-xl">{coins.toLocaleString()}</span>
+          <div className="flex items-center gap-3 bg-black/50 backdrop-blur-md border border-amber-500/20 px-6 py-3 rounded-2xl shadow-[0_0_15px_rgba(245,158,11,0.15)] group hover:shadow-[0_0_25px_rgba(245,158,11,0.3)] transition-all">
+            <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center border border-amber-500/40 group-hover:scale-110 transition-transform duration-300">
+              <img src="/Paracoin.png" alt="PARA Coins" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse-glow" />
             </div>
+            <div className="flex flex-col items-start justify-center">
+              <span className="text-xs text-amber-500/70 font-bold uppercase tracking-wider">Solde</span>
+              <span className="font-outfit font-black text-white text-2xl leading-none tracking-tight">{coins.toLocaleString()}</span>
+            </div>
+            
             {/* DEBUG BUTTON: to remove later */}
             <button 
               onClick={async () => {
@@ -247,7 +266,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
                 const data = await res.json();
                 if(data.coins) setCoins(data.coins);
               }}
-              className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded"
+              className="ml-4 text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-white/50 hover:text-white transition-colors"
             >
               +1000
             </button>
@@ -509,40 +528,52 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
       {activeTab === "collection" && (
         <div className="animate-fade-in">
 
-          <div className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl p-4 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-40 shadow-xl backdrop-blur-md bg-opacity-90">
-            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-              <h2 className="text-xl font-outfit font-bold text-white whitespace-nowrap">
-                Ma Collection <span className="text-[var(--color-text-secondary)] text-sm">({inventory.length} cartes)</span>
-              </h2>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-              <div className="relative w-full sm:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
-                <input 
-                  type="text" 
-                  placeholder="Rechercher une carte..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-black/30 border border-[var(--color-border-color)] rounded-lg text-white outline-none focus:border-[var(--color-accent-purple)] transition-colors"
-                />
+          <div className="relative mb-12 p-[1px] rounded-2xl bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-fuchsia-500/30 shadow-2xl">
+            <div className="bg-black/60 backdrop-blur-2xl rounded-2xl p-6 flex flex-col lg:flex-row gap-6 items-center justify-between sticky top-4 z-40">
+              <div className="flex flex-col items-center lg:items-start gap-1 w-full lg:w-auto">
+                <h2 className="text-3xl font-outfit font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300 flex items-center gap-3">
+                  <Layers className="w-8 h-8 text-indigo-400" /> Ma Collection
+                </h2>
+                <span className="text-indigo-200/50 font-medium tracking-wider uppercase text-sm ml-11">
+                  {inventory.length} cartes possédées
+                </span>
               </div>
               
-              <div className="relative w-full sm:w-48">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--color-text-secondary)]" />
-                <select 
-                  value={rarityFilter}
-                  onChange={(e) => setRarityFilter(e.target.value)}
-                  className="w-full pl-10 pr-8 py-2 bg-black/30 border border-[var(--color-border-color)] rounded-lg text-white outline-none focus:border-[var(--color-accent-purple)] transition-colors appearance-none"
-                >
-                  <option value="ALL">Toutes Raretés</option>
-                  <option value="COMMON">Commune</option>
-                  <option value="UNCOMMON">Peu Commune</option>
-                  <option value="RARE">Rare</option>
-                  <option value="EPIC">Épique</option>
-                  <option value="LEGENDARY">Légendaire</option>
-                  <option value="MYTHIC">Mythique</option>
-                </select>
+              <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div className="relative w-full sm:w-72 group">
+                  <div className="absolute inset-0 bg-indigo-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex items-center">
+                    <Search className="absolute left-4 w-5 h-5 text-indigo-300/50 group-focus-within:text-indigo-400 transition-colors" />
+                    <input 
+                      type="text" 
+                      placeholder="Rechercher une carte..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-indigo-200/30 outline-none focus:border-indigo-500/50 transition-all shadow-inner"
+                    />
+                  </div>
+                </div>
+                
+                <div className="relative w-full sm:w-56 group">
+                  <div className="absolute inset-0 bg-purple-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex items-center">
+                    <Filter className="absolute left-4 w-5 h-5 text-purple-300/50 group-focus-within:text-purple-400 transition-colors" />
+                    <select 
+                      value={rarityFilter}
+                      onChange={(e) => setRarityFilter(e.target.value)}
+                      className="w-full pl-12 pr-10 py-3 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-purple-500/50 transition-all appearance-none shadow-inner cursor-pointer"
+                    >
+                      <option value="ALL">Toutes Raretés</option>
+                      <option value="COMMON">Commune</option>
+                      <option value="UNCOMMON">Peu Commune</option>
+                      <option value="RARE">Rare</option>
+                      <option value="EPIC">Épique</option>
+                      <option value="LEGENDARY">Légendaire</option>
+                      <option value="MYTHIC">Mythique</option>
+                    </select>
+                    <div className="absolute right-4 pointer-events-none text-purple-300/50">▼</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -621,6 +652,19 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
 
       {activeTab === "catalogue" && (
         <div className="animate-fade-in">
+          <div className="relative mb-12 p-[1px] rounded-2xl bg-gradient-to-r from-rose-500/30 via-red-500/30 to-orange-500/30 shadow-2xl">
+            <div className="bg-black/60 backdrop-blur-2xl rounded-2xl p-6 flex flex-col lg:flex-row gap-6 items-center justify-between sticky top-4 z-40">
+              <div className="flex flex-col items-center lg:items-start gap-1 w-full lg:w-auto">
+                <h2 className="text-3xl font-outfit font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-300 to-red-300 flex items-center gap-3">
+                  <BookOpen className="w-8 h-8 text-rose-400" /> Catalogue Complet
+                </h2>
+                <span className="text-rose-200/50 font-medium tracking-wider uppercase text-sm ml-11">
+                  Découvrez toutes les cartes
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-16">
             {['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'].map(rarity => {
               const cardsOfRarity = allCards.filter(c => c.rarity === rarity);
@@ -644,8 +688,8 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
                      rarity === 'EPIC' ? 'Épique' : 
                      rarity === 'RARE' ? 'Rare' : 
                      rarity === 'UNCOMMON' ? 'Peu Commune' : 'Commune'}
-                    <span className="text-sm font-normal text-[var(--color-text-secondary)] bg-white/5 px-3 py-1 rounded-full ml-4 border border-white/10 drop-shadow-none">
-                      {ownedCount} / {cardsOfRarity.length} possédées
+                    <span className="text-sm font-normal text-[var(--color-text-secondary)] bg-white/5 px-3 py-1 rounded-full ml-4 border border-white/10 drop-shadow-none flex items-center gap-2">
+                      <Layers className="w-4 h-4" /> {ownedCount} / {cardsOfRarity.length} possédées
                     </span>
                   </h2>
                   
