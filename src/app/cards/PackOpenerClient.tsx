@@ -470,10 +470,13 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
         <div className="animate-fade-in">
 
           <div className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl p-4 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-4 z-40 shadow-xl backdrop-blur-md bg-opacity-90">
-            <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
               <h2 className="text-xl font-outfit font-bold text-white whitespace-nowrap">
                 Ma Collection <span className="text-[var(--color-text-secondary)] text-sm">({inventory.length} cartes)</span>
               </h2>
+              <a href="/cards/catalogue" className="bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white px-4 py-1.5 rounded-lg text-sm transition-colors border border-indigo-500/30 font-semibold whitespace-nowrap">
+                Voir le Catalogue Complet →
+              </a>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
@@ -574,44 +577,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
                 })}
               </div>
 
-              {/* Catalogue par Édition */}
-              <div className="pt-8 border-t border-white/10">
-                <h3 className="text-3xl font-outfit font-black text-white mb-8 border-b border-white/10 pb-4">Catalogue par Édition</h3>
-                {Array.from(new Set(stackedItems.map(item => item.card.edition || 'Standard'))).sort().map(edition => {
-                  const cardsOfEdition = stackedItems.filter(item => (item.card.edition || 'Standard') === edition);
-                  if (cardsOfEdition.length === 0) return null;
-                  
-                  return (
-                    <div key={edition} className="mb-12">
-                      <h4 className="text-2xl font-bold mb-6 text-[var(--color-text-secondary)] flex items-center gap-2">
-                        Édition: <span className="text-white">{edition}</span>
-                      </h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-                        {cardsOfEdition.map(item => (
-                          <div key={`${edition}-${item.card.id}`} className={`relative group perspective-1000 ${item.count === 0 ? 'opacity-50 grayscale hover:grayscale-0 transition-all duration-500' : ''}`}>
-                            <div 
-                              onClick={() => setSelectedCard(item.card)}
-                              className="cursor-pointer transition-all duration-500 transform-style-3d group-hover:scale-105 group-hover:-translate-y-4 group-hover:shadow-[0_20px_30px_rgba(0,0,0,0.5)] rounded-xl"
-                            >
-                              <CardDisplay card={item.card} size="md" />
-                              {item.count === 0 && (
-                                <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center backdrop-blur-[1px]">
-                                  <Lock className="w-10 h-10 text-white/50" />
-                                </div>
-                              )}
-                            </div>
-                            {item.count > 1 && (
-                              <div className="absolute -top-3 -right-3 z-50 bg-red-600 text-white font-black text-sm px-2.5 py-1 rounded-full border-2 border-[#111118] shadow-[0_0_10px_rgba(220,38,38,0.6)] animate-pulse-glow">
-                                x{item.count}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              {/* Catalogue par Édition supprimé d'ici pour aller dans une page dédiée */}
 
             </div>
           )}
