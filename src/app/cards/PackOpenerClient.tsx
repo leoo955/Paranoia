@@ -206,6 +206,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
 
   const ownedStandard = boxes.find(b => b.boxType === "standard")?.amount || 0;
   const ownedPremium = boxes.find(b => b.boxType === "premium")?.amount || 0;
+  const ownedLegendary = boxes.find(b => b.boxType === "legendary")?.amount || 0;
   const ownedMythic = boxes.find(b => b.boxType === "mythic")?.amount || 0;
 
   return (

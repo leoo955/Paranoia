@@ -6,7 +6,8 @@ import { authOptions } from "@/lib/auth";
 const PRICES: Record<string, number> = {
   standard: 100,
   premium: 250,
-  mythic: 500
+  legendary: 500,
+  mythic: 1000
 };
 
 export async function POST(req: Request) {

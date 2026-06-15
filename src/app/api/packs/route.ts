@@ -57,8 +57,10 @@ export async function POST(req: Request) {
       // Modifier selon la box
       if (boxType === "premium") {
         if (c.rarity === "COMMON" || c.rarity === "UNCOMMON") weight = 0;
-      } else if (boxType === "mythic") {
+      } else if (boxType === "legendary") {
         if (c.rarity === "COMMON" || c.rarity === "UNCOMMON" || c.rarity === "RARE") weight = 0;
+      } else if (boxType === "mythic") {
+        if (c.rarity === "COMMON" || c.rarity === "UNCOMMON" || c.rarity === "RARE" || c.rarity === "EPIC") weight = 0;
       }
 
       totalWeight += weight;
