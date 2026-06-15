@@ -38,6 +38,7 @@ export async function POST(req: Request) {
         characterPosition: parsedCharPos,
         attributes: parsedAttributes,
         authorId: user.id as string,
+        isPublished: true,
       },
     });
 
@@ -103,6 +104,7 @@ export async function PUT(req: Request) {
         customBadges: parsedBadges,
         characterPosition: parsedCharPos,
         attributes: parsedAttributes,
+        isPublished: true,
       },
     });
 

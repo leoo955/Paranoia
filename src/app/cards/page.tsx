@@ -43,7 +43,6 @@ export default async function CardsPage() {
   }
 
   const allCards = await prisma.tradingCard.findMany({
-    where: { isPublished: true },
     include: { player: true },
     orderBy: { rarity: 'desc' }
   });
