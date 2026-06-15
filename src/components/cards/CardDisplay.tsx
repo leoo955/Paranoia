@@ -215,11 +215,11 @@ export default function CardDisplay({
 
   const isPremiumLayout = attrs.isFullArt || card.level === "Netherite" || card.level === "Diamond" || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
 
-  // Full Art overrides default positions
-  const titlePos = attrs.isFullArt ? { x: 15, y: 8, scale: 100 } : (attrs.titlePos || { x: 50, y: 75, scale: 100 });
-  const descPos = attrs.isFullArt ? { x: 50, y: 85, scale: 100 } : (attrs.descPos || { x: 50, y: 92, scale: 100 });
-  const rarityBadgePos = attrs.isFullArt ? { x: 50, y: 8, scale: 100 } : (attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 });
-  const levelTextPos = attrs.isFullArt ? { x: 85, y: 8, scale: 100 } : (attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
+  // Full Art no longer overrides default positions rigidly, positions are managed by Admin state
+  const titlePos = attrs.titlePos || { x: 50, y: 75, scale: 100 };
+  const descPos = attrs.descPos || { x: 50, y: 92, scale: 100 };
+  const rarityBadgePos = attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 };
+  const levelTextPos = attrs.levelTextPos || { x: 50, y: 82, scale: 100 };
   const textPos = attrs.textPos; // Fallback for old cards
   const levelBadgePos = attrs.levelBadgePos || { x: 10, y: 8, scale: 100 };
 
@@ -384,24 +384,7 @@ export default function CardDisplay({
         </span>
       )}
 
-      {/* Description */}
-      {attrs.showDesc !== false && (
-        <div 
-          className={`absolute z-30 flex justify-center items-center pt-2 ${!attrs.titlePos && !attrs.textPos ? 'border-t border-white/10' : ''} ${attrs.isFullArt ? 'border-4 border-double border-red-500/80 bg-red-900/40 rounded-xl px-2 py-4' : ''} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
-          onMouseDown={(e) => handleMouseDown(e, 'desc')}
-          onWheel={(e) => handleWheel(e, 'desc')}
-          style={{
-            transform: `translate(-50%, -50%) scale(${(attrs.textPos ? textPos.scale : descPos.scale) / 100}) translateZ(30px)`,
-            left: `${attrs.textPos ? textPos.x : descPos.x}%`,
-            top: `${attrs.textPos ? textPos.y + 10 : descPos.y}%`,
-            width: attrs.isFullArt ? '95%' : '90%'
-          }}
-        >
-          <span className="text-xs font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center" style={{ color: attrs.descColor || 'white' }}>
-            {card.description || "Collection"}
-          </span>
-        </div>
-      )}
+
 
       {/* Custom Frame Overlay (behind characters and text) */}
       {attrs.frameUrl && (

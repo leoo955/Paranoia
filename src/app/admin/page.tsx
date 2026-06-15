@@ -516,7 +516,28 @@ export default function AdminPage() {
           name,
           customBackground: cardCustomBg,
           customBadges: cardCustomBadges,
-          characterPosition: { x: charPosX, y: charPosY, scale: charScale }
+          characterPosition: { x: charPosX, y: charPosY, scale: charScale },
+          level: cardLevel,
+          attributes: {
+            borderColor: cardBorderColor,
+            cardBgColor,
+            cardGlowColor,
+            mainColor,
+            rarityBadgeColor,
+            frameUrl: cardFrameUrl,
+            titlePos, descPos, rarityBadgePos, levelTextPos,
+            levelBadgePos,
+            levelBadgeUrl,
+            isFullArt,
+            titleColor,
+            descColor,
+            levelColor,
+            showTitle,
+            showDesc,
+            showRarityBadge,
+            showLevelText,
+            showLevelIcon
+          }
         })
       });
       if (res.ok) {
@@ -533,10 +554,36 @@ export default function AdminPage() {
     const t = templates.find(x => x.id === templateId);
     if (!t) return;
     setCardCustomBg(t.customBackground || "");
+    if (t.level) setCardLevel(t.level);
     try { setCardCustomBadges(typeof t.customBadges === 'string' ? JSON.parse(t.customBadges) : t.customBadges || []); } catch {}
     try { 
       const pos = typeof t.characterPosition === 'string' ? JSON.parse(t.characterPosition) : t.characterPosition;
       setCharPosX(pos?.x ?? 50); setCharPosY(pos?.y ?? 50); setCharScale(pos?.scale ?? 100);
+    } catch {}
+    try {
+      const attrs = typeof t.attributes === 'string' ? JSON.parse(t.attributes) : (t.attributes || {});
+      setCardBorderColor(attrs.borderColor || "");
+      setCardBgColor(attrs.cardBgColor || "");
+      setCardGlowColor(attrs.cardGlowColor || "");
+      setMainColor(attrs.mainColor || "");
+      setRarityBadgeColor(attrs.rarityBadgeColor || "");
+      setCardFrameUrl(attrs.frameUrl || "");
+      setIsFullArt(attrs.isFullArt || false);
+      setTitleColor(attrs.titleColor || "");
+      setDescColor(attrs.descColor || "");
+      setLevelColor(attrs.levelColor || "");
+      setShowTitle(attrs.showTitle !== false);
+      setShowDesc(attrs.showDesc !== false);
+      setShowRarityBadge(attrs.showRarityBadge !== false);
+      setShowLevelText(attrs.showLevelText !== false);
+      setShowLevelIcon(attrs.showLevelIcon !== false);
+
+      setTitlePos(attrs.titlePos || { x: 50, y: 75, scale: 100 }); 
+      setDescPos(attrs.descPos || { x: 50, y: 92, scale: 100 }); 
+      setRarityBadgePos(attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 }); 
+      setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
+      setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
+      setLevelBadgeUrl(attrs.levelBadgeUrl || "");
     } catch {}
   };
 
@@ -870,7 +917,19 @@ export default function AdminPage() {
                   <h4 className="text-sm font-bold text-white mb-4">Mode Full Art & Visibilité</h4>
                   
                   <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-[var(--color-accent-purple)] font-bold">
-                    <input type="checkbox" checked={isFullArt} onChange={(e) => setIsFullArt(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                    <input type="checkbox" checked={isFullArt} onChange={(e) => {
+                      const checked = e.target.checked;
+                      setIsFullArt(checked);
+                      if (checked) {
+                        setTitlePos({ x: 15, y: 8, scale: 100 });
+                        setRarityBadgePos({ x: 50, y: 8, scale: 100 });
+                        setLevelTextPos({ x: 85, y: 8, scale: 100 });
+                      } else {
+                        setTitlePos({ x: 50, y: 75, scale: 100 });
+                        setRarityBadgePos({ x: 15, y: 65, scale: 100 });
+                        setLevelTextPos({ x: 50, y: 82, scale: 100 });
+                      }
+                    }} className="rounded border-gray-600 bg-gray-700" />
                     Activer le Mode "Full Art" (Layout Personnalisé)
                   </label>
 
@@ -897,14 +956,6 @@ export default function AdminPage() {
                     <div className="flex items-center gap-2">
                       <input type="color" value={levelColor} onChange={(e) => setLevelColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
                       <span className="text-xs text-gray-400">Couleur Niveau</span>
-                    </div>
-
-                    <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-                      <input type="checkbox" checked={showDesc} onChange={(e) => setShowDesc(e.target.checked)} className="rounded" /> Afficher Description
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <input type="color" value={descColor} onChange={(e) => setDescColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
-                      <span className="text-xs text-gray-400">Couleur Description</span>
                     </div>
 
                     <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] col-span-2">

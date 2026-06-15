@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { name, customBackground, customBadges, characterPosition } = await req.json();
+    const { name, customBackground, customBadges, characterPosition, level, attributes } = await req.json();
 
     const template = await prisma.cardTemplate.create({
       data: {
@@ -38,6 +38,8 @@ export async function POST(req: Request) {
         customBackground: customBackground || null,
         customBadges: Array.isArray(customBadges) ? JSON.stringify(customBadges) : "[]",
         characterPosition: typeof characterPosition === 'object' && characterPosition !== null ? JSON.stringify(characterPosition) : '{"x":50,"y":50,"scale":100}',
+        level: level || "Normal",
+        attributes: typeof attributes === 'object' && attributes !== null ? JSON.stringify(attributes) : "{}"
       }
     });
 
