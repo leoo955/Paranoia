@@ -363,12 +363,12 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
                   onClick={openPack} 
                   className="relative cursor-pointer transition-transform hover:scale-105 active:scale-95 outline-none group"
                 >
-                  <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${selectedBoxType === 'standard' ? 'bg-blue-500' : selectedBoxType === 'premium' ? 'bg-purple-500' : 'bg-red-500'}`}></div>
-                  <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className="w-64 h-auto relative z-10 drop-shadow-2xl transition-all duration-300 transform hover:scale-110" />
+                  <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${selectedBoxType === 'standard' ? 'bg-blue-500' : selectedBoxType === 'premium' ? 'bg-purple-500' : selectedBoxType === 'legendary' ? 'bg-amber-500' : 'bg-red-500'}`}></div>
+                  <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/StandardB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-64 h-auto relative z-10 drop-shadow-2xl transition-all duration-300 transform hover:scale-110 ${selectedBoxType === 'legendary' ? 'hue-rotate-180 brightness-150' : ''}`} />
                   
                   {/* Floating particles effect on hover */}
                   <div className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Sparkles className={`w-32 h-32 animate-ping ${selectedBoxType === 'standard' ? 'text-blue-400' : selectedBoxType === 'premium' ? 'text-purple-400' : 'text-red-400'}`} />
+                    <Sparkles className={`w-32 h-32 animate-ping ${selectedBoxType === 'standard' ? 'text-blue-400' : selectedBoxType === 'premium' ? 'text-purple-400' : selectedBoxType === 'legendary' ? 'text-amber-400' : 'text-red-400'}`} />
                   </div>
                 </button>
               )}
@@ -376,7 +376,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
               {!isOpening && (
                 <button 
                   onClick={openPack}
-                  disabled={isOpening || isBuying || (selectedBoxType === "standard" ? ownedStandard : selectedBoxType === "premium" ? ownedPremium : ownedMythic) <= 0}
+                  disabled={isOpening || isBuying || (selectedBoxType === "standard" ? ownedStandard : selectedBoxType === "premium" ? ownedPremium : selectedBoxType === "legendary" ? ownedLegendary : ownedMythic) <= 0}
                   className="group relative px-12 py-4 mt-10 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl font-black text-xl text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(129,140,248,0.5)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
                 >
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
@@ -405,7 +405,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
                      'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'
                    }`} />
                 )}
-                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-80 h-auto relative z-10 transition-all duration-700 ${
+                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/StandardB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-80 h-auto relative z-10 transition-all duration-700 ${selectedBoxType === 'legendary' ? 'hue-rotate-180 brightness-150' : ''} ${
                   openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' :
                   openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' :
                   openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' :
@@ -420,7 +420,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
             <div className="z-10 flex flex-col items-center animate-slide-up relative mt-8 w-full max-w-7xl mx-auto">
               
               {/* BIG WIN EXPLOSION (Sparkles & Flash) */}
-              {openingGlow && (selectedBoxType === 'standard' || selectedBoxType === 'premium') && (
+              {openingGlow && (
                 <div className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center">
                   <div className={`absolute inset-0 animate-flash-fade ${
                     openingGlow === 'MYTHIC' ? 'bg-red-500/20 mix-blend-screen' :
