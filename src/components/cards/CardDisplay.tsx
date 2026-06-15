@@ -175,7 +175,7 @@ export default function CardDisplay({
   onUpdateElement?: (type: string, id: string, data: any) => void
 }) {
   // Define sizing classes based on 'size' prop
-  const wrapperClass = size === "lg" ? "w-64" : size === "md" ? "w-full max-w-[16rem]" : "w-48";
+  const wrapperClass = size === "lg" ? "w-80" : size === "md" ? "w-full max-w-[18rem]" : "w-56";
   
   // Icon sizes - Shrinking non-netherite to be more reasonable
   const iconClass = size === "lg" 
