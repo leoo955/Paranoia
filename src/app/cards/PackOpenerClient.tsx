@@ -328,13 +328,13 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 </div>
               )}
 
-              <div className="flex flex-row justify-center items-center gap-4 md:gap-8 flex-wrap">
+              <div className="flex flex-row justify-center items-center gap-8 md:gap-16 lg:gap-24 flex-wrap">
                 {drawnCards.map((card, i) => (
                   <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} />
                 ))}
               </div>
               
-              <div className="mt-12 flex gap-4 z-10">
+              <div className="mt-20 flex gap-6 z-10">
                 <button onClick={() => setShowReveal(false)} className="btn-primary px-8 py-3 rounded-full font-bold shadow-[0_0_15px_rgba(220,38,38,0.5)]">
                   Ouvrir un autre booster
                 </button>
