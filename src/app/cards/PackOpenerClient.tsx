@@ -234,23 +234,23 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
           {/* Cinematic Opening Overlay */}
           {isOpening && (
             <div className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 ${
-              openingGlow === 'MYTHIC' ? 'bg-red-900/60' : 
-              openingGlow === 'LEGENDARY' ? 'bg-yellow-900/60' : 
-              openingGlow === 'EPIC' ? 'bg-purple-900/60' : 
+              openingGlow === 'MYTHIC' ? 'bg-red-900/20' : 
+              openingGlow === 'LEGENDARY' ? 'bg-yellow-900/20' : 
+              openingGlow === 'EPIC' ? 'bg-purple-900/20' : 
               'bg-black/90'
             }`}>
               <div className="animate-booster-open relative flex items-center justify-center">
                 {openingGlow && (
                    <div className={`absolute inset-0 z-0 animate-pulse-glow blur-2xl ${
-                     openingGlow === 'MYTHIC' ? 'bg-red-500/80 shadow-[0_0_100px_rgba(239,68,68,1)]' :
-                     openingGlow === 'LEGENDARY' ? 'bg-yellow-400/80 shadow-[0_0_100px_rgba(250,204,21,1)]' :
-                     'bg-purple-500/80 shadow-[0_0_100px_rgba(168,85,247,1)]'
+                     openingGlow === 'MYTHIC' ? 'bg-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.5)]' :
+                     openingGlow === 'LEGENDARY' ? 'bg-yellow-400/30 shadow-[0_0_50px_rgba(250,204,21,0.5)]' :
+                     'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'
                    }`} />
                 )}
                 <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-80 h-auto relative z-10 transition-all duration-700 ${
-                  openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_60px_rgba(239,68,68,1)] scale-105' :
-                  openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_60px_rgba(250,204,21,1)] scale-105' :
-                  openingGlow === 'EPIC' ? 'drop-shadow-[0_0_60px_rgba(168,85,247,1)]' :
+                  openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' :
+                  openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' :
+                  openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' :
                   'drop-shadow-[0_0_30px_rgba(255,255,255,0.5)]'
                 }`} />
               </div>
