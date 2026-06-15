@@ -308,13 +308,13 @@ export default function CardDisplay({
           </div>
         </div>
       ) : (
-        <div className="absolute top-4 left-4 right-4 bottom-[42%] rounded-t-lg border border-white/20 overflow-hidden pointer-events-none bg-black/10 backdrop-blur-[2px]" style={{ transform: 'translateZ(20px)' }}>
+        <div className="absolute top-12 left-4 right-4 bottom-[42%] rounded-t-lg border border-white/20 overflow-hidden pointer-events-none bg-black/10 backdrop-blur-[2px]" style={{ transform: 'translateZ(20px)' }}>
           <div className="w-full h-full flex items-end justify-center pt-4">
             {card.imageUrl || card.player?.minecraftName || card.title ? (
               <img 
                 src={card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || card.title}`} 
                 alt={card.title} 
-                className={`h-[85%] object-contain drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : ''}`}
+                className={`h-[95%] object-contain drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : ''}`}
                 onMouseDown={(e) => handleMouseDown(e, 'character')}
                 onWheel={(e) => handleWheel(e, 'character')}
               />
