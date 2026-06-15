@@ -46,8 +46,7 @@ export default function AdminPage() {
   const [showLevelIcon, setShowLevelIcon] = useState(true);
   
   // New Full Art & Color States
-  const [isFullArt,
-          effect: cardEffect, setIsFullArt] = useState(false);
+  const [isFullArt, setIsFullArt] = useState(false);
   const [cardEffect, setCardEffect] = useState("");
   const [titleColor, setTitleColor] = useState("");
   const [descColor, setDescColor] = useState("");
