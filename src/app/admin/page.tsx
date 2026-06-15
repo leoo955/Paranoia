@@ -64,6 +64,42 @@ export default function AdminPage() {
   const [creatingCard, setCreatingCard] = useState(false);
   const [cardError, setCardError] = useState("");
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
+  const [appUsers, setAppUsers] = useState<any[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
+  const fetchUsers = async () => {
+    try {
+      setLoadingUsers(true);
+      const res = await fetch("/api/admin/users");
+      if (res.ok) {
+        const data = await res.json();
+        setAppUsers(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, role: newRole }),
+      });
+      if (res.ok) {
+        fetchUsers();
+        alert("Rôle mis à jour avec succès !");
+      } else {
+        const msg = await res.text();
+        alert("Erreur: " + msg);
+      }
+    } catch (err) {
+      alert("Erreur de connexion");
+    }
+  };
 
   const fetchPlayers = async () => {
     try {
@@ -115,6 +151,7 @@ export default function AdminPage() {
     fetchPlayers();
     fetchCards();
     fetchTemplates();
+    fetchUsers();
   }, []);
 
   useEffect(() => {
@@ -923,11 +960,72 @@ export default function AdminPage() {
 
         {activeTab === "moderation" && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold font-outfit text-white mb-6">Outils de Modération</h2>
-            <p className="text-[var(--color-text-secondary)] mb-4">Fonctionnalités de suppression de topics et de bannissement à venir prochainement.</p>
-            <div className="bg-[var(--color-bg-elevated)] border border-dashed border-[var(--color-border-color)] rounded-lg p-12 text-center text-[var(--color-text-muted)]">
-              Panel en construction
-            </div>
+            <h2 className="text-2xl font-bold font-outfit text-white mb-6">Gestion des Utilisateurs</h2>
+            <p className="text-[var(--color-text-secondary)] mb-4">Gérez les rôles des utilisateurs connectés (MEMBER, MODERATOR, ADMIN).</p>
+            
+            {loadingUsers ? (
+              <div className="text-white text-center py-8">Chargement des utilisateurs...</div>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-[var(--color-border-color)]">
+                <table className="w-full text-left text-white border-collapse">
+                  <thead className="bg-[var(--color-bg-elevated)] border-b border-[var(--color-border-color)]">
+                    <tr>
+                      <th className="p-4 font-semibold text-[var(--color-text-secondary)]">Utilisateur</th>
+                      <th className="p-4 font-semibold text-[var(--color-text-secondary)]">Date d'inscription</th>
+                      <th className="p-4 font-semibold text-[var(--color-text-secondary)]">Rôle actuel</th>
+                      <th className="p-4 font-semibold text-[var(--color-text-secondary)]">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {appUsers.map((user) => (
+                      <tr key={user.id} className="border-b border-[var(--color-border-color)] hover:bg-[var(--color-bg-elevated)]/50 transition-colors">
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            {user.image ? (
+                              <img src={user.image} alt={user.name || "User"} className="w-8 h-8 rounded-full" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">?</div>
+                            )}
+                            <div className="flex flex-col">
+                              <span className="font-medium">{user.name || "Inconnu"}</span>
+                              {user.minecraftName && <span className="text-xs text-[var(--color-text-secondary)]">IG: {user.minecraftName}</span>}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4 text-[var(--color-text-secondary)] text-sm">
+                          {new Date(user.createdAt).toLocaleDateString("fr-FR")}
+                        </td>
+                        <td className="p-4">
+                          <span className={`px-2 py-1 text-xs rounded-full font-bold ${
+                            user.role === 'ADMIN' ? 'bg-red-500/20 text-red-400' :
+                            user.role === 'MODERATOR' ? 'bg-purple-500/20 text-purple-400' :
+                            'bg-gray-500/20 text-gray-400'
+                          }`}>
+                            {user.role}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <select 
+                            value={user.role}
+                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                            className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded px-3 py-1 text-sm outline-none focus:border-[var(--color-accent-purple)]"
+                          >
+                            <option value="MEMBER">MEMBER</option>
+                            <option value="MODERATOR">MODERATOR</option>
+                            <option value="ADMIN">ADMIN</option>
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                    {appUsers.length === 0 && (
+                      <tr>
+                        <td colSpan={4} className="p-8 text-center text-[var(--color-text-secondary)]">Aucun utilisateur trouvé.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </div>
