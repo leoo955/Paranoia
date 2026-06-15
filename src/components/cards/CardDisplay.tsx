@@ -308,7 +308,7 @@ export default function CardDisplay({
           </div>
         </div>
       ) : (
-        <div className="absolute top-20 left-4 right-4 bottom-[42%] rounded-t-lg border border-white/20 overflow-hidden pointer-events-none bg-black/10 backdrop-blur-[2px]" style={{ transform: 'translateZ(20px)' }}>
+        <div className="absolute top-12 left-4 right-4 bottom-[42%] rounded-t-lg border border-white/20 overflow-hidden pointer-events-none bg-black/10 backdrop-blur-[2px]" style={{ transform: 'translateZ(20px)' }}>
           <div className="w-full h-full flex items-end justify-center pt-4">
             {card.imageUrl || card.player?.minecraftName || card.title ? (
               <img 
