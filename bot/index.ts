@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction } from 'discord.js';
+import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, ChannelType, PermissionsBitField, TextChannel } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
 import path from 'path';
@@ -44,7 +44,11 @@ const commands = [
       subcommand
         .setName('list')
         .setDescription('Afficher votre inventaire de cartes (pour flex)')
-    )
+    ),
+  new SlashCommandBuilder()
+    .setName('ticket-setup')
+    .setDescription('Configurer le panel de tickets (Admin uniquement)')
+    .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
 ];
 
 client.once('ready', async () => {
@@ -261,6 +265,35 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         await interaction.reply({ content: "Une erreur est survenue.", ephemeral: true });
       }
     }
+
+    if (interaction.commandName === 'ticket-setup') {
+      try {
+        const embed = new EmbedBuilder()
+          .setTitle('🛒 Boutique & Checkout')
+          .setColor('#6366f1')
+          .setDescription('Pour acheter des **ParaCoins**, ouvrez un ticket ci-dessous.\n\nUn membre du staff vous prendra en charge pour procéder au paiement (PayPal, etc.) et vous créditer vos ParaCoins directement en jeu et sur le site.')
+          .addFields(
+            { name: 'Prix des Boosters', value: '- Standard: 500 PC\n- Premium: 1200 PC\n- Mythique: 2500 PC' }
+          );
+
+        const row = new ActionRowBuilder<ButtonBuilder>()
+          .addComponents(
+            new ButtonBuilder()
+              .setCustomId('open_checkout_ticket')
+              .setLabel('Ouvrir un ticket Checkout')
+              .setEmoji('🛒')
+              .setStyle(ButtonStyle.Primary)
+          );
+
+        await interaction.reply({ content: 'Panel créé avec succès !', ephemeral: true });
+        if (interaction.channel?.isTextBased()) {
+          await interaction.channel.send({ embeds: [embed], components: [row] });
+        }
+      } catch (error) {
+        console.error("Ticket setup error:", error);
+        await interaction.reply({ content: "Erreur lors de la création du panel.", ephemeral: true });
+      }
+    }
   }
 
   if (interaction.isButton()) {
@@ -319,6 +352,66 @@ client.on('interactionCreate', async (interaction: Interaction) => {
             );
 
           await interaction.update({ embeds: [embed], components: [], content: '' });
+        }
+      } else if (interaction.customId === 'open_checkout_ticket') {
+        const guild = interaction.guild;
+        if (!guild) return await interaction.reply({ content: 'Ce bouton ne peut être utilisé que sur un serveur.', ephemeral: true });
+
+        const ticketName = `checkout-${interaction.user.username.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
+        
+        // Vérifier si le joueur a déjà un ticket de ce nom
+        const existingChannel = guild.channels.cache.find(c => c.name === ticketName);
+        if (existingChannel) {
+          return await interaction.reply({ content: `Vous avez déjà un ticket ouvert : <#${existingChannel.id}>`, ephemeral: true });
+        }
+
+        const channel = await guild.channels.create({
+          name: ticketName,
+          type: ChannelType.GuildText,
+          permissionOverwrites: [
+            {
+              id: guild.id, // @everyone
+              deny: [PermissionsBitField.Flags.ViewChannel],
+            },
+            {
+              id: interaction.user.id,
+              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory],
+            },
+            {
+              id: client.user!.id,
+              allow: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.SendMessages, PermissionsBitField.Flags.ReadMessageHistory, PermissionsBitField.Flags.ManageChannels],
+            }
+          ],
+        });
+
+        const embed = new EmbedBuilder()
+          .setTitle('Ticket Checkout')
+          .setColor('#6366f1')
+          .setDescription(`Bienvenue <@${interaction.user.id}> !\n\nMerci de préciser le nombre de **ParaCoins** que vous souhaitez acheter.\nUn administrateur vous transmettra les informations de paiement (PayPal, etc.).`);
+
+        const row = new ActionRowBuilder<ButtonBuilder>()
+          .addComponents(
+            new ButtonBuilder()
+              .setCustomId('close_ticket')
+              .setLabel('Fermer le ticket')
+              .setEmoji('🔒')
+              .setStyle(ButtonStyle.Danger)
+          );
+
+        await channel.send({ content: `<@${interaction.user.id}>`, embeds: [embed], components: [row] });
+        await interaction.reply({ content: `Votre ticket a été créé : <#${channel.id}>`, ephemeral: true });
+
+      } else if (interaction.customId === 'close_ticket') {
+        const channel = interaction.channel as TextChannel;
+        if (channel) {
+          await interaction.reply({ content: 'Fermeture du ticket dans 5 secondes...' });
+          setTimeout(async () => {
+            try {
+              await channel.delete();
+            } catch (e) {
+              console.error("Erreur lors de la suppression du salon:", e);
+            }
+          }, 5000);
         }
       }
     } catch (error) {

@@ -38,7 +38,7 @@ export default async function Home() {
               alt="PARANOIA SMP" 
               width={800} 
               height={266} 
-              className="w-full max-w-[500px] md:max-w-[700px] object-contain drop-shadow-[0_0_35px_rgba(220,38,38,0.5)]"
+              className="w-full max-w-[500px] md:max-w-[700px] object-contain"
               priority
             />
           </div>
