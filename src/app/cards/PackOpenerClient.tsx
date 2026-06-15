@@ -260,6 +260,35 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
           {/* The Drawn Cards Reveal */}
           {showReveal && drawnCards.length > 0 && (
             <div className="z-10 flex flex-col items-center animate-slide-up relative mt-8 w-full max-w-5xl mx-auto">
+              
+              {/* BIG WIN EXPLOSION (Sparkles & Flash) */}
+              {openingGlow && (selectedBoxType === 'standard' || selectedBoxType === 'premium') && (
+                <div className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center">
+                  <div className={`absolute inset-0 animate-flash-fade ${
+                    openingGlow === 'MYTHIC' ? 'bg-red-500/20 mix-blend-screen' :
+                    openingGlow === 'LEGENDARY' ? 'bg-yellow-500/20 mix-blend-screen' :
+                    'bg-purple-500/20 mix-blend-screen'
+                  }`}></div>
+                  {Array.from({ length: 50 }).map((_, i) => (
+                    <Sparkles 
+                      key={i} 
+                      className={`absolute animate-particle ${
+                        openingGlow === 'MYTHIC' ? 'text-red-400' :
+                        openingGlow === 'LEGENDARY' ? 'text-yellow-400' :
+                        'text-purple-400'
+                      }`}
+                      style={{ 
+                        '--tx': `${(Math.random() - 0.5) * 1200}px`, 
+                        '--ty': `${(Math.random() - 0.5) * 1200}px`,
+                        animationDelay: `${Math.random() * 0.2}s`,
+                        width: `${Math.random() * 60 + 20}px`,
+                        height: `${Math.random() * 60 + 20}px`,
+                      } as React.CSSProperties} 
+                    />
+                  ))}
+                </div>
+              )}
+
               <div className="flex flex-row justify-center items-center gap-4 md:gap-8 flex-wrap">
                 {drawnCards.map((card, i) => (
                   <div 
