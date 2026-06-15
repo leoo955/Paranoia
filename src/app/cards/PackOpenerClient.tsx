@@ -335,7 +335,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 </div>
               )}
 
-              <div className="flex flex-row justify-center items-center gap-4 md:gap-8 lg:gap-12 flex-wrap w-full max-w-[90vw]">
+              <div className="flex flex-row justify-center items-center gap-[3px] px-[5px] flex-wrap w-full max-w-[95vw]">
                 {drawnCards.map((card, i) => (
                   <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} />
                 ))}
