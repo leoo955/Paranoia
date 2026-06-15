@@ -13,6 +13,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized. Please log in." }, { status: 401 });
     }
 
+    // Verify user actually exists in DB (in case of DB reset but stale session cookie)
+    const userExists = await prisma.user.findUnique({ where: { id: userId } });
+    if (!userExists) {
+      return NextResponse.json({ error: "Compte introuvable. Veuillez vous déconnecter et vous reconnecter." }, { status: 401 });
+    }
+
     // Fetch all available TradingCards
     const cards = await prisma.tradingCard.findMany({
       // We can drop the isPublished constraint for now if testing locally without an admin page to publish,

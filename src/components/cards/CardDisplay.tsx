@@ -384,8 +384,24 @@ export default function CardDisplay({
         </span>
       )}
 
-
-
+      {/* Description */}
+      {attrs.showDesc !== false && (
+        <div 
+          className={`absolute z-30 flex justify-center items-center pt-2 ${!attrs.titlePos && !attrs.textPos ? 'border-t border-white/10' : ''} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
+          onMouseDown={(e) => handleMouseDown(e, 'desc')}
+          onWheel={(e) => handleWheel(e, 'desc')}
+          style={{
+            transform: `translate(-50%, -50%) scale(${(attrs.textPos ? textPos.scale : descPos.scale) / 100}) translateZ(30px)`,
+            left: `${attrs.textPos ? textPos.x : descPos.x}%`,
+            top: `${attrs.textPos ? textPos.y + 10 : descPos.y}%`,
+            width: '90%'
+          }}
+        >
+          <span className="text-xs font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center" style={{ color: attrs.descColor || 'white' }}>
+            {card.description || "Collection"}
+          </span>
+        </div>
+      )}
       {/* Custom Frame Overlay (behind characters and text) */}
       {attrs.frameUrl && (
         <img src={attrs.frameUrl} alt="Card Frame" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />

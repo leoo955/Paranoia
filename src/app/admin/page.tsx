@@ -943,6 +943,14 @@ export default function AdminPage() {
                     </div>
 
                     <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
+                      <input type="checkbox" checked={showDesc} onChange={(e) => setShowDesc(e.target.checked)} className="rounded" /> Afficher Description
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input type="color" value={descColor} onChange={(e) => setDescColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer" />
+                      <span className="text-xs text-gray-400">Couleur Description</span>
+                    </div>
+
+                    <label className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
                       <input type="checkbox" checked={showRarityBadge} onChange={(e) => setShowRarityBadge(e.target.checked)} className="rounded" /> Afficher Rareté
                     </label>
                     <div className="flex items-center gap-2">
