@@ -23,7 +23,7 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
         style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)' }}
       >
         {/* Front */}
-        <div className="absolute inset-0 pointer-events-none" style={{ backfaceVisibility: 'hidden' }}>
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ backfaceVisibility: 'hidden' }}>
           <CardDisplay card={card} size="lg" />
         </div>
         
@@ -304,7 +304,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
 
           {/* The Drawn Cards Reveal */}
           {showReveal && drawnCards.length > 0 && (
-            <div className="z-10 flex flex-col items-center animate-slide-up relative mt-8 w-full max-w-5xl mx-auto">
+            <div className="z-10 flex flex-col items-center animate-slide-up relative mt-8 w-full max-w-7xl mx-auto">
               
               {/* BIG WIN EXPLOSION (Sparkles & Flash) */}
               {openingGlow && (selectedBoxType === 'standard' || selectedBoxType === 'premium') && (
@@ -334,7 +334,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
                 </div>
               )}
 
-              <div className="flex flex-row justify-center items-center gap-8 md:gap-16 lg:gap-24 flex-wrap">
+              <div className="flex flex-row justify-center items-center gap-6 md:gap-12 flex-wrap w-full">
                 {drawnCards.map((card, i) => (
                   <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} />
                 ))}
