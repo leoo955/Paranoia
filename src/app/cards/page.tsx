@@ -43,10 +43,6 @@ export default async function CardsPage() {
           <h1 className="text-4xl font-outfit font-black text-white inline-block mb-2">Cartes de Joueurs</h1>
           <p className="text-[var(--color-text-secondary)]">Collectionnez les cartes des membres du serveur.</p>
         </div>
-        <Link href="/cards/create" className="btn-primary flex items-center gap-2">
-          <Sparkles className="w-5 h-5" />
-          <span>Créer une carte</span>
-        </Link>
       </div>
 
       <PackOpenerClient initialInventory={inventory} initialBoxes={userBoxes} isLoggedIn={!!userId} />
