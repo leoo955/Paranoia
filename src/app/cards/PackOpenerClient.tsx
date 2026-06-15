@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock } from "lucide-react";
+import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock, BookOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
 import CardDisplay from "@/components/cards/CardDisplay";
 
@@ -66,7 +66,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
   const [openingGlow, setOpeningGlow] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<"opener" | "collection">("opener");
+  const [activeTab, setActiveTab] = useState<"opener" | "collection" | "catalogue">("opener");
   const [searchQuery, setSearchQuery] = useState("");
   const [rarityFilter, setRarityFilter] = useState("ALL");
   const router = useRouter();
@@ -224,6 +224,12 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
             className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'collection' ? 'bg-[var(--color-accent-purple)] text-white shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
           >
             <Layers className="w-5 h-5" /> Ma Collection
+          </button>
+          <button 
+            onClick={() => setActiveTab("catalogue")}
+            className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'catalogue' ? 'bg-[var(--color-accent-purple)] text-white shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
+          >
+            <BookOpen className="w-5 h-5" /> Catalogue
           </button>
         </div>
         
@@ -474,9 +480,6 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
               <h2 className="text-xl font-outfit font-bold text-white whitespace-nowrap">
                 Ma Collection <span className="text-[var(--color-text-secondary)] text-sm">({inventory.length} cartes)</span>
               </h2>
-              <a href="/cards/catalogue" className="bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white px-4 py-1.5 rounded-lg text-sm transition-colors border border-indigo-500/30 font-semibold whitespace-nowrap">
-                Voir le Catalogue Complet →
-              </a>
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
@@ -577,10 +580,61 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, initi
                 })}
               </div>
 
-              {/* Catalogue par Édition supprimé d'ici pour aller dans une page dédiée */}
-
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === "catalogue" && (
+        <div className="animate-fade-in">
+          <div className="flex flex-col gap-16">
+            {Array.from(new Set(allCards.map(c => c.edition || 'Standard'))).sort().map(edition => {
+              const cardsOfEdition = allCards.filter(c => (c.edition || 'Standard') === edition);
+              if (cardsOfEdition.length === 0) return null;
+
+              // Check owned cards for this edition
+              const ownedCount = cardsOfEdition.filter(c => inventory.some(i => i.tradingCard?.id === c.id)).length;
+
+              return (
+                <div key={edition}>
+                  <h2 className="text-3xl font-bold mb-6 text-white flex items-center gap-3 border-b border-white/10 pb-4">
+                    <BookOpen className="text-indigo-500 w-8 h-8" />
+                    Édition: {edition}
+                    <span className="text-sm font-normal text-[var(--color-text-secondary)] bg-white/5 px-3 py-1 rounded-full ml-4 border border-white/10">
+                      {ownedCount} / {cardsOfEdition.length} possédées
+                    </span>
+                  </h2>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+                    {cardsOfEdition.map(card => {
+                      const isOwned = inventory.some(i => i.tradingCard?.id === card.id);
+                      return (
+                        <div key={card.id} className={`relative group perspective-1000 ${!isOwned ? 'opacity-50 grayscale hover:grayscale-0 transition-all duration-500' : ''}`}>
+                          <div 
+                            onClick={() => isOwned && setSelectedCard(card)}
+                            className={`transition-all duration-500 transform-style-3d group-hover:scale-105 group-hover:-translate-y-4 group-hover:shadow-[0_20px_30px_rgba(0,0,0,0.5)] rounded-xl ${isOwned ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                          >
+                            <CardDisplay card={card as any} size="md" />
+                            {!isOwned && (
+                              <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center backdrop-blur-[1px]">
+                                <Lock className="w-10 h-10 text-white/50" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+            
+            {allCards.length === 0 && (
+              <div className="text-center py-20 text-[var(--color-text-secondary)]">
+                Aucune carte n'a encore été publiée.
+              </div>
+            )}
+          </div>
         </div>
       )}
 
