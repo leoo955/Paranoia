@@ -109,7 +109,11 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
     ...((attrs.cardBgColor || attrs.mainColor) 
       ? { backgroundColor: attrs.cardBgColor || attrs.mainColor, backgroundImage: 'none' } 
       : (!hasVideoBg && card?.customBackground 
-          ? { backgroundImage: `url('${card.customBackground}')`, backgroundSize: 'cover', backgroundPosition: 'center' } 
+          ? { 
+              backgroundImage: `url('${card.customBackground}')`, 
+              backgroundSize: attrs.bgScale ? `${attrs.bgScale}%` : 'cover', 
+              backgroundPosition: `${attrs.bgPosX ?? 50}% ${attrs.bgPosY ?? 50}%` 
+            } 
           : (!hasVideoBg && card ? getLevelStyle(card.level) : { backgroundColor: "transparent" })))
   };
 

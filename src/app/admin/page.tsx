@@ -58,6 +58,9 @@ export default function AdminPage() {
   const [charPosX, setCharPosX] = useState(50);
   const [charPosY, setCharPosY] = useState(50);
   const [charScale, setCharScale] = useState(100);
+  const [bgPosX, setBgPosX] = useState(50);
+  const [bgPosY, setBgPosY] = useState(50);
+  const [bgScale, setBgScale] = useState(100);
   const [titlePos, setTitlePos] = useState({ x: 50, y: 75, scale: 100 });
   const [descPos, setDescPos] = useState({ x: 50, y: 92, scale: 100 });
   const [rarityBadgePos, setRarityBadgePos] = useState({ x: 15, y: 65, scale: 100 });
@@ -351,6 +354,7 @@ export default function AdminPage() {
         customBadges: cardCustomBadges,
         characterPosition: { x: charPosX, y: charPosY, scale: charScale },
         attributes: {
+          bgPosX, bgPosY, bgScale,
           borderColor: cardBorderColor,
           cardBgColor,
           cardGlowColor,
@@ -395,6 +399,7 @@ export default function AdminPage() {
         setCardCustomBg("");
         setCardImageUrl("");
         setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
+        setBgPosX(50); setBgPosY(50); setBgScale(100);
         setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
         setIsFullArt(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
         setCardFrameUrl("");
@@ -434,6 +439,9 @@ export default function AdminPage() {
     try {
       const attrs = typeof card.attributes === 'string' ? JSON.parse(card.attributes) : (card.attributes || {});
       setCardBorderColor(attrs.borderColor || "");
+      setBgPosX(attrs.bgPosX ?? 50);
+      setBgPosY(attrs.bgPosY ?? 50);
+      setBgScale(attrs.bgScale ?? 100);
       setCardBgColor(attrs.cardBgColor || "");
       setCardGlowColor(attrs.cardGlowColor || "");
       setMainColor(attrs.mainColor || "");
@@ -458,6 +466,7 @@ export default function AdminPage() {
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
     } catch {
       setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
+      setBgPosX(50); setBgPosY(50); setBgScale(100);
       setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
       setIsFullArt(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
       setCardFrameUrl("");
@@ -507,6 +516,9 @@ export default function AdminPage() {
     setCharPosX(50);
     setCharPosY(50);
     setCharScale(100);
+    setBgPosX(50);
+    setBgPosY(50);
+    setBgScale(100);
     setTitlePos({ x: 50, y: 75, scale: 100 }); setDescPos({ x: 50, y: 92, scale: 100 }); setRarityBadgePos({ x: 15, y: 65, scale: 100 }); setLevelTextPos({ x: 50, y: 82, scale: 100 });
     setLevelBadgePos({ x: 10, y: 8, scale: 100 });
     setLevelBadgeUrl("");
@@ -1023,6 +1035,22 @@ export default function AdminPage() {
                       <input type="file" accept="image/png, image/jpeg, image/gif, video/mp4, video/webm" className="hidden" onChange={handleBgUpload} />
                     </label>
                   </div>
+                  {cardCustomBg && (
+                    <div className="grid grid-cols-3 gap-2 mt-3 p-3 bg-black/20 rounded-lg border border-white/5">
+                      <div>
+                        <label className="text-xs text-white/50 block mb-1">Pos X ({bgPosX}%)</label>
+                        <input type="range" min="0" max="100" value={bgPosX} onChange={e => setBgPosX(Number(e.target.value))} className="w-full accent-indigo-500" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-white/50 block mb-1">Pos Y ({bgPosY}%)</label>
+                        <input type="range" min="0" max="100" value={bgPosY} onChange={e => setBgPosY(Number(e.target.value))} className="w-full accent-indigo-500" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-white/50 block mb-1">Zoom ({bgScale}%)</label>
+                        <input type="range" min="10" max="300" value={bgScale} onChange={e => setBgScale(Number(e.target.value))} className="w-full accent-indigo-500" />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Skin Custom (Image du perso)</label>
