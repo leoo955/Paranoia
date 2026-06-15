@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  discordId     String?   @unique
+  minecraftName String?
+  role          String    @default("MEMBER")
+  createdAt     DateTime  @default(now())
+
+  accounts      Account[]
+  sessions      Session[]
+  topics        Topic[]
+  comments      Comment[]
+  tierLists     TierList[]
+  createdCards  TradingCard[]
+  inventory     UserCard[]
+  applications  Application[]
+}
+
+model Topic {
+  id        String    @id @default(cuid())
+  title     String
+  content   String
+  category  String    @default("general")
+  pinned    Boolean   @default(false)
+  locked    Boolean   @default(false)
+  views     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  comments  Comment[]
+}
+
+model Comment {
+  id        String    @id @default(cuid())
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  authorId  String
+  author    User      @relation(fields: [authorId], references: [id])
+  topicId   String
+  topic     Topic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies   Comment[] @relation("CommentReplies")
+}
+
+model TierList {
+  id        String   @id @default(cuid())
+  title     String
+  data      String   // JSON stored as text for SQLite
+  gameMode  String   @default("GENERAL")
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+}
+
+model Application {
+  id            String   @id @default(cuid())
+  minecraftName String
+  age           Int
+  motivation    String
+  experience    String
+  referral      String?
+  status        String   @default("PENDING")
+  reviewNote    String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  applicantId   String
+  applicant     User     @relation(fields: [applicantId], references: [id])
+}
+
+model TradingCard {
+  id          String   @id @default(cuid())
+  title       String
+  playerId    String?
+  player      Player?  @relation(fields: [playerId], references: [id])
+  description String?
+  imageUrl    String?
+  customBackground String?
+  customBadges String @default("[]") // JSON stored as text
+  characterPosition String @default("{\"x\":50,\"y\":50,\"scale\":100}") // JSON stored as text
+  rarity      String   @default("COMMON")
+  level       String   @default("Normal")
+  proba       Float    @default(100)
+  attributes  String   @default("{}") // JSON stored as text
+  template    String   @default("classic")
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+
+  owners      UserCard[]
+}
+
+model CardTemplate {
+  id               String   @id @default(cuid())
+  name             String
+  customBackground String?
+  customBadges     String   @default("[]")
+  characterPosition String  @default("{\"x\":50,\"y\":50,\"scale\":100}")
+  createdAt        DateTime @default(now())
+}
+
+model UserCard {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tradingCardId String
+  tradingCard   TradingCard @relation(fields: [tradingCardId], references: [id], onDelete: Cascade)
+  obtainedAt    DateTime    @default(now())
+}
+
+model Player {
+  id            String   @id @default(cuid())
+  minecraftName String   @unique
+  status        String   @default("ACTIVE") // ACTIVE, BANNED, LEFT
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cards         TradingCard[]
+}
