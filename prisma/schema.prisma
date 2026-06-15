@@ -53,6 +53,7 @@ model User {
   mcVerificationCode String?   @unique
   isMcVerified       Boolean   @default(false)
   role               String    @default("MEMBER")
+  paraCoins          Int       @default(0)
   createdAt          DateTime  @default(now())
 
   accounts      Account[]

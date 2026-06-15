@@ -54,11 +54,13 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
   );
 };
 
-export default function PackOpenerClient({ initialInventory, initialBoxes, isLoggedIn }: { initialInventory: UserCard[], initialBoxes?: any[], isLoggedIn: boolean }) {
+export default function PackOpenerClient({ initialInventory, initialBoxes, initialCoins, isLoggedIn }: { initialInventory: UserCard[], initialBoxes?: any[], initialCoins: number, isLoggedIn: boolean }) {
   const [inventory, setInventory] = useState<UserCard[]>(initialInventory);
   const [boxes, setBoxes] = useState<any[]>(initialBoxes || []);
+  const [coins, setCoins] = useState<number>(initialCoins || 0);
   const [selectedBoxType, setSelectedBoxType] = useState<string>("standard");
   const [isOpening, setIsOpening] = useState(false);
+  const [isBuying, setIsBuying] = useState(false);
   const [drawnCards, setDrawnCards] = useState<TradingCard[]>([]);
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
@@ -69,6 +71,38 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
   const [rarityFilter, setRarityFilter] = useState("ALL");
   const router = useRouter();
 
+  const buyBooster = async (type: string, price: number) => {
+    if (!isLoggedIn) {
+      alert("Vous devez être connecté.");
+      return;
+    }
+    if (coins < price) {
+      alert("Fonds insuffisants !");
+      return;
+    }
+    setIsBuying(true);
+    try {
+      const res = await fetch("/api/boosters/buy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ boxType: type })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur d'achat");
+      
+      setCoins(data.remainingCoins);
+      setBoxes(prev => {
+        const existing = prev.find(b => b.boxType === type);
+        if (existing) return prev.map(b => b.boxType === type ? { ...b, amount: b.amount + 1 } : b);
+        return [...prev, { boxType: type, amount: 1 }];
+      });
+    } catch (e: any) {
+      alert(e.message);
+    } finally {
+      setIsBuying(false);
+    }
+  };
+
   const openPack = async () => {
     if (!isLoggedIn) {
       alert("Vous devez être connecté pour ouvrir des boosters.");
@@ -77,7 +111,7 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
 
     const userBox = boxes.find(b => b.boxType === selectedBoxType);
     if (!userBox || userBox.amount <= 0) {
-      alert(`Vous ne possédez aucune Box ${selectedBoxType}.`);
+      alert(`Vous ne possédez aucun Booster ${selectedBoxType}.`);
       return;
     }
     
@@ -168,82 +202,140 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
   return (
     <div className="w-full">
 
-      <div className="flex gap-4 mb-8 border-b border-[var(--color-border-color)] pb-4">
-        <button 
-          onClick={() => setActiveTab("opener")}
-          className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'opener' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
-        >
-          <PackageOpen className="w-5 h-5" /> Ouvrir des Box
-        </button>
-        <button 
-          onClick={() => setActiveTab("collection")}
-          className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'collection' ? 'bg-[var(--color-accent-purple)] text-white shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
-        >
-          <Layers className="w-5 h-5" /> Ma Collection
-        </button>
+      <div className="flex justify-between items-center mb-8 border-b border-[var(--color-border-color)] pb-4">
+        <div className="flex gap-4">
+          <button 
+            onClick={() => setActiveTab("opener")}
+            className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'opener' ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
+          >
+            <PackageOpen className="w-5 h-5" /> Ouvrir des Boosters
+          </button>
+          <button 
+            onClick={() => setActiveTab("collection")}
+            className={`flex items-center gap-2 px-6 py-3 font-bold rounded-lg transition-all ${activeTab === 'collection' ? 'bg-[var(--color-accent-purple)] text-white shadow-[0_0_15px_rgba(168,85,247,0.5)]' : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] hover:text-white hover:bg-white/5'}`}
+          >
+            <Layers className="w-5 h-5" /> Ma Collection
+          </button>
+        </div>
+        
+        {isLoggedIn && (
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 bg-black/40 border border-white/10 px-4 py-2 rounded-xl">
+              <img src="/Paracoin.png" alt="PARA Coins" className="w-6 h-6 object-contain drop-shadow-md" />
+              <span className="font-outfit font-bold text-white text-xl">{coins.toLocaleString()}</span>
+            </div>
+            {/* DEBUG BUTTON: to remove later */}
+            <button 
+              onClick={async () => {
+                const res = await fetch("/api/boosters/add-coins", { method: "POST" });
+                const data = await res.json();
+                if(data.coins) setCoins(data.coins);
+              }}
+              className="text-xs bg-white/10 hover:bg-white/20 px-2 py-1 rounded"
+            >
+              +1000
+            </button>
+          </div>
+        )}
       </div>
 
       {activeTab === "opener" && (
         <div className="bg-[#0f0f16] border border-indigo-500/20 rounded-3xl p-8 lg:p-16 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0f0f16] to-[#0f0f16] pointer-events-none" />
           
-          <h2 className="text-4xl lg:text-5xl font-outfit font-black text-white mb-4 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Ouvrir des Box</h2>
+          <h2 className="text-4xl lg:text-5xl font-outfit font-black text-white mb-4 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Ouvrir des Boosters</h2>
           <p className="text-[var(--color-text-secondary)] mb-12 max-w-xl z-10 text-lg">
-            Sélectionnez une box et ouvrez-la pour obtenir de nouvelles cartes !
+            Sélectionnez un booster et ouvrez-le pour obtenir de nouvelles cartes !
           </p>
 
           {!showReveal && (
             <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 z-10">
               {/* Standard Box */}
-              <button 
+              <div 
                 onClick={() => setSelectedBoxType("standard")}
-                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 ${selectedBoxType === "standard" ? "bg-blue-900/20 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-blue-500/50 opacity-70"}`}
+                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 cursor-pointer ${selectedBoxType === "standard" ? "bg-blue-900/20 border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-blue-500/50 opacity-70"}`}
               >
                 <div className="w-20 h-20 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/50">
                   <img src="/StandardB.png" alt="Standard" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(59,130,246,0.6)]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-blue-300">Box Standard</h3>
+                  <h3 className="text-xl font-bold text-blue-300">Booster Standard</h3>
                   <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-blue-500/50 underline-offset-2">Toutes les raretés disponibles</p>
                 </div>
-                <div className="mt-2 px-4 py-1 rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
-                  x{ownedStandard} possédé{ownedStandard > 1 ? 's' : ''}
+                <div className="mt-2 w-full flex flex-col gap-2">
+                  <div className="px-4 py-1 mx-auto rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
+                    x{ownedStandard} possédé{ownedStandard > 1 ? 's' : ''}
+                  </div>
+                  {ownedStandard === 0 && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); buyBooster("standard", 100); }}
+                      disabled={isBuying}
+                      className="flex items-center justify-center gap-2 w-full py-2 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold text-white transition-colors disabled:opacity-50"
+                    >
+                      <span>Acheter</span>
+                      <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 100</span>
+                    </button>
+                  )}
                 </div>
-              </button>
+              </div>
 
               {/* Premium Box */}
-              <button 
+              <div 
                 onClick={() => setSelectedBoxType("premium")}
-                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 ${selectedBoxType === "premium" ? "bg-purple-900/20 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-purple-500/50 opacity-70"}`}
+                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 cursor-pointer ${selectedBoxType === "premium" ? "bg-purple-900/20 border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-purple-500/50 opacity-70"}`}
               >
                 <div className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/50">
                   <img src="/PreniumB.png" alt="Premium" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(168,85,247,0.6)]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-purple-300">Box Premium</h3>
+                  <h3 className="text-xl font-bold text-purple-300">Booster Premium</h3>
                   <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-purple-500/50 underline-offset-2">Commune et Peu Commune exclues</p>
                 </div>
-                <div className="mt-2 px-4 py-1 rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
-                  x{ownedPremium} possédé{ownedPremium > 1 ? 's' : ''}
+                <div className="mt-2 w-full flex flex-col gap-2">
+                  <div className="px-4 py-1 mx-auto rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
+                    x{ownedPremium} possédé{ownedPremium > 1 ? 's' : ''}
+                  </div>
+                  {ownedPremium === 0 && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); buyBooster("premium", 250); }}
+                      disabled={isBuying}
+                      className="flex items-center justify-center gap-2 w-full py-2 bg-purple-600 hover:bg-purple-500 rounded-lg font-bold text-white transition-colors disabled:opacity-50"
+                    >
+                      <span>Acheter</span>
+                      <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 250</span>
+                    </button>
+                  )}
                 </div>
-              </button>
+              </div>
 
               {/* Mythic Box */}
-              <button 
+              <div 
                 onClick={() => setSelectedBoxType("mythic")}
-                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 ${selectedBoxType === "mythic" ? "bg-red-900/20 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-red-500/50 opacity-70"}`}
+                className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-4 cursor-pointer ${selectedBoxType === "mythic" ? "bg-red-900/20 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)] scale-105" : "bg-[var(--color-bg-elevated)] border-[var(--color-border-color)] hover:border-red-500/50 opacity-70"}`}
               >
                 <div className="w-20 h-20 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/50">
                   <img src="/MythiqueB.png" alt="Mythique" className="w-16 h-16 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.6)]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-red-400 drop-shadow-[0_0_5px_rgba(239,68,68,0.8)]">Box Mythique</h3>
+                  <h3 className="text-xl font-bold text-red-400 drop-shadow-[0_0_5px_rgba(239,68,68,0.8)]">Booster Mythique</h3>
                   <p className="text-sm text-[var(--color-text-secondary)] mt-1 underline decoration-red-500/50 underline-offset-2">Rare et inférieur exclues</p>
                 </div>
-                <div className="mt-2 px-4 py-1 rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
-                  x{ownedMythic} possédé{ownedMythic > 1 ? 's' : ''}
+                <div className="mt-2 w-full flex flex-col gap-2">
+                  <div className="px-4 py-1 mx-auto rounded-full bg-black/50 border border-white/10 font-mono font-bold text-white">
+                    x{ownedMythic} possédé{ownedMythic > 1 ? 's' : ''}
+                  </div>
+                  {ownedMythic === 0 && (
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); buyBooster("mythic", 500); }}
+                      disabled={isBuying}
+                      className="flex items-center justify-center gap-2 w-full py-2 bg-red-600 hover:bg-red-500 rounded-lg font-bold text-white transition-colors disabled:opacity-50"
+                    >
+                      <span>Acheter</span>
+                      <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 500</span>
+                    </button>
+                  )}
                 </div>
-              </button>
+              </div>
             </div>
           )}
 
@@ -268,9 +360,14 @@ export default function PackOpenerClient({ initialInventory, initialBoxes, isLog
               {!isOpening && (
                 <button 
                   onClick={openPack}
-                  className={`mt-10 px-12 py-4 rounded-full font-black text-xl tracking-widest uppercase transition-all hover:scale-105 shadow-xl border-2 ${selectedBoxType === 'standard' ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(59,130,246,0.6)]' : selectedBoxType === 'premium' ? 'bg-purple-600 border-purple-400 text-white hover:bg-purple-500 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)]' : 'bg-red-600 border-red-400 text-white hover:bg-red-500 hover:shadow-[0_0_20px_rgba(239,68,68,0.6)]'}`}
+                  disabled={isOpening || isBuying || (selectedBoxType === "standard" ? ownedStandard : selectedBoxType === "premium" ? ownedPremium : ownedMythic) <= 0}
+                  className="group relative px-12 py-4 mt-10 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl font-black text-xl text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(129,140,248,0.5)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
                 >
-                  OUVRIR
+                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                  <span className="relative flex items-center gap-3">
+                    <Sparkles className="w-6 h-6 animate-pulse" />
+                    Ouvrir le Booster
+                  </span>
                 </button>
               )}
             </div>

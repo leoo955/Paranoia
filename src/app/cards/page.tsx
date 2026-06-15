@@ -20,7 +20,14 @@ export default async function CardsPage() {
 
   let inventory: any[] = [];
   let userBoxes: any[] = [];
+  let paraCoins = 0;
   if (userId) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { paraCoins: true }
+    });
+    paraCoins = user?.paraCoins || 0;
+
     inventory = await prisma.userCard.findMany({
       where: { userId },
       include: {
@@ -45,7 +52,7 @@ export default async function CardsPage() {
         </div>
       </div>
 
-      <PackOpenerClient initialInventory={inventory} initialBoxes={userBoxes} isLoggedIn={!!userId} />
+      <PackOpenerClient initialInventory={inventory} initialBoxes={userBoxes} initialCoins={paraCoins} isLoggedIn={!!userId} />
     </div>
   );
 }
