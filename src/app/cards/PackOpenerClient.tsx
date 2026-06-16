@@ -391,28 +391,28 @@ export default function PackOpenerClient({
                     <div 
                       key={key}
                       onClick={() => !isOpening && setSelectedBoxType(key)}
-                      className={`relative flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
+                      className={`relative flex items-center gap-4 py-3 px-4 transition-all duration-300 cursor-pointer overflow-hidden ${
                         isSelected 
-                        ? `${box.bgBase} ${box.border} ${box.shadow} scale-[1.02]` 
-                        : 'bg-black/40 border-white/5 hover:border-white/20 hover:bg-white/5'
+                        ? `bg-gradient-to-r from-white/5 to-transparent border-l-4 ${box.border}` 
+                        : 'border-l-4 border-transparent hover:bg-white/5'
                       }`}
                     >
-                      {isSelected && <div className={`absolute inset-0 opacity-20 bg-gradient-to-r from-transparent to-${box.glow.split('-')[1]}-500 pointer-events-none`} />}
+                      {isSelected && <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-white to-transparent pointer-events-none" />}
                       
-                      <div className={`relative w-16 h-16 rounded-xl flex items-center justify-center border-2 shrink-0 overflow-hidden ${isSelected ? box.border + ' bg-black/50' : 'border-white/10 bg-black/40'}`}>
-                        {isSelected && <div className={`absolute inset-0 ${box.glow} opacity-30 blur-md`}></div>}
-                        <img src={box.image} alt={box.name} className={`w-12 h-12 object-contain drop-shadow-lg relative z-10 ${box.hueRotate}`} />
+                      <div className={`relative w-14 h-14 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${isSelected ? 'bg-black/50' : 'bg-transparent'}`}>
+                        {isSelected && <div className={`absolute inset-0 ${box.glow} opacity-20 blur-md`}></div>}
+                        <img src={box.image} alt={box.name} className={`w-10 h-10 object-contain drop-shadow-lg relative z-10 ${box.hueRotate} ${!isSelected && 'opacity-60 grayscale-[30%]'}`} />
                         {key === 'mythic' && (
-                          <div className="absolute -top-2 -right-2 bg-red-600 rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse z-20">
-                            <Clock className="w-3 h-3 text-white" />
+                          <div className="absolute -top-1 -right-1 bg-red-600 rounded-full w-4 h-4 flex items-center justify-center shadow-lg animate-pulse z-20">
+                            <Clock className="w-2.5 h-2.5 text-white" />
                           </div>
                         )}
                       </div>
                       
                       <div className="flex flex-col flex-1 relative z-10">
-                        <h4 className={`text-lg font-black uppercase tracking-wide ${isSelected ? box.text : 'text-gray-300'}`}>{box.name}</h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${box.owned > 0 ? 'bg-green-500/20 text-green-400' : 'bg-gray-800 text-gray-500'}`}>
+                        <h4 className={`text-base font-bold uppercase tracking-wide transition-colors ${isSelected ? box.text : 'text-gray-400'}`}>{box.name}</h4>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${box.owned > 0 ? 'bg-green-500/10 text-green-400' : 'text-gray-600'}`}>
                             Stock: {box.owned}
                           </span>
                         </div>
