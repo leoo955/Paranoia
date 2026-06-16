@@ -443,15 +443,16 @@ export default function PackOpenerClient({
                 </div>
 
                 {/* Drop Rates Table */}
-                <div className="absolute top-6 right-6 z-20 bg-black/60 border border-white/10 rounded-xl p-4 shadow-xl backdrop-blur-md hidden sm:block pointer-events-none">
-                  <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 border-b border-white/10 pb-2 ${activeBox.text}`}>
+                <div className="absolute top-6 right-6 z-20 bg-black/60 border border-white/10 rounded-2xl p-6 shadow-2xl backdrop-blur-md hidden sm:block pointer-events-none">
+                  <h4 className={`text-sm font-black uppercase tracking-widest mb-4 border-b border-white/10 pb-3 ${activeBox.text} flex items-center gap-2`}>
+                    <Sparkles className="w-4 h-4" />
                     Taux de Drop
                   </h4>
-                  <ul className="text-xs space-y-1.5 w-32">
+                  <ul className="text-sm space-y-3 w-56 font-medium">
                     {activeBox.rates.map((rate: any, idx: number) => (
-                      <li key={idx} className={`flex justify-between font-medium ${rate.c}`}>
-                        <span>{rate.r}</span>
-                        <span className="font-mono">{rate.p}</span>
+                      <li key={idx} className={`flex justify-between items-center ${rate.c}`}>
+                        <span className="tracking-wide drop-shadow-md">{rate.r}</span>
+                        <span className="font-mono bg-black/50 px-2 py-1 rounded-md border border-white/10 shadow-inner text-xs font-bold tracking-wider">{rate.p}</span>
                       </li>
                     ))}
                   </ul>
