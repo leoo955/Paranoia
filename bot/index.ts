@@ -54,11 +54,13 @@ const commands = [
 client.once('ready', async () => {
   console.log(`Bot logged in as ${client.user?.tag}`);
   
+  if (!client.user) return;
+
   const rest = new REST({ version: '10' }).setToken(token);
   try {
     console.log('Started refreshing application (/) commands.');
     await rest.put(
-      Routes.applicationCommands(clientId),
+      Routes.applicationCommands(client.user.id),
       { body: commands },
     );
     console.log('Successfully reloaded application (/) commands.');
