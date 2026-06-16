@@ -319,12 +319,12 @@ export default function CardDisplay({
           <img 
             src={attrs.editionBadgeUrl} 
             alt="Edition Badge"
-            className={`absolute z-30 object-contain drop-shadow-md ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
+            className={`absolute z-[70] object-contain drop-shadow-md ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
             style={{
               left: `${editionBadgePos.x}%`,
               top: `${editionBadgePos.y}%`,
               width: `${editionBadgePos.scale * 0.15}cqi`,
-              transform: `translate(-50%, -50%) translateZ(${translateZ})`
+              transform: `translate(-50%, -50%) translateZ(70px)`
             }}
             onMouseDown={(e) => handleMouseDown(e, 'editionBadge')}
             onWheel={(e) => handleWheel(e, 'editionBadge')}
