@@ -54,6 +54,17 @@ const commands = [
       subcommand
         .setName('list')
         .setDescription('Afficher votre inventaire de cartes (pour flex)')
+    )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName('show')
+        .setDescription('Afficher les détails d\'une carte que vous possédez')
+        .addStringOption(option => 
+          option.setName('nom')
+            .setDescription('La carte à afficher')
+            .setAutocomplete(true)
+            .setRequired(true)
+        )
     ),
   new SlashCommandBuilder()
     .setName('ticket-setup')
@@ -85,7 +96,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
       const focusedOption = interaction.options.getFocused(true);
       
       let discordIdToSearch = '';
-      if (focusedOption.name === 'carte_offerte') {
+      if (focusedOption.name === 'carte_offerte' || focusedOption.name === 'nom') {
         discordIdToSearch = interaction.user.id;
       } else if (focusedOption.name === 'carte_demandée') {
         const targetUser = interaction.options.get('utilisateur')?.value as string;
@@ -266,6 +277,47 @@ client.on('interactionCreate', async (interaction: Interaction) => {
               if (text.length > 1020) text = text.slice(0, 1000) + '...';
               embed.addFields({ name: `${rarity} (${cards.length} modèles)`, value: text });
             }
+          }
+
+          await interaction.reply({ embeds: [embed] });
+        } else if (subcommand === 'show') {
+          const cardId = interaction.options.get('nom')?.value as string;
+          if (!cardId) {
+            return await interaction.reply({ content: "Veuillez sélectionner une carte valide.", ephemeral: true });
+          }
+
+          const card = await prisma.tradingCard.findUnique({
+            where: { id: cardId },
+            include: { player: true }
+          });
+
+          if (!card) {
+            return await interaction.reply({ content: "Carte introuvable.", ephemeral: true });
+          }
+
+          const colors: Record<string, number> = {
+            'MYTHIC': 0xdc2626, // Red
+            'LEGENDARY': 0xfacc15, // Yellow
+            'EPIC': 0xa855f7, // Purple
+            'RARE': 0x3b82f6, // Blue
+            'UNCOMMON': 0x22c55e, // Green
+            'COMMON': 0x94a3b8 // Gray
+          };
+
+          const embed = new EmbedBuilder()
+            .setTitle(card.title)
+            .setColor(colors[card.rarity] || 0x94a3b8)
+            .addFields(
+              { name: 'Rareté', value: card.rarity, inline: true },
+              { name: 'Saison', value: card.season || '1', inline: true }
+            );
+
+          if (card.description) {
+            embed.setDescription(card.description);
+          }
+
+          if (card.imageUrl) {
+            embed.setImage(card.imageUrl);
           }
 
           await interaction.reply({ embeds: [embed] });
