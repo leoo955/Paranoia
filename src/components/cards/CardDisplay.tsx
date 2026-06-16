@@ -356,8 +356,8 @@ export default function CardDisplay({
         )}
 
         {/* Fixed Variant Badges Container */}
-        <div className="absolute top-[2cqi] right-[2cqi] flex flex-row gap-[1cqi] z-[70] pointer-events-none items-center">
-          {attrs.variantBadgeUrl && (
+        <div className="absolute top-[2cqi] left-[2cqi] flex flex-row gap-[1cqi] z-[70] pointer-events-none items-center">
+          {attrs.variantBadgeUrl && !attrs.variantBadgeUrls && (
             <img 
               src={attrs.variantBadgeUrl} 
               alt="Variant Badge"
@@ -366,11 +366,21 @@ export default function CardDisplay({
               draggable={false}
             />
           )}
-          {childVariantBadges.map((badgeUrl, idx) => (
+          {attrs.variantBadgeUrls && attrs.variantBadgeUrls.map((badgeUrl: string, idx: number) => (
             <img 
-              key={idx}
+              key={`manual-${idx}`}
               src={badgeUrl} 
               alt={`Variant Badge ${idx}`}
+              className="object-contain drop-shadow-md"
+              style={{ width: '15cqi', height: '15cqi' }}
+              draggable={false}
+            />
+          ))}
+          {childVariantBadges.map((badgeUrl, idx) => (
+            <img 
+              key={`child-${idx}`}
+              src={badgeUrl} 
+              alt={`Child Variant Badge ${idx}`}
               className="object-contain drop-shadow-md"
               style={{ width: '15cqi', height: '15cqi' }}
               draggable={false}
@@ -379,19 +389,7 @@ export default function CardDisplay({
         </div>
 
         {/* Side Text (Card ID or SMP branding) */}
-        {!attrs.hideSideText && <div 
-          className="absolute z-30 origin-bottom-left -rotate-90 flex items-center gap-[1cqi]"
-          style={{ 
-            top: '40%', left: '0',
-            transform: `translateZ(${parseInt(translateZ) * 0.8}px) translateY(100%)`
-          }}
-        >
-          <div className="bg-black/95  text-white/50 font-black flex items-center gap-[1cqi] rounded-t-md border-white/20 shadow-lg" style={{ padding: '0.5cqi 3cqi', borderWidth: '0.2cqi 0.2cqi 0 0.2cqi', fontSize: '3cqi' }}>
-            <span className="tracking-[0.3em]">PARANOIA SMP</span>
-          </div>
-        </div>}
-
-        {/* Bottom Layout: Description + Nameplate */}
+        {/* Removed per user request */}        {/* Bottom Layout: Description + Nameplate */}
         <div className="absolute bottom-0 inset-x-0 z-30 flex flex-col" style={{ transform: `translateZ(${parseInt(translateZ) * 1.2}px)` }}>
           
           {/* Description / Effect Box */}
