@@ -174,7 +174,7 @@ export default function AdminPage() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [selectedUserEconomy, setSelectedUserEconomy] = useState<any>(null);
   const [economyActionAmount, setEconomyActionAmount] = useState<number>(1);
-  const [economyActionType, setEconomyActionType] = useState<"add_coins" | "remove_coins" | "add_booster" | "remove_booster">("add_coins");
+  const [economyActionType, setEconomyActionType] = useState<"set_coins" | "set_booster">("set_coins");
   const [economyBoxType, setEconomyBoxType] = useState<string>("standard");
   const [isUpdatingEconomy, setIsUpdatingEconomy] = useState(false);
 
@@ -2092,10 +2092,11 @@ export default function AdminPage() {
                       <p className="text-xl font-bold text-white">{selectedUserEconomy.paraCoins || 0}</p>
                     </div>
                     <div className="bg-black/30 p-3 rounded-lg flex-1 border border-white/5">
-                      <p className="text-xs text-[var(--color-text-secondary)]">Boosters (S / P / M)</p>
+                      <p className="text-xs text-[var(--color-text-secondary)]">Boosters (S / P / L / M)</p>
                       <div className="flex gap-3 text-sm text-white mt-1 font-bold">
                         <span className="text-blue-400">{selectedUserEconomy.boxes?.find((b: any) => b.boxType === 'standard')?.amount || 0}</span>
                         <span className="text-purple-400">{selectedUserEconomy.boxes?.find((b: any) => b.boxType === 'premium')?.amount || 0}</span>
+                        <span className="text-yellow-400">{selectedUserEconomy.boxes?.find((b: any) => b.boxType === 'legendary')?.amount || 0}</span>
                         <span className="text-red-400">{selectedUserEconomy.boxes?.find((b: any) => b.boxType === 'mythic')?.amount || 0}</span>
                       </div>
                     </div>
@@ -2109,14 +2110,12 @@ export default function AdminPage() {
                         onChange={(e) => setEconomyActionType(e.target.value as any)}
                         className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none"
                       >
-                        <option value="add_coins">Ajouter PARA Coins</option>
-                        <option value="remove_coins">Retirer PARA Coins</option>
-                        <option value="add_booster">Ajouter Booster</option>
-                        <option value="remove_booster">Retirer Booster</option>
+                        <option value="set_coins">Définir PARA Coins</option>
+                        <option value="set_booster">Définir Booster</option>
                       </select>
                     </div>
 
-                    {(economyActionType === "add_booster" || economyActionType === "remove_booster") && (
+                    {economyActionType === "set_booster" && (
                       <div>
                         <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Type de Booster</label>
                         <select 
@@ -2126,6 +2125,7 @@ export default function AdminPage() {
                         >
                           <option value="standard">Standard</option>
                           <option value="premium">Premium</option>
+                          <option value="legendary">Légendaire</option>
                           <option value="mythic">Mythique</option>
                         </select>
                       </div>

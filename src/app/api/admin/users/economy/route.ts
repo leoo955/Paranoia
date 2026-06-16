@@ -30,25 +30,19 @@ export async function POST(req: Request) {
       return new NextResponse("User not found", { status: 404 });
     }
 
-    if (action === "add_coins") {
+    if (action === "set_coins") {
       await prisma.user.update({
         where: { id: userId },
-        data: { paraCoins: user.paraCoins + amount }
+        data: { paraCoins: amount }
       });
-    } else if (action === "remove_coins") {
-      const newAmount = Math.max(0, user.paraCoins - amount);
-      await prisma.user.update({
-        where: { id: userId },
-        data: { paraCoins: newAmount }
-      });
-    } else if (action === "add_booster") {
+    } else if (action === "set_booster") {
       if (!boxType) return new NextResponse("Missing boxType", { status: 400 });
       
       const existingBox = user.boxes.find(b => b.boxType === boxType);
       if (existingBox) {
         await prisma.userBox.update({
           where: { id: existingBox.id },
-          data: { amount: existingBox.amount + amount }
+          data: { amount: amount }
         });
       } else {
         await prisma.userBox.create({
@@ -57,17 +51,6 @@ export async function POST(req: Request) {
             boxType,
             amount
           }
-        });
-      }
-    } else if (action === "remove_booster") {
-      if (!boxType) return new NextResponse("Missing boxType", { status: 400 });
-      
-      const existingBox = user.boxes.find(b => b.boxType === boxType);
-      if (existingBox) {
-        const newAmount = Math.max(0, existingBox.amount - amount);
-        await prisma.userBox.update({
-          where: { id: existingBox.id },
-          data: { amount: newAmount }
         });
       }
     } else {
