@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ActionRow
 import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
 import path from 'path';
+import http from 'http';
 
 // Load env from the Next.js project root
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -488,3 +489,14 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 });
 
 client.login(token);
+
+// Simple HTTP server for keepalive (UptimeRobot, Render Web Service, etc.)
+const port = process.env.PORT || 3001;
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Bot is alive!\n');
+});
+
+server.listen(port, () => {
+  console.log(`Keepalive server is running on port ${port}`);
+});
