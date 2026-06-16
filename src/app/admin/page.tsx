@@ -103,8 +103,10 @@ export default function AdminPage() {
   const [levelTextPos, setLevelTextPos] = useState({ x: 50, y: 82, scale: 100 });
   const [levelBadgePos, setLevelBadgePos] = useState({ x: 10, y: 8, scale: 100 });
   const [editionBadgePos, setEditionBadgePos] = useState({ x: 85, y: 73, scale: 100 });
+  const [variantBadgePos, setVariantBadgePos] = useState({ x: 15, y: 15, scale: 100 });
   const [levelBadgeUrl, setLevelBadgeUrl] = useState("");
   const [editionBadgeUrl, setEditionBadgeUrl] = useState("");
+  const [variantBadgeUrl, setVariantBadgeUrl] = useState("");
   const [draggingItem, setDraggingItem] = useState<{type: string, id: string} | null>(null);
 
   const [showVGuide, setShowVGuide] = useState(false);
@@ -398,6 +400,13 @@ export default function AdminPage() {
             dragRawPos.current.y += deltaY;
             return { ...prev, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
          });
+      } else if (draggingItem.type === 'variantBadge') {
+         setVariantBadgePos(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: prev.x, y: prev.y };
+            dragRawPos.current.x += deltaX;
+            dragRawPos.current.y += deltaY;
+            return { ...prev, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
+         });
       } else if (draggingItem.type === 'customBadge') {
          setCardCustomBadges(prev => prev.map((b, i) => {
             if (String(i) === draggingItem.id || b.id === draggingItem.id) {
@@ -445,6 +454,7 @@ export default function AdminPage() {
       if (type === 'levelText') setLevelTextPos(prev => ({...prev, scale: Math.max(10, Math.min(300, prev.scale + delta))}));
       if (type === 'levelBadge') setLevelBadgePos(prev => ({...prev, scale: Math.max(10, Math.min(300, prev.scale + delta))}));
       if (type === 'editionBadge') setEditionBadgePos(prev => ({...prev, scale: Math.max(10, Math.min(300, prev.scale + delta))}));
+      if (type === 'variantBadge') setVariantBadgePos(prev => ({...prev, scale: Math.max(10, Math.min(300, prev.scale + delta))}));
       if (type === 'customBadge') {
          setCardCustomBadges(prev => prev.map((b, i) => String(i) === id || b.id === id ? { ...b, size: Math.max(10, Math.min(200, b.size + delta)) } : b));
       }
@@ -591,8 +601,10 @@ export default function AdminPage() {
           titlePos, descPos, rarityBadgePos, levelTextPos,
           levelBadgePos,
           editionBadgePos,
+          variantBadgePos,
           levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
+          variantBadgeUrl,
           isFullArt,
           isHolo,
           hideCharacter,
@@ -712,8 +724,10 @@ export default function AdminPage() {
       setTitlePos(attrs.titlePos || { x: 50, y: 75, scale: 100 }); setDescPos(attrs.descPos || { x: 50, y: 92, scale: 100 }); setRarityBadgePos(attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 }); setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
       setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
       setEditionBadgePos(attrs.editionBadgePos || { x: 85, y: 73, scale: 100 });
+      setVariantBadgePos(attrs.variantBadgePos || { x: 15, y: 15, scale: 100 });
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
+      setVariantBadgeUrl(attrs.variantBadgeUrl || "");
     } catch {
       setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor(""); setFactionColor("");
       setBgPosX(50); setBgPosY(50); setBgScale(100);
@@ -931,8 +945,11 @@ export default function AdminPage() {
             titlePos, descPos, rarityBadgePos, levelTextPos,
             levelBadgePos,
             editionBadgePos,
+            variantBadgePos,
+          variantBadgePos,
             levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
+          variantBadgeUrl,
             isFullArt,
             isHolo,
           hideCharacter,
@@ -1014,8 +1031,10 @@ export default function AdminPage() {
       setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
       setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
       setEditionBadgePos(attrs.editionBadgePos || { x: 85, y: 73, scale: 100 });
+      setVariantBadgePos(attrs.variantBadgePos || { x: 15, y: 15, scale: 100 });
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
+      setVariantBadgeUrl(attrs.variantBadgeUrl || "");
     } catch {}
   };
   const handleEditionIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1777,8 +1796,11 @@ export default function AdminPage() {
                       titlePos, descPos, rarityBadgePos, levelTextPos,
                       levelBadgePos,
                       editionBadgePos,
+            variantBadgePos,
+          variantBadgePos,
                       levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
+          variantBadgeUrl,
                       isFullArt,
             isHolo,
           hideCharacter,

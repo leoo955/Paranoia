@@ -245,6 +245,7 @@ export default function CardDisplay({
   const textPos = attrs.textPos; // Fallback for old cards
   const levelBadgePos = attrs.levelBadgePos || { x: 10, y: 8, scale: 100 };
   const editionBadgePos = attrs.editionBadgePos || { x: 85, y: 73, scale: 100 };
+  const variantBadgePos = attrs.variantBadgePos || { x: 15, y: 15, scale: 100 };
 
   const handleMouseDown = (e: React.MouseEvent, type: string, id: string = "") => {
     if (!isEditing || !onUpdateElement) return;
@@ -342,6 +343,24 @@ export default function CardDisplay({
             }}
             onMouseDown={(e) => handleMouseDown(e, 'editionBadge')}
             onWheel={(e) => handleWheel(e, 'editionBadge')}
+            draggable={false}
+          />
+        )}
+
+        {/* Variant Badge */}
+        {attrs.variantBadgeUrl && (
+          <img 
+            src={attrs.variantBadgeUrl} 
+            alt="Variant Badge"
+            className={`absolute z-[70] object-contain drop-shadow-md ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
+            style={{
+              left: `${variantBadgePos.x}%`,
+              top: `${variantBadgePos.y}%`,
+              width: `${variantBadgePos.scale * 0.15}cqi`,
+              transform: `translate(-50%, -50%) translateZ(70px)`
+            }}
+            onMouseDown={(e) => handleMouseDown(e, 'variantBadge')}
+            onWheel={(e) => handleWheel(e, 'variantBadge')}
             draggable={false}
           />
         )}
