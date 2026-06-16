@@ -328,6 +328,17 @@ export default function AdminPage() {
 
   const [isCapturing, setIsCapturing] = useState(false);
 
+  const waitForVideo = async (cardElement: HTMLElement) => {
+    const videoEl = cardElement.querySelector("video");
+    if (videoEl && videoEl.readyState < 2) { // HAVE_CURRENT_DATA
+      await new Promise(resolve => {
+        videoEl.addEventListener('loadeddata', resolve, { once: true });
+        setTimeout(resolve, 3000); // 3s timeout
+      });
+      await new Promise(r => setTimeout(r, 200)); // small paint delay
+    }
+  };
+
   const handleCaptureDiscordImage = async () => {
     if (!editingCardId) return;
     
@@ -335,6 +346,8 @@ export default function AdminPage() {
     try {
       const cardElement = document.getElementById("live-preview-card");
       if (!cardElement) throw new Error("Card element not found");
+
+      await waitForVideo(cardElement);
 
       const blob = await toBlob(cardElement, {
         pixelRatio: 2,
@@ -395,6 +408,7 @@ export default function AdminPage() {
       try {
         const cardElement = document.getElementById("live-preview-card");
         if (cardElement) {
+          await waitForVideo(cardElement);
           const blob = await toBlob(cardElement, {
             pixelRatio: 2,
             backgroundColor: 'transparent',
@@ -931,6 +945,7 @@ export default function AdminPage() {
       try {
         const cardElement = document.getElementById("live-preview-card");
         if (cardElement) {
+          await waitForVideo(cardElement);
           const blob = await toBlob(cardElement, {
             pixelRatio: 2,
             backgroundColor: 'transparent',
