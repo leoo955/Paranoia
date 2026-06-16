@@ -51,9 +51,9 @@ export async function POST(req: Request) {
     }
 
     const DROP_RATES: Record<string, Record<string, number>> = {
-      standard: { COMMON: 40, UNCOMMON: 30, RARE: 20, EPIC: 8, LEGENDARY: 2, MYTHIC: 0 },
-      premium: { COMMON: 20, UNCOMMON: 25, RARE: 35, EPIC: 15, LEGENDARY: 5, MYTHIC: 0 },
-      legendary: { COMMON: 10, UNCOMMON: 15, RARE: 40, EPIC: 25, LEGENDARY: 10, MYTHIC: 0 },
+      standard: { COMMON: 40, UNCOMMON: 30, RARE: 20, EPIC: 7.8, LEGENDARY: 2, MYTHIC: 0.2 },
+      premium: { COMMON: 20, UNCOMMON: 25, RARE: 35, EPIC: 14.5, LEGENDARY: 5, MYTHIC: 0.5 },
+      legendary: { COMMON: 10, UNCOMMON: 15, RARE: 40, EPIC: 23, LEGENDARY: 10, MYTHIC: 2 },
       mythic: { COMMON: 0, UNCOMMON: 0, RARE: 0, EPIC: 75, LEGENDARY: 20, MYTHIC: 5 }
     };
 

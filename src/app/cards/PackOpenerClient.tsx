@@ -261,7 +261,7 @@ export default function PackOpenerClient({
       bgBase: "bg-blue-900/20",
       shadow: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
       hueRotate: "",
-      rates: [ {r: "Commune", p: "40%", c: "text-gray-400"}, {r: "Peu Commune", p: "30%", c: "text-green-400"}, {r: "Rare", p: "20%", c: "text-blue-400"}, {r: "Épique", p: "8%", c: "text-purple-400"}, {r: "Légendaire", p: "2%", c: "text-yellow-400"} ]
+      rates: [ {r: "Commune", p: "40%", c: "text-gray-400"}, {r: "Peu Commune", p: "30%", c: "text-green-400"}, {r: "Rare", p: "20%", c: "text-blue-400"}, {r: "Épique", p: "7.8%", c: "text-purple-400"}, {r: "Légendaire", p: "2%", c: "text-yellow-400"}, {r: "Mythique", p: "0.2%", c: "text-red-500"} ]
     },
     premium: {
       name: "Premium",
@@ -274,7 +274,7 @@ export default function PackOpenerClient({
       bgBase: "bg-purple-900/20",
       shadow: "shadow-[0_0_20px_rgba(168,85,247,0.3)]",
       hueRotate: "",
-      rates: [ {r: "Commune", p: "20%", c: "text-gray-400"}, {r: "Peu Commune", p: "25%", c: "text-green-400"}, {r: "Rare", p: "35%", c: "text-blue-400"}, {r: "Épique", p: "15%", c: "text-purple-400"}, {r: "Légendaire", p: "5%", c: "text-yellow-400"} ]
+      rates: [ {r: "Commune", p: "20%", c: "text-gray-400"}, {r: "Peu Commune", p: "25%", c: "text-green-400"}, {r: "Rare", p: "35%", c: "text-blue-400"}, {r: "Épique", p: "14.5%", c: "text-purple-400"}, {r: "Légendaire", p: "5%", c: "text-yellow-400"}, {r: "Mythique", p: "0.5%", c: "text-red-500"} ]
     },
     legendary: {
       name: "Légendaire",
@@ -287,7 +287,7 @@ export default function PackOpenerClient({
       bgBase: "bg-amber-900/20",
       shadow: "shadow-[0_0_20px_rgba(245,158,11,0.3)]",
       hueRotate: "hue-rotate-180 brightness-150",
-      rates: [ {r: "Commune", p: "10%", c: "text-gray-400"}, {r: "Peu Commune", p: "15%", c: "text-green-400"}, {r: "Rare", p: "40%", c: "text-blue-400"}, {r: "Épique", p: "25%", c: "text-purple-400"}, {r: "Légendaire", p: "10%", c: "text-yellow-400"} ]
+      rates: [ {r: "Commune", p: "10%", c: "text-gray-400"}, {r: "Peu Commune", p: "15%", c: "text-green-400"}, {r: "Rare", p: "40%", c: "text-blue-400"}, {r: "Épique", p: "23%", c: "text-purple-400"}, {r: "Légendaire", p: "10%", c: "text-yellow-400"}, {r: "Mythique", p: "2%", c: "text-red-500"} ]
     },
     mythic: {
       name: "Mythique",
@@ -371,7 +371,7 @@ export default function PackOpenerClient({
       </div>
 
       {activeTab === "opener" && (
-        <div className="bg-[#0f0f16] border border-indigo-500/20 rounded-3xl p-6 lg:p-10 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
+        <div className="bg-[#0f0f16] border border-indigo-500/20 rounded-3xl p-4 lg:p-6 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0f0f16] to-[#0f0f16] pointer-events-none" />
           
           {/* FOMO TICKER */}
@@ -388,17 +388,8 @@ export default function PackOpenerClient({
             </div>
           </div>
 
-          <h2 className="text-3xl lg:text-4xl font-outfit font-black text-white mt-4 mb-2 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Ouvrir des Boosters</h2>
-          
-          <div className="flex flex-col items-center gap-2 mb-6 z-10">
-            <p className="text-[var(--color-text-secondary)] max-w-xl text-base">
-              Sélectionnez un booster et ouvrez-le pour obtenir de nouvelles cartes !
-            </p>
-          </div>
-
-                    {!showReveal && (
-            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-10 mb-8 z-10 mt-6 relative">
-              
+          {!showReveal && (
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-10 mb-4 z-10 mt-14 relative">
               {/* LEFT COLUMN: Booster Selection List */}
               <div className="w-full lg:w-1/3 flex flex-col gap-3 z-20">
                 <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 px-2">
@@ -492,40 +483,39 @@ export default function PackOpenerClient({
 
                 {/* Action Area */}
                 <div className="mt-auto pt-8 w-full max-w-sm relative z-20 flex flex-col gap-3">
+                  {!isOpening && activeBox.owned > 0 && (
+                    <button 
+                      onClick={openPack}
+                      disabled={isOpening || isBuying}
+                      className={`group relative w-full py-4 rounded-xl font-black text-xl text-white overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl border ${activeBox.border}`}
+                    >
+                      <div className={`absolute inset-0 ${activeBox.glow} opacity-50 group-hover:opacity-80 transition-opacity`} />
+                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                      <span className="relative flex items-center justify-center gap-3 drop-shadow-md">
+                        <Sparkles className="w-6 h-6 animate-pulse" />
+                        Ouvrir le Booster
+                      </span>
+                    </button>
+                  )}
                   {!isOpening && (
-                    activeBox.owned > 0 ? (
+                    coins < activeBox.price ? (
                       <button 
-                        onClick={openPack}
-                        disabled={isOpening || isBuying}
-                        className={`group relative w-full py-4 rounded-xl font-black text-xl text-white overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl border ${activeBox.border}`}
+                        onClick={(e) => { e.stopPropagation(); router.push('/shop'); }}
+                        className={`flex items-center justify-center gap-2 w-full bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-xl font-bold text-white transition-all shadow-[0_0_15px_rgba(156,163,175,0.2)] border border-gray-600 ${activeBox.owned > 0 ? 'py-3 text-sm' : 'py-4 text-lg'}`}
                       >
-                        <div className={`absolute inset-0 ${activeBox.glow} opacity-50 group-hover:opacity-80 transition-opacity`} />
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                        <span className="relative flex items-center justify-center gap-3 drop-shadow-md">
-                          <Sparkles className="w-6 h-6 animate-pulse" />
-                          Ouvrir le Booster
-                        </span>
+                        Fonds insuffisants - Boutique
                       </button>
                     ) : (
-                      coins < activeBox.price ? (
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); router.push('/shop'); }}
-                          className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-xl font-bold text-white transition-all text-lg shadow-[0_0_15px_rgba(156,163,175,0.2)] border border-gray-600"
-                        >
-                          Fonds insuffisants - Boutique
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); buyBooster(selectedBoxType, activeBox.price); }} 
-                          disabled={isBuying} 
-                          className={`relative overflow-hidden flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 text-lg shadow-2xl border ${activeBox.border}`}
-                        >
-                          <div className={`absolute inset-0 ${activeBox.glow} opacity-30 group-hover:opacity-50 transition-opacity`} />
-                          <span className="relative flex items-center gap-2 drop-shadow-md">
-                            Acheter pour <img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> {activeBox.price}
-                          </span>
-                        </button>
-                      )
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); buyBooster(selectedBoxType, activeBox.price); }} 
+                        disabled={isBuying} 
+                        className={`relative overflow-hidden flex items-center justify-center gap-2 w-full rounded-xl font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 shadow-2xl border ${activeBox.border} ${activeBox.owned > 0 ? 'py-3 text-sm' : 'py-4 text-lg'}`}
+                      >
+                        <div className={`absolute inset-0 ${activeBox.glow} opacity-30 group-hover:opacity-50 transition-opacity`} />
+                        <span className="relative flex items-center gap-2 drop-shadow-md">
+                          Acheter pour <img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> {activeBox.price}
+                        </span>
+                      </button>
                     )
                   )}
                   {isOpening && (
