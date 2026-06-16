@@ -248,6 +248,63 @@ export default function PackOpenerClient({
   const ownedLegendary = boxes.find(b => b.boxType === "legendary")?.amount || 0;
   const ownedMythic = boxes.find(b => b.boxType === "mythic")?.amount || 0;
 
+
+  const boxesData: any = {
+    standard: {
+      name: "Standard",
+      image: "/StandardB.png",
+      price: 150,
+      owned: ownedStandard,
+      glow: "bg-blue-500",
+      text: "text-blue-400",
+      border: "border-blue-500",
+      bgBase: "bg-blue-900/20",
+      shadow: "shadow-[0_0_20px_rgba(59,130,246,0.3)]",
+      hueRotate: "",
+      rates: [ {r: "Commune", p: "40%", c: "text-gray-400"}, {r: "Peu Commune", p: "30%", c: "text-green-400"}, {r: "Rare", p: "20%", c: "text-blue-400"}, {r: "Épique", p: "8%", c: "text-purple-400"}, {r: "Légendaire", p: "2%", c: "text-yellow-400"} ]
+    },
+    premium: {
+      name: "Premium",
+      image: "/PreniumB.png",
+      price: 250,
+      owned: ownedPremium,
+      glow: "bg-purple-500",
+      text: "text-purple-400",
+      border: "border-purple-500",
+      bgBase: "bg-purple-900/20",
+      shadow: "shadow-[0_0_20px_rgba(168,85,247,0.3)]",
+      hueRotate: "",
+      rates: [ {r: "Commune", p: "20%", c: "text-gray-400"}, {r: "Peu Commune", p: "25%", c: "text-green-400"}, {r: "Rare", p: "35%", c: "text-blue-400"}, {r: "Épique", p: "15%", c: "text-purple-400"}, {r: "Légendaire", p: "5%", c: "text-yellow-400"} ]
+    },
+    legendary: {
+      name: "Légendaire",
+      image: "/StandardB.png",
+      price: 400,
+      owned: ownedLegendary,
+      glow: "bg-amber-500",
+      text: "text-amber-400",
+      border: "border-amber-500",
+      bgBase: "bg-amber-900/20",
+      shadow: "shadow-[0_0_20px_rgba(245,158,11,0.3)]",
+      hueRotate: "hue-rotate-180 brightness-150",
+      rates: [ {r: "Commune", p: "10%", c: "text-gray-400"}, {r: "Peu Commune", p: "15%", c: "text-green-400"}, {r: "Rare", p: "40%", c: "text-blue-400"}, {r: "Épique", p: "25%", c: "text-purple-400"}, {r: "Légendaire", p: "10%", c: "text-yellow-400"} ]
+    },
+    mythic: {
+      name: "Mythique",
+      image: "/MythiqueB.png",
+      price: 750,
+      owned: ownedMythic,
+      glow: "bg-red-600",
+      text: "text-red-500",
+      border: "border-red-500",
+      bgBase: "bg-red-900/20",
+      shadow: "shadow-[0_0_20px_rgba(239,68,68,0.3)]",
+      hueRotate: "",
+      rates: [ {r: "Épique", p: "75%", c: "text-purple-400"}, {r: "Légendaire", p: "20%", c: "text-yellow-400"}, {r: "Mythique", p: "5%", c: "text-red-500"} ]
+    }
+  };
+  const activeBox = boxesData[selectedBoxType] || boxesData['standard'];
+
   return (
     <div className="w-full">
 
@@ -339,229 +396,147 @@ export default function PackOpenerClient({
             </p>
           </div>
 
-          {!showReveal && (
-            <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4 z-10">
-              {/* Standard Box */}
-              <div 
-                onClick={() => setSelectedBoxType("standard")}
-                className={`p-3 rounded-2xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "standard" ? "bg-blue-900/30 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-blue-500/50 opacity-80 hover:opacity-100"}`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                <div className="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
-                  <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
-                  <img src="/StandardB.png" alt="Standard" className="w-14 h-14 object-contain drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] relative z-10" />
-                </div>
-                <div className="relative z-10 text-center">
-                  <div className="flex items-center justify-center gap-2 group/info relative">
-                    <h3 className="text-lg font-black text-blue-300 drop-shadow-md tracking-wide font-outfit uppercase">Standard</h3>
-                    
-                    <div className="absolute bottom-full mb-2 w-48 bg-black/95 border border-white/10 rounded-xl p-3 shadow-2xl opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-50 left-1/2 -translate-x-1/2">
-                      <h4 className="font-bold text-blue-400 mb-1 uppercase tracking-wider text-xs border-b border-white/10 pb-1">Taux de Drop</h4>
-                      <ul className="text-[10px] text-left w-full space-y-1 font-medium">
-                        <li className="flex justify-between text-gray-400"><span>Commune</span><span>40%</span></li>
-                        <li className="flex justify-between text-green-400"><span>Peu Commune</span><span>30%</span></li>
-                        <li className="flex justify-between text-blue-400"><span>Rare</span><span>20%</span></li>
-                        <li className="flex justify-between text-purple-400"><span>Épique</span><span>8%</span></li>
-                        <li className="flex justify-between text-yellow-400"><span>Légendaire</span><span>2%</span></li>
-                      </ul>
-                    </div>
-                  </div>
-                  <p className="text-xs text-blue-200/70 mt-2 font-medium">Toutes les raretés</p>
-                </div>
-                <div className="mt-2 w-full flex flex-col gap-2 relative z-10">
-                  <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
-                    x{ownedStandard} en stock
-                  </div>
-                  {ownedStandard === 0 && (
-      coins < 150 ? (
-        <button onClick={(e) => { e.stopPropagation(); router.push('/shop'); }} className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 rounded-xl font-bold text-white transition-all text-sm shadow-[0_0_10px_rgba(156,163,175,0.3)]">
-          Boutique
-        </button>
-      ) : (
-        <button onClick={(e) => { e.stopPropagation(); buyBooster("standard", 150); }} disabled={isBuying} className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl font-bold text-white transition-all disabled:opacity-50 text-sm shadow-[0_0_10px_rgba(59,130,246,0.3)]">
-          <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 150</span>
-        </button>
-      )
-    )}
-                </div>
-              </div>
-
-              {/* Premium Box */}
-              <div 
-                onClick={() => setSelectedBoxType("premium")}
-                className={`p-3 rounded-2xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "premium" ? "bg-purple-900/30 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-purple-500/50 opacity-80 hover:opacity-100"}`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                <div className="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
-                  <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
-                  <img src="/PreniumB.png" alt="Premium" className="w-14 h-14 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.6)] relative z-10" />
-                </div>
-                <div className="relative z-10 text-center">
-                  <div className="flex items-center justify-center gap-2 group/info relative">
-                    <h3 className="text-lg font-black text-purple-300 drop-shadow-md tracking-wide font-outfit uppercase">Premium</h3>
-                    
-                    <div className="absolute bottom-full mb-2 w-48 bg-black/95 border border-white/10 rounded-xl p-3 shadow-2xl opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-50 left-1/2 -translate-x-1/2">
-                      <h4 className="font-bold text-purple-400 mb-1 uppercase tracking-wider text-xs border-b border-white/10 pb-1">Taux de Drop</h4>
-                      <ul className="text-[10px] text-left w-full space-y-1 font-medium">
-                        <li className="flex justify-between text-gray-400"><span>Commune</span><span>20%</span></li>
-                        <li className="flex justify-between text-green-400"><span>Peu Commune</span><span>25%</span></li>
-                        <li className="flex justify-between text-blue-400"><span>Rare</span><span>35%</span></li>
-                        <li className="flex justify-between text-purple-400"><span>Épique</span><span>15%</span></li>
-                        <li className="flex justify-between text-yellow-400"><span>Légendaire</span><span>5%</span></li>
-                      </ul>
-                    </div>
-                  </div>
-                  <p className="text-xs text-purple-200/70 mt-2 font-medium">Mini. Rare garanti</p>
-                </div>
-                <div className="mt-2 w-full flex flex-col gap-2 relative z-10">
-                  <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
-                    x{ownedPremium} en stock
-                  </div>
-                  {ownedPremium === 0 && (
-      coins < 250 ? (
-        <button onClick={(e) => { e.stopPropagation(); router.push('/shop'); }} className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 rounded-xl font-bold text-white transition-all text-sm shadow-[0_0_10px_rgba(156,163,175,0.3)]">
-          Boutique
-        </button>
-      ) : (
-        <button onClick={(e) => { e.stopPropagation(); buyBooster("premium", 250); }} disabled={isBuying} className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 rounded-xl font-bold text-white transition-all disabled:opacity-50 text-sm shadow-[0_0_10px_rgba(168,85,247,0.3)]">
-          <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 250</span>
-        </button>
-      )
-    )}
-                </div>
-              </div>
-
-              {/* Legendary Box */}
-              <div 
-                onClick={() => setSelectedBoxType("legendary")}
-                className={`p-3 rounded-2xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "legendary" ? "bg-amber-900/30 border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-amber-500/50 opacity-80 hover:opacity-100"}`}
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center border border-amber-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
-                  <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
-                  <img src="/StandardB.png" alt="Legendary" className="w-14 h-14 object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] hue-rotate-180 brightness-150 relative z-10" />
-                </div>
-                <div className="relative z-10 text-center">
-                  <div className="flex items-center justify-center gap-2 group/info relative">
-                    <h3 className="text-lg font-black text-amber-400 drop-shadow-md tracking-wide font-outfit uppercase">Légendaire</h3>
-                    
-                    <div className="absolute bottom-full mb-2 w-48 bg-black/95 border border-white/10 rounded-xl p-3 shadow-2xl opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-50 left-1/2 -translate-x-1/2">
-                      <h4 className="font-bold text-amber-400 mb-1 uppercase tracking-wider text-xs border-b border-white/10 pb-1">Taux de Drop</h4>
-                      <ul className="text-[10px] text-left w-full space-y-1 font-medium">
-                        <li className="flex justify-between text-gray-400"><span>Commune</span><span>10%</span></li>
-                        <li className="flex justify-between text-green-400"><span>Peu Commune</span><span>15%</span></li>
-                        <li className="flex justify-between text-blue-400"><span>Rare</span><span>40%</span></li>
-                        <li className="flex justify-between text-purple-400"><span>Épique</span><span>25%</span></li>
-                        <li className="flex justify-between text-yellow-400"><span>Légendaire</span><span>10%</span></li>
-                      </ul>
-                    </div>
-                  </div>
-                  <p className="text-xs text-amber-200/70 mt-2 font-medium">Mini. Épique garanti</p>
-                </div>
-                <div className="mt-2 w-full flex flex-col gap-2 relative z-10">
-                  <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
-                    x{ownedLegendary} en stock
-                  </div>
-                  {ownedLegendary === 0 && (
-      coins < 400 ? (
-        <button onClick={(e) => { e.stopPropagation(); router.push('/shop'); }} className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 rounded-xl font-bold text-white transition-all text-sm shadow-[0_0_10px_rgba(156,163,175,0.3)]">
-          Boutique
-        </button>
-      ) : (
-        <button onClick={(e) => { e.stopPropagation(); buyBooster("legendary", 400); }} disabled={isBuying} className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-500 hover:to-orange-400 rounded-xl font-bold text-white transition-all disabled:opacity-50 text-sm shadow-[0_0_10px_rgba(245,158,11,0.3)]">
-          <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 400</span>
-        </button>
-      )
-    )}
-                </div>
-              </div>
-
-              {/* Mythic Box */}
-              <div 
-                onClick={() => setSelectedBoxType("mythic")}
-                className={`p-3 rounded-2xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "mythic" ? "bg-red-900/30 border-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-red-500/50 opacity-80 hover:opacity-100"}`}
-              >
-                <div className="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-lg tracking-wider shadow-[0_0_10px_rgba(220,38,38,0.8)] z-20 flex items-center gap-1">
-                  <Clock className="w-3 h-3" /> Offre Flash
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-b from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500 mt-2">
-                  <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
-                  <img src="/MythiqueB.png" alt="Mythique" className="w-14 h-14 object-contain drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] relative z-10 animate-pulse-glow" />
-                </div>
-                <div className="relative z-10 text-center">
-                  <div className="flex items-center justify-center gap-2 group/info relative">
-                    <h3 className="text-lg font-black text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,1)] tracking-wide font-outfit uppercase">Mythique</h3>
-                    <div className="w-5 h-5 rounded-full border border-red-500/50 flex items-center justify-center text-red-500 text-xs font-bold cursor-help hover:bg-red-500/20">?</div>
-                    <div className="absolute bottom-full mb-2 w-48 bg-black/95 border border-white/10 rounded-xl p-3 shadow-2xl opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-50 left-1/2 -translate-x-1/2">
-                      <h4 className="font-bold text-red-500 mb-1 uppercase tracking-wider text-xs border-b border-white/10 pb-1">Taux de Drop</h4>
-                      <ul className="text-[10px] text-left w-full space-y-1 font-medium">
-                        <li className="flex justify-between text-purple-400"><span>Épique</span><span>75%</span></li>
-                        <li className="flex justify-between text-yellow-400"><span>Légendaire</span><span>20%</span></li>
-                        <li className="flex justify-between text-red-500"><span>Mythique</span><span>5%</span></li>
-                      </ul>
-                    </div>
-                  </div>
-                  <p className="text-xs text-red-200/70 mt-2 font-medium">Légendaire ou Mythique</p>
-                </div>
-                <div className="mt-2 w-full flex flex-col gap-2 relative z-10">
-                  <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">
-                    x{ownedMythic} en stock
-                  </div>
-                  {ownedMythic === 0 && (
-      coins < 750 ? (
-        <button onClick={(e) => { e.stopPropagation(); router.push('/shop'); }} className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 rounded-xl font-bold text-white transition-all text-sm shadow-[0_0_10px_rgba(156,163,175,0.3)]">
-          Boutique
-        </button>
-      ) : (
-        <button onClick={(e) => { e.stopPropagation(); buyBooster("mythic", 750); }} disabled={isBuying} className="flex items-center justify-center gap-1.5 w-full py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 rounded-xl font-bold text-white transition-all disabled:opacity-50 text-sm shadow-[0_0_10px_rgba(239,68,68,0.3)]">
-          <span className="flex items-center gap-1"><img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" /> 750</span>
-        </button>
-      )
-    )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!showReveal && (
-            <div className="z-10 flex flex-col items-center mt-4">
-              {/* Only show the normal booster if NOT opening */}
-              {!isOpening && (
-                <button 
-                  onClick={openPack} 
-                  className="relative cursor-pointer transition-transform hover:scale-105 active:scale-95 outline-none group"
-                >
-                  <div className={`absolute inset-0 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity ${selectedBoxType === 'standard' ? 'bg-blue-500' : selectedBoxType === 'premium' ? 'bg-purple-500' : selectedBoxType === 'legendary' ? 'bg-amber-500' : 'bg-red-500'}`}></div>
-                  <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/StandardB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-48 h-auto relative z-10 drop-shadow-2xl transition-all duration-300 transform hover:scale-110 ${selectedBoxType === 'legendary' ? 'hue-rotate-180 brightness-150' : ''}`} />
-                  
-                  {/* Floating particles effect on hover */}
-                  <div className="absolute inset-0 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Sparkles className={`w-32 h-32 animate-ping ${selectedBoxType === 'standard' ? 'text-blue-400' : selectedBoxType === 'premium' ? 'text-purple-400' : selectedBoxType === 'legendary' ? 'text-amber-400' : 'text-red-400'}`} />
-                  </div>
-                </button>
-              )}
+                    {!showReveal && (
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-10 mb-8 z-10 mt-6 relative">
               
-              {!isOpening && (
-                <button 
-                  onClick={openPack}
-                  disabled={isOpening || isBuying || (selectedBoxType === "standard" ? ownedStandard : selectedBoxType === "premium" ? ownedPremium : selectedBoxType === "legendary" ? ownedLegendary : ownedMythic) <= 0}
-                  className="group relative px-10 py-3 mt-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl font-black text-xl text-white overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(129,140,248,0.5)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
-                >
-                  <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                  <span className="relative flex items-center gap-3">
-                    <Sparkles className="w-6 h-6 animate-pulse" />
-                    Ouvrir le Booster
-                  </span>
-                </button>
-              )}
+              {/* LEFT COLUMN: Booster Selection List */}
+              <div className="w-full lg:w-1/3 flex flex-col gap-3 z-20">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 px-2">
+                  <Layers className="w-5 h-5 text-indigo-400" /> Sélecteur de Boosters
+                </h3>
+                
+                {Object.keys(boxesData).map(key => {
+                  const box = boxesData[key];
+                  const isSelected = selectedBoxType === key;
+                  return (
+                    <div 
+                      key={key}
+                      onClick={() => !isOpening && setSelectedBoxType(key)}
+                      className={`relative flex items-center gap-4 p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
+                        isSelected 
+                        ? `${box.bgBase} ${box.border} ${box.shadow} scale-[1.02]` 
+                        : 'bg-black/40 border-white/5 hover:border-white/20 hover:bg-white/5'
+                      }`}
+                    >
+                      {isSelected && <div className={`absolute inset-0 opacity-20 bg-gradient-to-r from-transparent to-${box.glow.split('-')[1]}-500 pointer-events-none`} />}
+                      
+                      <div className={`relative w-16 h-16 rounded-xl flex items-center justify-center border-2 shrink-0 overflow-hidden ${isSelected ? box.border + ' bg-black/50' : 'border-white/10 bg-black/40'}`}>
+                        {isSelected && <div className={`absolute inset-0 ${box.glow} opacity-30 blur-md`}></div>}
+                        <img src={box.image} alt={box.name} className={`w-12 h-12 object-contain drop-shadow-lg relative z-10 ${box.hueRotate}`} />
+                        {key === 'mythic' && (
+                          <div className="absolute -top-2 -right-2 bg-red-600 rounded-full w-5 h-5 flex items-center justify-center shadow-lg animate-pulse z-20">
+                            <Clock className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-col flex-1 relative z-10">
+                        <h4 className={`text-lg font-black uppercase tracking-wide ${isSelected ? box.text : 'text-gray-300'}`}>{box.name}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${box.owned > 0 ? 'bg-green-500/20 text-green-400' : 'bg-gray-800 text-gray-500'}`}>
+                            Stock: {box.owned}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* RIGHT COLUMN: The Stage */}
+              <div className="w-full lg:w-2/3 relative flex flex-col items-center justify-center p-8 rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden min-h-[500px]">
+                {/* Dynamic Background Glow */}
+                <div className={`absolute inset-0 opacity-10 blur-3xl rounded-full ${activeBox.glow} transition-colors duration-700 pointer-events-none`} />
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+
+                {/* Booster Info Header */}
+                <div className="absolute top-6 left-6 z-20 pointer-events-none">
+                  <h2 className={`text-3xl font-black uppercase tracking-wider ${activeBox.text} drop-shadow-lg`}>
+                    Booster {activeBox.name}
+                  </h2>
+                  <p className="text-white/60 text-sm font-medium mt-1">
+                    {activeBox.owned > 0 ? 'Prêt à être ouvert' : 'Achetez pour obtenir de nouvelles cartes'}
+                  </p>
+                </div>
+
+                {/* Drop Rates Table */}
+                <div className="absolute top-6 right-6 z-20 bg-black/60 border border-white/10 rounded-xl p-4 shadow-xl backdrop-blur-md hidden sm:block pointer-events-none">
+                  <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 border-b border-white/10 pb-2 ${activeBox.text}`}>
+                    Taux de Drop
+                  </h4>
+                  <ul className="text-xs space-y-1.5 w-32">
+                    {activeBox.rates.map((rate: any, idx: number) => (
+                      <li key={idx} className={`flex justify-between font-medium ${rate.c}`}>
+                        <span>{rate.r}</span>
+                        <span className="font-mono">{rate.p}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* The Booster Image */}
+                <div className="relative mt-12 mb-4 z-10 w-full flex justify-center pointer-events-none">
+                  <div className={`absolute inset-0 opacity-40 blur-3xl rounded-full ${activeBox.glow} transition-all duration-700 ${isOpening ? 'scale-150' : ''}`} />
+                  <img 
+                    src={activeBox.image} 
+                    alt={activeBox.name} 
+                    className={`w-64 h-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-all duration-500 ease-in-out relative z-10 ${isOpening ? 'animate-shake scale-110' : 'animate-float'} ${activeBox.hueRotate}`} 
+                    style={isOpening ? { filter: 'brightness(1.5) contrast(1.2)' } : {}}
+                  />
+                  {isOpening && (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center">
+                       <Sparkles className={`w-40 h-40 animate-ping ${activeBox.text}`} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Area */}
+                <div className="mt-auto pt-8 w-full max-w-sm relative z-20 flex flex-col gap-3">
+                  {!isOpening && (
+                    activeBox.owned > 0 ? (
+                      <button 
+                        onClick={openPack}
+                        disabled={isOpening || isBuying}
+                        className={`group relative w-full py-4 rounded-xl font-black text-xl text-white overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl border ${activeBox.border}`}
+                      >
+                        <div className={`absolute inset-0 ${activeBox.glow} opacity-50 group-hover:opacity-80 transition-opacity`} />
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                        <span className="relative flex items-center justify-center gap-3 drop-shadow-md">
+                          <Sparkles className="w-6 h-6 animate-pulse" />
+                          Ouvrir le Booster
+                        </span>
+                      </button>
+                    ) : (
+                      coins < activeBox.price ? (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); router.push('/shop'); }}
+                          className="flex items-center justify-center gap-2 w-full py-4 bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-xl font-bold text-white transition-all text-lg shadow-[0_0_15px_rgba(156,163,175,0.2)] border border-gray-600"
+                        >
+                          Fonds insuffisants - Boutique
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); buyBooster(selectedBoxType, activeBox.price); }} 
+                          disabled={isBuying} 
+                          className={`relative overflow-hidden flex items-center justify-center gap-2 w-full py-4 rounded-xl font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 text-lg shadow-2xl border ${activeBox.border}`}
+                        >
+                          <div className={`absolute inset-0 ${activeBox.glow} opacity-30 group-hover:opacity-50 transition-opacity`} />
+                          <span className="relative flex items-center gap-2 drop-shadow-md">
+                            Acheter pour <img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> {activeBox.price}
+                          </span>
+                        </button>
+                      )
+                    )
+                  )}
+                  {isOpening && (
+                    <div className="w-full py-4 text-center text-white/50 font-bold animate-pulse text-lg tracking-widest uppercase">
+                      Ouverture en cours...
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
-          
           {/* Cinematic Opening Overlay */}
           {isOpening && (
             <div className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 ${
