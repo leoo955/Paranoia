@@ -358,7 +358,7 @@ export default function CardDisplay({
           )}
 
           {/* Nameplate */}
-          {!attrs.hideNameplate && <div className={`w-full ${factionColor} border-white/50 relative shadow-[0_-5px_15px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center rounded-b-xl`} style={{ borderTopWidth: '0.6cqi', padding: '2cqi 2cqi 1.5cqi 2cqi' }}>
+          {!attrs.hideNameplate && <div className={`w-full ${factionColor?.startsWith('#') || factionColor?.startsWith('rgb') ? '' : factionColor} border-white/50 relative shadow-[0_-5px_15px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center rounded-b-xl`} style={{ backgroundColor: factionColor?.startsWith('#') || factionColor?.startsWith('rgb') ? factionColor : undefined, borderTopWidth: '0.6cqi', padding: '2cqi 2cqi 1.5cqi 2cqi' }}>
             {/* Rarity/Role tag */}
             {!attrs.hideRole && <div className="absolute bg-white text-black font-black uppercase rounded-sm shadow-md" style={{ top: '-3cqi', right: '2cqi', padding: '0.5cqi 1.5cqi', fontSize: '3cqi' }}>
               {role}

@@ -62,6 +62,7 @@ export default function AdminPage() {
   const [cardBgColor, setCardBgColor] = useState("");
   const [cardGlowColor, setCardGlowColor] = useState("");
   const [mainColor, setMainColor] = useState("");
+  const [factionColor, setFactionColor] = useState("");
   const [rarityBadgeColor, setRarityBadgeColor] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showTitle, setShowTitle] = useState(true);
@@ -583,6 +584,7 @@ export default function AdminPage() {
           cardBgColor,
           cardGlowColor,
           mainColor,
+          factionColor,
           rarityBadgeColor,
           frameUrl: cardFrameUrl,
           titlePos, descPos, rarityBadgePos, levelTextPos,
@@ -632,7 +634,7 @@ export default function AdminPage() {
         setCardTitle("");
         setCardCustomBg("");
         setCardImageUrl("");
-        setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
+        setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor(""); setFactionColor("");
         setBgPosX(50); setBgPosY(50); setBgScale(100);
         setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
         setIsFullArt(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
@@ -679,6 +681,7 @@ export default function AdminPage() {
       setCardBgColor(attrs.cardBgColor || "");
       setCardGlowColor(attrs.cardGlowColor || "");
       setMainColor(attrs.mainColor || "");
+      setFactionColor(attrs.factionColor || "");
       setRarityBadgeColor(attrs.rarityBadgeColor || "");
       setCardFrameUrl(attrs.frameUrl || "");
       
@@ -709,7 +712,7 @@ export default function AdminPage() {
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
     } catch {
-      setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
+      setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor(""); setFactionColor("");
       setBgPosX(50); setBgPosY(50); setBgScale(100);
       setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
       setIsFullArt(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
@@ -753,7 +756,7 @@ export default function AdminPage() {
     setCardTitle("");
     setCardCustomBg("");
     setCardImageUrl("");
-    setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor("");
+    setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor(""); setFactionColor("");
     setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
     setCardFrameUrl("");
     setCardCustomBadges([]);
@@ -919,6 +922,7 @@ export default function AdminPage() {
             cardBgColor,
             cardGlowColor,
             mainColor,
+            factionColor,
             rarityBadgeColor,
             frameUrl: cardFrameUrl,
             titlePos, descPos, rarityBadgePos, levelTextPos,
@@ -975,6 +979,7 @@ export default function AdminPage() {
       setCardBgColor(attrs.cardBgColor || "");
       setCardGlowColor(attrs.cardGlowColor || "");
       setMainColor(attrs.mainColor || "");
+      setFactionColor(attrs.factionColor || "");
       setRarityBadgeColor(attrs.rarityBadgeColor || "");
       setCardFrameUrl(attrs.frameUrl || "");
       setIsFullArt(attrs.isFullArt || false);
@@ -1470,6 +1475,17 @@ export default function AdminPage() {
                     onChange={(e) => setCardGlowColor(e.target.value)}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)] mb-4"
                     placeholder="Ex: #ff00ff, gold"
+                    disabled={creatingCard}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Couleur du Bloc en Bas (Code Hex ou bg-color)</label>
+                  <input 
+                    type="text"
+                    value={factionColor}
+                    onChange={(e) => setFactionColor(e.target.value)}
+                    className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)] mb-4"
+                    placeholder="Ex: #ff0000 ou bg-red-600"
                     disabled={creatingCard}
                   />
                 </div>
