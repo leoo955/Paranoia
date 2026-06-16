@@ -116,8 +116,11 @@ export default function AdminPage() {
   
   const [templates, setTemplates] = useState<any[]>([]);
   const [editions, setEditions] = useState<any[]>([]);
+  const [variants, setVariants] = useState<any[]>([]);
   const [newEditionName, setNewEditionName] = useState("");
   const [newEditionIconUrl, setNewEditionIconUrl] = useState("");
+  const [newVariantName, setNewVariantName] = useState("");
+  const [newVariantIcon, setNewVariantIcon] = useState("");
 
   const [godCardId, setGodCardId] = useState("");
   const [godPlayerId, setGodPlayerId] = useState("");
@@ -273,6 +276,16 @@ export default function AdminPage() {
   };
 
   
+  
+  const fetchVariants = async () => {
+    try {
+      const res = await fetch("/api/variants");
+      if (res.ok) setVariants(await res.json());
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const fetchEditions = async () => {
     try {
       const res = await fetch("/api/editions");
@@ -308,6 +321,7 @@ export default function AdminPage() {
     fetchCards();
     fetchTemplates();
     fetchEditions();
+    fetchVariants();
     fetchUsers();
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -982,6 +996,7 @@ export default function AdminPage() {
         toast.success("Template sauvegardé !");
         fetchTemplates();
     fetchEditions();
+    fetchVariants();
       }
     } catch (e) {
       console.error(e);
@@ -1061,6 +1076,36 @@ export default function AdminPage() {
     }
   };
 
+  
+  const handleCreateVariant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newVariantName) return;
+    try {
+      const res = await fetch("/api/variants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newVariantName, iconUrl: newVariantIcon })
+      });
+      if (res.ok) {
+        setNewVariantName("");
+        setNewVariantIcon("");
+        fetchVariants();
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erreur");
+    }
+  };
+
+  const handleDeleteVariant = (id: string) => {
+    confirmToast("Êtes-vous sûr de vouloir supprimer cette variante ?", async () => {
+      try {
+        const res = await fetch(`/api/variants?id=${id}`, { method: "DELETE" });
+        if (res.ok) fetchVariants();
+      } catch (e) { console.error(e); }
+    });
+  };
+
   const handleCreateEdition = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEditionName) return;
@@ -1075,6 +1120,7 @@ export default function AdminPage() {
         setNewEditionName("");
         setNewEditionIconUrl("");
         fetchEditions();
+    fetchVariants();
       } else {
         toast.error("Erreur lors de la création de l'édition.");
       }
@@ -1089,8 +1135,12 @@ export default function AdminPage() {
     confirmToast("Êtes-vous sûr de vouloir supprimer cette édition ?", async () => {
       try {
         const res = await fetch(`/api/editions?id=${id}`, { method: "DELETE" });
-        if (res.ok) fetchEditions();
-        else toast.error("Erreur lors de la suppression.");
+        if (res.ok) {
+          fetchEditions();
+          fetchVariants();
+        } else {
+          toast.error("Erreur lors de la suppression.");
+        }
       } catch (e) {
         console.error(e);
       }
@@ -1429,14 +1479,37 @@ export default function AdminPage() {
                       <option key={c.id} value={c.id} className="bg-[var(--color-bg-elevated)] text-white">{c.title || c.playerName || "Carte sans nom"}</option>
                     ))}
                   </select>
-                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge de Variante (Image)</label>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge de Variante (Profil existant ou Image Custom)</label>
                   <div className="flex gap-2">
+                    <select
+                      value={variants.find(v => v.iconUrl === variantBadgeUrl)?.name || (variantBadgeUrl ? "custom" : "")}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "custom") {
+                           // keep current or empty
+                        } else if (val === "") {
+                           setVariantBadgeUrl("");
+                        } else {
+                           const v = variants.find(v => v.name === val);
+                           if (v) setVariantBadgeUrl(v.iconUrl || "");
+                        }
+                      }}
+                      className="bg-black/40 border border-indigo-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-400"
+                      disabled={creatingCard}
+                    >
+                      <option value="" className="bg-[var(--color-bg-elevated)] text-white">-- Aucun --</option>
+                      {variants.map(v => (
+                        <option key={v.id} value={v.name} className="bg-[var(--color-bg-elevated)] text-white">{v.name}</option>
+                      ))}
+                      <option value="custom" className="bg-[var(--color-bg-elevated)] text-white">URL Personnalisée</option>
+                    </select>
+
                     <input 
                       type="text"
                       value={variantBadgeUrl}
                       onChange={(e) => setVariantBadgeUrl(e.target.value)}
                       className="flex-1 bg-black/40 border border-indigo-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-400"
-                      placeholder="URL de l'image"
+                      placeholder="URL de l'image..."
                       disabled={creatingCard}
                     />
                     <label className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg px-4 py-2 cursor-pointer flex items-center justify-center transition-colors font-bold shadow-lg shadow-indigo-500/20">

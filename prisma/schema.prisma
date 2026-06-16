@@ -187,6 +187,13 @@ model Edition {
   createdAt DateTime @default(now())
 }
 
+model VariantProfile {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  iconUrl   String?
+  createdAt DateTime @default(now())
+}
+
 model UserBox {
   id        String   @id @default(cuid())
   userId    String

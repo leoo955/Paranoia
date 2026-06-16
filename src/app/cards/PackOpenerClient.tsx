@@ -122,6 +122,16 @@ export default function PackOpenerClient({
   const [drawnCards, setDrawnCards] = useState<TradingCard[]>([]);
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
+  useEffect(() => {
+    if (selectedCard) {
+      document.body.style.overflow = 'hidden';
+      // Optionnel: document.documentElement.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      // Optionnel: document.documentElement.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [selectedCard]);
   const [selectedUserCardEffect, setSelectedUserCardEffect] = useState<string | null>(null);
   const [openingGlow, setOpeningGlow] = useState<string | null>(null);
   const [showRatesModal, setShowRatesModal] = useState(false);
