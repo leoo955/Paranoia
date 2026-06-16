@@ -919,17 +919,18 @@ const buyBooster = async (type: string, price: number) => {
 
       {selectedCard && (
         <div 
-          className="fixed inset-0 z-[100] flex items-start md:items-center justify-center bg-black/95 p-4 overflow-y-auto animate-in fade-in duration-300 custom-scrollbar"
+          className="fixed inset-0 z-[100] bg-black/95 overflow-y-auto custom-scrollbar animate-in fade-in duration-300"
           onClick={() => setSelectedCard(null)}
         >
-          <div 
-            className="relative w-full max-w-5xl flex flex-col md:flex-row items-center md:items-stretch gap-8 animate-slide-up my-auto py-8 md:py-0"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button 
-              onClick={() => setSelectedCard(null)}
-              className="absolute -top-16 right-0 md:-top-6 md:-right-16 text-white/50 hover:text-white transition-colors z-50 bg-white/5 hover:bg-purple-500/20 p-3 rounded-full border border-white/10"
+          <div className="min-h-full flex items-center justify-center p-4 sm:p-6">
+            <div 
+              className="relative w-full max-w-5xl flex flex-col md:flex-row items-center md:items-stretch gap-8 animate-slide-up"
+              onClick={(e) => e.stopPropagation()}
             >
+              <button 
+                onClick={() => setSelectedCard(null)}
+                className="absolute -top-14 right-0 md:-top-6 md:-right-16 text-white/50 hover:text-white transition-colors z-[110] bg-white/5 hover:bg-purple-500/20 p-3 rounded-full border border-white/10"
+              >
               <X className="w-8 h-8" />
             </button>
 
@@ -1023,6 +1024,7 @@ const buyBooster = async (type: string, price: number) => {
                   </div>
                 </div>
               )}
+              </div>
             </div>
           </div>
         </div>
