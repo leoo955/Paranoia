@@ -30,21 +30,9 @@ export default async function CardsPage() {
 
     inventory = await prisma.userCard.findMany({
       where: { userId },
-      select: {
-        id: true,
-        obtainedAt: true,
+      include: {
         tradingCard: {
-          select: {
-            id: true,
-            title: true,
-            rarity: true,
-            renderedImageUrl: true,
-            imageUrl: true,
-            proba: true,
-            player: {
-              select: { minecraftName: true }
-            }
-          }
+          include: { player: true }
         }
       },
       orderBy: { obtainedAt: 'desc' }
@@ -55,17 +43,7 @@ export default async function CardsPage() {
   }
 
   const allCards = await prisma.tradingCard.findMany({
-    select: {
-      id: true,
-      title: true,
-      rarity: true,
-      renderedImageUrl: true,
-      imageUrl: true,
-      proba: true,
-      player: {
-        select: { minecraftName: true }
-      }
-    },
+    include: { player: true },
     orderBy: { rarity: 'desc' }
   });
 
