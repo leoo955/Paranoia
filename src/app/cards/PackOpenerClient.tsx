@@ -475,13 +475,13 @@ export default function PackOpenerClient({
                     <button 
                       onClick={openPack}
                       disabled={isOpening || isBuying}
-                      className={`group relative w-full py-4 rounded-xl font-black text-xl text-white overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-2xl border ${activeBox.border}`}
+                      className={`group relative w-full py-4 rounded-2xl font-black text-2xl text-white overflow-hidden transition-all hover:-translate-y-1 active:translate-y-1 active:border-b-0 shadow-xl border-t border-x border-b-4 ${activeBox.border} bg-black/60`}
                     >
-                      <div className={`absolute inset-0 ${activeBox.glow} opacity-50 group-hover:opacity-80 transition-opacity`} />
-                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                      <span className="relative flex items-center justify-center gap-3 drop-shadow-md">
-                        <Sparkles className="w-6 h-6 animate-pulse" />
-                        Ouvrir le Booster
+                      <div className={`absolute inset-0 ${activeBox.glow} opacity-30 group-hover:opacity-50 transition-opacity`} />
+                      <div className="absolute top-0 bottom-0 left-0 w-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] skew-x-[-45deg] group-hover:translate-x-[150%] transition-transform duration-700 ease-in-out" />
+                      <span className="relative flex items-center justify-center gap-3 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-wide">
+                        <Sparkles className="w-7 h-7 text-white animate-pulse" />
+                        OUVRIR LE BOOSTER
                       </span>
                     </button>
                   )}
@@ -489,7 +489,7 @@ export default function PackOpenerClient({
                     coins < activeBox.price ? (
                       <button 
                         onClick={(e) => { e.stopPropagation(); router.push('/shop'); }}
-                        className={`flex items-center justify-center gap-2 w-full bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 rounded-xl font-bold text-white transition-all shadow-[0_0_15px_rgba(156,163,175,0.2)] border border-gray-600 ${activeBox.owned > 0 ? 'py-3 text-sm' : 'py-4 text-lg'}`}
+                        className={`flex items-center justify-center gap-2 w-full bg-gray-800 hover:bg-gray-700 rounded-xl font-bold text-white transition-all shadow-lg border-t border-x border-b-4 border-gray-600 hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-0 ${activeBox.owned > 0 ? 'py-3 text-xs uppercase' : 'py-4 text-lg'}`}
                       >
                         Fonds insuffisants - Boutique
                       </button>
@@ -497,17 +497,17 @@ export default function PackOpenerClient({
                       <button 
                         onClick={(e) => { e.stopPropagation(); buyBooster(selectedBoxType, activeBox.price); }} 
                         disabled={isBuying} 
-                        className={`relative overflow-hidden flex items-center justify-center gap-2 w-full rounded-xl font-bold text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-50 shadow-2xl border ${activeBox.border} ${activeBox.owned > 0 ? 'py-3 text-sm' : 'py-4 text-lg'}`}
+                        className={`group relative overflow-hidden flex items-center justify-center gap-2 w-full rounded-xl font-black text-white transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-0 shadow-lg border-t border-x border-b-4 ${activeBox.border} bg-black/40 ${activeBox.owned > 0 ? 'py-3 text-sm' : 'py-4 text-xl'}`}
                       >
-                        <div className={`absolute inset-0 ${activeBox.glow} opacity-30 group-hover:opacity-50 transition-opacity`} />
-                        <span className="relative flex items-center gap-2 drop-shadow-md">
-                          Acheter pour <img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> {activeBox.price}
+                        <div className={`absolute inset-0 ${activeBox.glow} opacity-10 group-hover:opacity-30 transition-opacity`} />
+                        <span className="relative flex items-center gap-2 drop-shadow-md uppercase tracking-widest">
+                          ACHETER POUR <img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> {activeBox.price}
                         </span>
                       </button>
                     )
                   )}
                   {isOpening && (
-                    <div className="w-full py-4 text-center text-white/50 font-bold animate-pulse text-lg tracking-widest uppercase">
+                    <div className="w-full py-4 text-center text-white/50 font-bold animate-pulse text-xl tracking-widest uppercase">
                       Ouverture en cours...
                     </div>
                   )}
