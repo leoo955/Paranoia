@@ -15,7 +15,7 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
   return (
     <div 
       className="relative z-10 transform transition-transform hover:scale-105 duration-500 animate-epic-reveal cursor-pointer group shrink-0" 
-      style={{ animationDelay: `${index * 0.4}s`, animationFillMode: 'both', perspective: '1000px', width: '20rem', height: '28rem', minWidth: '20rem' }}
+      style={{ animationDelay: `${index * 0.4}s`, animationFillMode: 'both', perspective: '1000px', width: '16rem', height: '22.4rem', minWidth: '16rem' }}
       onClick={() => setIsFlipped(true)}
     >
       <div 
@@ -24,7 +24,7 @@ const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: num
       >
         {/* Front */}
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ backfaceVisibility: 'hidden' }}>
-          <CardDisplay card={card} size="lg" />
+          <CardDisplay card={card} size="md" />
         </div>
         
         {/* Back */}
@@ -565,7 +565,7 @@ export default function PackOpenerClient({
                 </div>
               )}
 
-              <div className="flex flex-row justify-center items-center gap-6 md:gap-10 px-4 flex-nowrap w-fit mx-auto max-w-full overflow-visible">
+              <div className="flex flex-row justify-center items-center gap-6 md:gap-10 px-4 flex-wrap w-fit mx-auto max-w-full overflow-visible">
                 {drawnCards.map((card, i) => (
                   <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} />
                 ))}
