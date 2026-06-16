@@ -73,8 +73,12 @@ async function buildCardListMessage(discordId: string, page: number) {
   if (currentCard.card.renderedImageUrl) {
     // If we have a fully generated HD image from the site, use it directly!
     // We add a timestamp to prevent Discord from caching it if it was updated recently.
+    const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const imageUrl = currentCard.card.renderedImageUrl.startsWith('http') 
+      ? currentCard.card.renderedImageUrl 
+      : `${appUrl}${currentCard.card.renderedImageUrl}`;
     const timestamp = Date.now();
-    embed.setImage(`${currentCard.card.renderedImageUrl}?v=${timestamp}`);
+    embed.setImage(`${imageUrl}?v=${timestamp}`);
   } else {
     // Fallback if no HD image is generated yet
     const timestamp = Date.now();
