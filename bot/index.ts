@@ -7,6 +7,16 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const prisma = new PrismaClient();
+
+async function getUserByDiscordId(discordId: string) {
+  let user = await prisma.user.findUnique({ where: { discordId } });
+  if (user) return user;
+  const account = await prisma.account.findFirst({
+    where: { provider: 'discord', providerAccountId: discordId },
+    include: { user: true }
+  });
+  return account?.user || null;
+}
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.DISCORD_CLIENT_ID;
 
@@ -86,9 +96,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
       if (!discordIdToSearch) return await interaction.respond([]);
 
       // Fetch user from DB
-      const user = await prisma.user.findUnique({
-        where: { discordId: discordIdToSearch }
-      });
+      const user = await getUserByDiscordId(discordIdToSearch);
 
       if (!user) {
         return await interaction.respond([]);
@@ -144,8 +152,8 @@ client.on('interactionCreate', async (interaction: Interaction) => {
           return await interaction.reply({ content: 'Vous ne pouvez pas échanger avec vous-même !', ephemeral: true });
         }
 
-        const proposer = await prisma.user.findUnique({ where: { discordId: interaction.user.id } });
-        const receiver = await prisma.user.findUnique({ where: { discordId: targetUser.id } });
+        const proposer = await getUserByDiscordId(interaction.user.id);
+        const receiver = await getUserByDiscordId(targetUser.id);
 
         if (!proposer) return await interaction.reply({ content: 'Vous n\'êtes pas enregistré sur Paranoia.', ephemeral: true });
         if (!receiver) return await interaction.reply({ content: 'Ce joueur n\'est pas enregistré sur Paranoia.', ephemeral: true });
@@ -207,7 +215,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
       try {
         const subcommand = interaction.options.getSubcommand();
         if (subcommand === 'list') {
-          const user = await prisma.user.findUnique({ where: { discordId: interaction.user.id } });
+          const user = await getUserByDiscordId(interaction.user.id);
           if (!user) return await interaction.reply({ content: "Vous n'êtes pas enregistré sur Paranoia.", ephemeral: true });
 
           const inventory = await prisma.userCard.findMany({
@@ -309,9 +317,9 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         const proposerCardId = parts[4]; // userCard id (uuid)
         const receiverCardId = parts[5]; // userCard id (uuid)
 
-        // Find the discord ID of the receiver to make sure only they can click
-        const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
-        if (!receiver || receiver.discordId !== interaction.user.id) {
+        // Check if the person clicking is the intended receiver
+        const currentUser = await getUserByDiscordId(interaction.user.id);
+        if (!currentUser || currentUser.id !== receiverId) {
           return await interaction.reply({ content: 'Ce bouton ne vous est pas destiné !', ephemeral: true });
         }
 
