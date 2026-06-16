@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, GripVertical, Settings, Save, Trash2, Share2 } from "lucide-react";
 import { useSession } from "next-auth/react";
+import toast from 'react-hot-toast';
 
 export default function TierListPage() {
   const { data: session } = useSession();
@@ -59,13 +60,13 @@ export default function TierListPage() {
         body: JSON.stringify({ gameMode: activeMode, data: tiers })
       });
       if (res.ok) {
-        alert("Tier List sauvegardée avec succès !");
+        toast.success("Tier List sauvegardée avec succès !");
       } else {
-        alert("Erreur lors de la sauvegarde.");
+        toast.error("Erreur lors de la sauvegarde.");
       }
     } catch (err) {
       console.error(err);
-      alert("Erreur réseau");
+      toast.error("Erreur réseau");
     } finally {
       setIsSaving(false);
     }

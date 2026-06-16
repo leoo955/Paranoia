@@ -7,9 +7,9 @@ export const getRarityGlow = (rarity: string) => {
     case "LEGENDARY": return "animate-pulse-glow-legendary";
     case "MYTHIC": return "animate-pulse-glow-mythic";
     case "EPIC": return "animate-pulse-glow-epic";
-    case "RARE": return "shadow-[0_0_20px_rgba(59,130,246,0.6)] border-blue-500/50";
-    case "UNCOMMON": return "shadow-[0_0_15px_rgba(255,255,255,0.2)] border-white/20";
-    default: return "shadow-md border-gray-700/50";
+    case "RARE": return "animate-pulse-glow-rare";
+    case "UNCOMMON": return "animate-pulse-glow-uncommon";
+    default: return "animate-pulse-glow-common";
   }
 };
 
@@ -233,7 +233,7 @@ export default function CardDisplay({
   const levelTextPos = attrs.levelTextPos || { x: 50, y: 82, scale: 100 };
   const textPos = attrs.textPos; // Fallback for old cards
   const levelBadgePos = attrs.levelBadgePos || { x: 10, y: 8, scale: 100 };
-  const editionBadgePos = attrs.editionBadgePos || { x: 88, y: 8, scale: 100 };
+  const editionBadgePos = attrs.editionBadgePos || { x: 85, y: 73, scale: 100 };
 
   const handleMouseDown = (e: React.MouseEvent, type: string, id: string = "") => {
     if (!isEditing || !onUpdateElement) return;
@@ -254,198 +254,171 @@ export default function CardDisplay({
     ...(attrs.borderColor ? { borderColor: attrs.borderColor } : {}),
     borderWidth: attrs.isFullArt ? '6px' : '2px', // Fun border logic
   };
+  // --- Aesthetic TCG Layout Data (No Gameplay) ---
+  const levelIconUrl = getLevelIcon(card.level);
+  
+  // Faction / Level Color for the nameplate
+  let factionColor = 'bg-gray-800';
+  if (card.level === 'Diamond') factionColor = 'bg-cyan-600';
+  if (card.level === 'Gold') factionColor = 'bg-yellow-600';
+  if (card.level === 'Iron') factionColor = 'bg-gray-400';
+  if (card.level === 'Netherite') factionColor = 'bg-purple-900';
+  if (attrs.factionColor) factionColor = attrs.factionColor; // Custom override
+  
+  // Rarity styling
+  let rarityBgColor = 'bg-gray-500';
+  let rarityTextColor = 'text-white';
+  if (card.rarity === 'MYTHIC') { rarityBgColor = 'bg-red-600'; rarityTextColor = 'text-yellow-300'; }
+  if (card.rarity === 'LEGENDARY') { rarityBgColor = 'bg-yellow-500'; rarityTextColor = 'text-white'; }
+  if (card.rarity === 'EPIC') { rarityBgColor = 'bg-purple-600'; rarityTextColor = 'text-white'; }
+  if (card.rarity === 'RARE') { rarityBgColor = 'bg-blue-600'; rarityTextColor = 'text-white'; }
+  if (card.rarity === 'UNCOMMON') { rarityBgColor = 'bg-green-600'; rarityTextColor = 'text-white'; }
+
+  const role = card.edition || attrs.role || 'SURVIVANT';
+  const faction = attrs.faction || 'PARANOIA SMP';
+
 
   return (
-    <div className={`relative ${wrapperClass} aspect-[2.5/3.5] mx-auto ${isEditing ? '' : 'perspective-1000'} @container`}>
+    <div className={`relative ${wrapperClass} aspect-[2.5/3.5] mx-auto rounded-xl ${isEditing ? '' : 'perspective-1000'} @container`}>
       <InteractiveCard 
         card={{...card, isEditing}} 
-        className={`${wrapperClass} aspect-[2.5/3.5] border-2 ${getLevelBorder(card.level)} ${(attrs.cardGlowColor || attrs.mainColor) ? 'animate-pulse-glow-custom' : getRarityGlow(card.rarity)}`}
+        className={`${wrapperClass} aspect-[2.5/3.5] border-2 rounded-xl overflow-hidden ${getLevelBorder(card.level)} ${(attrs.cardGlowColor || attrs.mainColor) ? 'animate-pulse-glow-custom' : getRarityGlow(card.rarity)}`}
         style={combinedStyle}
       >
         
-        {/* Custom Badges (Rendered inside the 3D space to float) */}
-        {customBadges.map((badge: any, idx: number) => badge.url && (
-          <img 
-            key={badge.id || idx}
-            src={badge.url}
-            alt="Custom Badge"
-            className={`absolute drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] z-40 ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
-            onMouseDown={(e) => handleMouseDown(e, 'customBadge', badge.id || String(idx))}
-            onWheel={(e) => handleWheel(e, 'customBadge', badge.id || String(idx))}
-            style={{
-              left: `${badge.x}%`,
-              top: `${badge.y}%`,
-              width: `${(badge.size / 288) * 100}cqi`,
-              transform: `translate(-50%, -50%) translateZ(${parseInt(translateZ) * 1.5}px)`
-            }}
-          />
-        ))}
+        {/* Full Art Character Image */}
+        <div className="absolute inset-0 z-10 w-full h-full flex items-end justify-center overflow-hidden rounded-xl">
+          {!attrs.hideCharacter && (
+            (card.imageUrl || card.player?.minecraftName || card.title) ? (
+              <img 
+                src={card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || card.title}`} 
+                alt={card.title} 
+                className={`w-[120%] h-[85%] object-cover object-top drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`} 
+                onMouseDown={(e) => handleMouseDown(e, 'character')}
+                onWheel={(e) => handleWheel(e, 'character')}
+              />
+            ) : (
+              <div className="w-20 h-20 bg-gray-700/50 rounded-full mb-10 border border-white/10"></div>
+            )
+          )}
+        </div>
 
-        {/* Level Badge Top Left (Inside the 3D effect) */}
-        {attrs.showLevelIcon !== false && (attrs.levelBadgeUrl || getLevelIcon(card.level)) && (
-          <img 
-            src={attrs.levelBadgeUrl || getLevelIcon(card.level)!} 
-            alt={card.level} 
-            className={`absolute w-[22cqi] h-[22cqi] object-contain z-40 ${isEditing ? 'cursor-grab active:cursor-grabbing animate-none hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'pointer-events-none animate-bounce-slow drop-shadow-[0_0_15px_rgba(0,0,0,0.6)]'}`} 
-            onMouseDown={(e) => handleMouseDown(e, 'levelBadge')}
-            onWheel={(e) => handleWheel(e, 'levelBadge')}
-            style={{ 
-              left: `${levelBadgePos.x}%`,
-              top: `${levelBadgePos.y}%`,
-              transform: `translate(-50%, -50%) scale(${levelBadgePos.scale / 100}) translateZ(${translateZ})` 
-            }}
-          />
-        )}
+        {/* Top-Right: Rarity Box */}
+        {!attrs.hideRarityBox && <div 
+          className={`absolute z-30 flex items-center ${rarityBgColor} border-white rounded-bl-xl rounded-tr-md shadow-lg overflow-hidden`}
+          style={{ 
+            top: '2%', right: '2%',
+            borderWidth: '0.4cqi',
+            transform: `translateZ(${translateZ})`
+          }}
+        >
+          <span className={`${rarityTextColor} font-black italic px-[2.5cqi] py-[1cqi] leading-none uppercase tracking-wider`} style={{ fontSize: '4.5cqi' }}>
+            {card.rarity}
+          </span>
+        </div>}
 
-        {/* Edition Badge Top Right (Inside the 3D effect) */}
+        {/* Edition Badge */}
         {attrs.editionBadgeUrl && (
           <img 
             src={attrs.editionBadgeUrl} 
-            alt="Edition" 
-            className={`absolute w-[16cqi] h-[16cqi] object-contain z-40 ${isEditing ? 'cursor-grab active:cursor-grabbing animate-none hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]' : 'pointer-events-none drop-shadow-[0_0_10px_rgba(0,0,0,0.6)]'}`} 
-            onMouseDown={(e) => handleMouseDown(e, 'editionBadge')}
-            onWheel={(e) => handleWheel(e, 'editionBadge')}
-            style={{ 
+            alt="Edition Badge"
+            className={`absolute z-30 object-contain drop-shadow-md ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
+            style={{
               left: `${editionBadgePos.x}%`,
               top: `${editionBadgePos.y}%`,
-              transform: `translate(-50%, -50%) scale(${editionBadgePos.scale / 100}) translateZ(${translateZ})` 
+              width: `${editionBadgePos.scale * 0.15}cqi`,
+              transform: `translate(-50%, -50%) translateZ(${translateZ})`
             }}
+            onMouseDown={(e) => handleMouseDown(e, 'editionBadge')}
+            onWheel={(e) => handleWheel(e, 'editionBadge')}
+            draggable={false}
           />
         )}
 
-      {isPremiumLayout ? (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl" style={{ transform: 'translateZ(20px)' }}>
-          <div className="w-full h-full relative">
-            {card.imageUrl || card.player?.minecraftName || card.title ? (
-              <img 
-                src={card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || card.title}`} 
-                alt={card.title} 
-                className={`absolute drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : ''}`} 
-                onMouseDown={(e) => handleMouseDown(e, 'character')}
-                onWheel={(e) => handleWheel(e, 'character')}
-                style={{
-                   left: `${charPos.x}%`,
-                   top: `${charPos.y}%`,
-                   transform: `translate(-50%, -50%) scale(${charPos.scale / 100})`,
-                   transformOrigin: 'center center'
-                }}
-              />
-            ) : (
-              <div className="absolute left-1/2 top-1/4 -translate-x-1/2 w-20 h-20 bg-gray-700/50 rounded-full border border-white/10"></div>
-            )}
+        {/* Side Text (Card ID or SMP branding) */}
+        {!attrs.hideSideText && <div 
+          className="absolute z-30 origin-bottom-left -rotate-90 flex items-center gap-[1cqi]"
+          style={{ 
+            top: '40%', left: '0',
+            transform: `translateZ(${parseInt(translateZ) * 0.8}px) translateY(100%)`
+          }}
+        >
+          <div className="bg-black/95  text-white/50 font-black flex items-center gap-[1cqi] rounded-t-md border-white/20 shadow-lg" style={{ padding: '0.5cqi 3cqi', borderWidth: '0.2cqi 0.2cqi 0 0.2cqi', fontSize: '3cqi' }}>
+            <span className="tracking-[0.3em]">PARANOIA SMP</span>
           </div>
+        </div>}
+
+        {/* Bottom Layout: Description + Nameplate */}
+        <div className="absolute bottom-0 inset-x-0 z-30 flex flex-col" style={{ transform: `translateZ(${parseInt(translateZ) * 1.2}px)` }}>
+          
+          {/* Description / Effect Box */}
+          {(!attrs.hideDescription && card.description) && (
+            <div className={`w-full bg-black/90 border-white/20 shadow-inner relative ${attrs.hideNameplate ? 'rounded-b-xl' : ''}`} style={{ margin: attrs.hideNameplate ? '0' : '0 0 1cqi 0', padding: '2cqi 2cqi 2cqi 2cqi', borderTopWidth: '0.2cqi', borderBottomWidth: '0.2cqi' }}>
+              <p className="text-white/90 font-medium leading-tight text-center italic" style={{ fontSize: '3.2cqi' }}>
+                &quot;{card.description}&quot;
+              </p>
+            </div>
+          )}
+
+          {/* Nameplate */}
+          {!attrs.hideNameplate && <div className={`w-full ${factionColor} border-white/50 relative shadow-[0_-5px_15px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center rounded-b-xl`} style={{ borderTopWidth: '0.6cqi', padding: '2cqi 2cqi 1.5cqi 2cqi' }}>
+            {/* Rarity/Role tag */}
+            {!attrs.hideRole && <div className="absolute bg-white text-black font-black uppercase rounded-sm shadow-md" style={{ top: '-3cqi', right: '2cqi', padding: '0.5cqi 1.5cqi', fontSize: '3cqi' }}>
+              {role}
+            </div>}
+            
+            {!attrs.hideTitle && <h3 className="text-white font-black uppercase tracking-widest text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ fontSize: '7.5cqi', WebkitTextStroke: '0.1cqi black', lineHeight: 1 }}>
+              {card.title}
+            </h3>}
+            
+            {!attrs.hideBottomText && <div className="flex justify-center mt-[0.5cqi]">
+              <span className="text-white/70 font-bold tracking-[0.2em] uppercase" style={{ fontSize: '3cqi' }}>
+                {card.level} TIER • {faction}
+              </span>
+            </div>}
+          </div>}
         </div>
-      ) : (
-        <div className="absolute top-10 left-4 right-4 bottom-[42%] rounded-t-lg border border-white/20 overflow-hidden pointer-events-none bg-black/10 backdrop-blur-[2px]" style={{ transform: 'translateZ(20px)' }}>
-          <div className="w-full h-full flex items-end justify-center pt-4">
-            {card.imageUrl || card.player?.minecraftName || card.title ? (
-              <img 
-                src={card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || card.title}`} 
-                alt={card.title} 
-                className={`h-[95%] object-contain drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : ''}`}
-                onMouseDown={(e) => handleMouseDown(e, 'character')}
-                onWheel={(e) => handleWheel(e, 'character')}
-              />
-            ) : (
-              <div className="w-20 h-20 bg-gray-700/50 rounded-full mb-4 border border-white/10"></div>
-            )}
+
+        {/* Custom Badges */}
+        {customBadges && customBadges.map((badge: any, i: number) => (
+          <img 
+            key={badge.id || i}
+            src={badge.url}
+            alt="Badge"
+            className={`absolute z-[60] object-contain drop-shadow-lg ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
+            style={{ 
+              left: `${badge.x}%`, 
+              top: `${badge.y}%`, 
+              width: `${badge.size}px`, 
+              height: `${badge.size}px`, 
+              transform: `translate(-50%, -50%) translateZ(60px)` 
+            }}
+            onMouseDown={(e) => handleMouseDown(e, 'customBadge', badge.id || String(i))}
+            onWheel={(e) => handleWheel(e, 'customBadge', badge.id || String(i))}
+            draggable={false}
+          />
+        ))}
+
+        {/* Smart Guides (Photoshop style) */}
+        {isEditing && attrs.showVGuide && (
+          <div className="absolute top-0 bottom-0 left-1/2 w-[2px] bg-[var(--color-accent-purple)] shadow-[0_0_8px_var(--color-accent-purple)] z-[100] pointer-events-none" style={{ transform: 'translateX(-50%) translateZ(100px)' }} />
+        )}
+        {isEditing && attrs.showHGuide && (
+          <div className="absolute left-0 right-0 top-1/2 h-[2px] bg-[var(--color-accent-purple)] shadow-[0_0_8px_var(--color-accent-purple)] z-[100] pointer-events-none" style={{ transform: 'translateY(-50%) translateZ(100px)' }} />
+        )}
+
+        {/* Custom Frame Overlay (behind characters and text) */}
+        {attrs.frameUrl && (
+          <img src={attrs.frameUrl} alt="Card Frame" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
+        )}
+
+        {/* Special Effects Overlay */}
+        {attrs.effect && attrs.effect !== "none" && (
+          <div className="absolute inset-0 pointer-events-none rounded-xl z-50 overflow-hidden" style={{ transform: 'translateZ(40px)' }}>
+            <div className={`absolute inset-0 w-full h-full ${attrs.effect === 'holo' ? 'effect-holo' : attrs.effect === 'shiny' ? 'effect-shiny' : attrs.effect === 'glitch' ? 'effect-glitch' : attrs.effect === 'paillettes' ? 'effect-paillettes' : ''}`} />
           </div>
-        </div>
-      )}
-
-      {/* Background Gradient Fallback (only if not manually positioned) */}
-      {!attrs.titlePos && !attrs.textPos && !attrs.isFullArt && (
-        <div className="absolute inset-x-0 bottom-0 min-h-[45%] bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10 rounded-b-xl pointer-events-none" />
-      )}
-
-      {/* Rarity Badge */}
-      {attrs.showRarityBadge !== false && (
-        <div 
-          className={`absolute z-30 inline-block px-[2.5cqi] py-[1cqi] text-[3.5cqi] font-bold uppercase rounded-md border ${getRarityBadge(card.rarity)} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
-          onMouseDown={(e) => handleMouseDown(e, 'rarityBadge')}
-          onWheel={(e) => handleWheel(e, 'rarityBadge')}
-          style={{
-            transform: `translate(-50%, -50%) scale(${(attrs.textPos ? textPos.scale : rarityBadgePos.scale) / 100}) translateZ(30px)`,
-            left: `${attrs.textPos ? textPos.x - 35 : rarityBadgePos.x}%`,
-            top: `${attrs.textPos ? textPos.y - 25 : rarityBadgePos.y}%`,
-            whiteSpace: 'nowrap',
-            ...((attrs.rarityBadgeColor || attrs.mainColor) ? { backgroundColor: `${attrs.rarityBadgeColor || attrs.mainColor}33`, borderColor: attrs.rarityBadgeColor || attrs.mainColor, color: attrs.rarityBadgeColor || attrs.mainColor } : {})
-          }}
-        >
-          {card.rarity}
-        </div>
-      )}
-
-      {/* Title */}
-      {attrs.showTitle !== false && (
-        <h3 
-          className={`absolute z-30 font-outfit font-black text-[6.5cqi] text-white leading-tight uppercase text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
-          onMouseDown={(e) => handleMouseDown(e, 'title')}
-          onWheel={(e) => handleWheel(e, 'title')}
-          style={{
-            transform: `translate(-50%, -50%) scale(${(attrs.textPos ? textPos.scale : titlePos.scale) / 100}) translateZ(30px)`,
-            left: `${attrs.textPos ? textPos.x : titlePos.x}%`,
-            top: `${attrs.textPos ? textPos.y - 12 : titlePos.y}%`,
-            width: '90%',
-            color: attrs.titleColor || undefined
-          }}
-        >
-          {card.title}
-        </h3>
-      )}
-
-      {/* Level Text */}
-      {attrs.showLevelText !== false && (
-        <span 
-          className={`absolute z-30 text-[4cqi] font-bold text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] ${levelColorClass} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
-          onMouseDown={(e) => handleMouseDown(e, 'levelText')}
-          onWheel={(e) => handleWheel(e, 'levelText')}
-          style={{
-            transform: `translate(-50%, -50%) scale(${(attrs.textPos ? textPos.scale : levelTextPos.scale) / 100}) translateZ(30px)`,
-            left: `${attrs.textPos ? textPos.x : levelTextPos.x}%`,
-            top: `${attrs.textPos ? textPos.y - 5 : levelTextPos.y}%`,
-            width: '90%',
-            color: attrs.levelColor || attrs.mainColor || undefined
-          }}
-        >
-          {card.level}
-        </span>
-      )}
-
-      {/* Description */}
-      {attrs.showDesc !== false && card.description && (
-        <div 
-          className={`absolute z-30 flex justify-center items-center pt-[2cqi] ${!attrs.titlePos && !attrs.textPos ? 'border-t border-white/10' : ''} ${isEditing ? 'cursor-grab active:cursor-grabbing' : 'pointer-events-none'}`}
-          onMouseDown={(e) => handleMouseDown(e, 'desc')}
-          onWheel={(e) => handleWheel(e, 'desc')}
-          style={{
-            transform: `translate(-50%, -50%) scale(${(attrs.textPos ? textPos.scale : descPos.scale) / 100}) translateZ(30px)`,
-            left: `${attrs.textPos ? textPos.x : descPos.x}%`,
-            top: `${attrs.textPos ? textPos.y + 10 : descPos.y}%`,
-            width: '90%'
-          }}
-        >
-          <span className="text-[3.5cqi] font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center" style={{ color: attrs.descColor || 'white' }}>
-            {card.description}
-          </span>
-        </div>
-      )}
-      {/* Custom Frame Overlay (behind characters and text) */}
-      {attrs.frameUrl && (
-        <img src={attrs.frameUrl} alt="Card Frame" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
-      )}
-
-      {/* Special Effects Overlay */}
-      {attrs.effect && attrs.effect !== "none" && (
-        <div 
-          className="absolute inset-0 pointer-events-none rounded-xl z-50 overflow-hidden"
-          style={{ transform: 'translateZ(40px)' }}
-        >
-          <div className={`absolute inset-0 w-full h-full ${attrs.effect === 'holo' ? 'effect-holo' : attrs.effect === 'shiny' ? 'effect-shiny' : attrs.effect === 'glitch' ? 'effect-glitch' : attrs.effect === 'paillettes' ? 'effect-paillettes' : ''}`} />
-        </div>
-      )}
-
-    </InteractiveCard>
+        )}
+</InteractiveCard>
     </div>
   );
 }

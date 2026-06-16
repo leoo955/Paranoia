@@ -39,13 +39,13 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        // @ts-ignore
+        // @ts-expect-error
         session.user.id = token.id;
-        // @ts-ignore
+        // @ts-expect-error
         session.user.role = token.role;
-        // @ts-ignore
+        // @ts-expect-error
         session.user.minecraftName = token.minecraftName;
-        // @ts-ignore
+        // @ts-expect-error
         session.user.isMcVerified = token.isMcVerified;
       }
       return session;

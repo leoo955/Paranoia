@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Send, ChevronRight } from "lucide-react";
+import toast from 'react-hot-toast';
 
 export default function CandidaturePage() {
   const [step, setStep] = useState(1);
@@ -18,7 +19,7 @@ export default function CandidaturePage() {
       setStep(step + 1);
     } else {
       // API call would go here
-      alert("Candidature envoyée avec succès ! (Simulation)");
+      toast.success("Candidature envoyée avec succès ! (Simulation)");
     }
   };
 

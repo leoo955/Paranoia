@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, ShoppingCart, Sparkles, AlertCircle, Zap, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
+import toast from 'react-hot-toast';
 
 export default function ShopClient({ initialBalance, isLoggedIn }: { initialBalance: number, isLoggedIn: boolean }) {
   const [balance, setBalance] = useState(initialBalance);
@@ -57,7 +58,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
 
   const handleBuy = async (pkgId: string, amount: number) => {
     if (!isLoggedIn) {
-      alert("Vous devez être connecté pour faire un achat.");
+      toast("Vous devez être connecté pour faire un achat.", { icon: '⚠️' });
       return;
     }
 
@@ -79,7 +80,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
       router.refresh();
       setTimeout(() => setSuccessMsg(null), 5000);
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setLoadingPkg(null);
     }

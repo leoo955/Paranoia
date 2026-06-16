@@ -82,7 +82,7 @@
   }
 
   .animate-pulse-glow {
-    animation: pulse-glow 3s ease-in-out infinite;
+    
   }
 
   .animate-slide-up {
@@ -125,13 +125,25 @@
   }
 
   @keyframes epic-card-reveal {
-    0% { transform: scale(0) translateY(100px); opacity: 0; filter: brightness(3); }
-    60% { transform: scale(1.1) translateY(-20px); opacity: 1; filter: brightness(1.5); }
-    100% { transform: scale(1) translateY(0); opacity: 1; filter: brightness(1); }
+    0% { transform: scale(0.5) translateY(100px) rotateY(180deg); opacity: 0; filter: brightness(0); }
+    50% { transform: scale(1.1) translateY(-20px) rotateY(90deg); filter: brightness(2); }
+    100% { transform: scale(1) translateY(0) rotateY(0deg); opacity: 1; filter: brightness(1); }
   }
 
-  .animate-epic-reveal {
-    animation: epic-card-reveal 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  @keyframes huge-reveal {
+    0% { transform: scale(0.1); opacity: 0; filter: blur(20px); }
+    30% { transform: scale(1.2); opacity: 1; filter: blur(0px); }
+    80% { transform: scale(1); opacity: 1; filter: blur(0px); }
+    100% { transform: scale(1.5); opacity: 0; filter: blur(10px); }
+  }
+
+  .animate-epic-card-reveal {
+    animation: epic-card-reveal 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  .animate-huge-reveal {
+    animation: huge-reveal 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    font-size: clamp(3rem, 10vw, 8rem);
   }
   
   @keyframes flash-burst {
@@ -314,6 +326,20 @@
   25% { transform: translateX(-5px) rotate(-5deg); }
   50% { transform: translateX(5px) rotate(5deg); }
   75% { transform: translateX(-5px) rotate(-5deg); }
+}
+
+@keyframes card-tremble {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -1px) rotate(-0.5deg); }
+  20% { transform: translate(-1px, 0px) rotate(0.5deg); }
+  30% { transform: translate(1px, 1px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(0.5deg); }
+  50% { transform: translate(-1px, 1px) rotate(-0.5deg); }
+  60% { transform: translate(-1px, 1px) rotate(0deg); }
+  70% { transform: translate(1px, 1px) rotate(-0.5deg); }
+  80% { transform: translate(-1px, -1px) rotate(0.5deg); }
+  90% { transform: translate(1px, 1px) rotate(0deg); }
+  100% { transform: translate(1px, -1px) rotate(-0.5deg); }
 }
 
 @keyframes flash {

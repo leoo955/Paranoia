@@ -1,9 +1,13 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock, BookOpen, Flame, Clock } from "lucide-react";
+import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock, BookOpen, Flame, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import CardDisplay from "@/components/cards/CardDisplay";
+import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti';
+
 
 type Player = { id: string; minecraftName: string };
 type TradingCard = { id: string; title: string; rarity: string; level: string; edition: string; description: string | null; player: Player | null };
@@ -11,46 +15,82 @@ type UserCard = { id: string; obtainedAt: Date; tradingCard: TradingCard };
 
 const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: number, boxType: string }) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [showWow, setShowWow] = useState(false);
+
+  const handleFlip = () => {
+    if (isFlipped) return;
+    setIsFlipped(true);
+    if (card.rarity === 'MYTHIC' || card.rarity === 'LEGENDARY') {
+      setShowWow(true);
+      // Trigger Confetti
+      const duration = 3000;
+      const end = Date.now() + duration;
+      const frame = () => {
+        confetti({
+          particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, zIndex: 300,
+          colors: card.rarity === 'MYTHIC' ? ['#ef4444', '#dc2626', '#b91c1c', '#ffffff'] : ['#facc15', '#eab308', '#ca8a04', '#ffffff']
+        });
+        confetti({
+          particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, zIndex: 300,
+          colors: card.rarity === 'MYTHIC' ? ['#ef4444', '#dc2626', '#b91c1c', '#ffffff'] : ['#facc15', '#eab308', '#ca8a04', '#ffffff']
+        });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      };
+      frame();
+      setTimeout(() => setShowWow(false), 3500);
+    }
+  };
 
   return (
-    <div 
-      className="relative z-10 transform transition-transform hover:scale-105 duration-500 animate-epic-reveal cursor-pointer group shrink-0" 
-      style={{ animationDelay: `${index * 0.4}s`, animationFillMode: 'both', perspective: '1000px', width: '16rem', height: '22.4rem', minWidth: '16rem' }}
-      onClick={() => setIsFlipped(true)}
-    >
-      <div 
-        className="w-full h-full relative transition-transform duration-700" 
-        style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)' }}
-      >
-        {/* Front */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ backfaceVisibility: 'hidden' }}>
-          <CardDisplay card={card} size="md" />
-        </div>
-        
-        {/* Back */}
-        <div 
-          className="absolute inset-0 w-full h-full rounded-2xl border-2 border-purple-500/30 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]" 
-          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: 'radial-gradient(circle at center, #1e1b4b 0%, #0a0a0f 100%)' }}
-        >
-          {/* Textures pour remplir toute la carte */}
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-60 mix-blend-screen pointer-events-none"></div>
-          
-          {/* Cercle magique central */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-2 border-dashed border-purple-500/20 animate-[spin_20s_linear_infinite] pointer-events-none"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border border-purple-400/30 animate-[spin_15s_linear_infinite_reverse] pointer-events-none"></div>
+    <>
+      {showWow && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center pointer-events-none">
+          <div className={`absolute inset-0 animate-flash-fade ${card.rarity === 'MYTHIC' ? 'bg-red-500/40' : 'bg-yellow-500/40'} mix-blend-screen`}></div>
 
-          <div className="relative z-10 flex flex-col items-center justify-center pointer-events-none w-full px-4">
-            <img src="/Paranoia_logo.png" className="w-[85%] h-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
+        </div>
+      )}
+      <div 
+        className="relative z-10 animate-epic-card-reveal cursor-pointer group shrink-0" 
+        style={{ animationDelay: `${index * 0.4}s`, animationFillMode: 'both', perspective: '1000px', width: '16rem', height: '22.4rem', minWidth: '16rem' }}
+        onClick={handleFlip}
+      >
+        {/* Wrapper pour le survol */}
+        <div className="w-full h-full transition-transform duration-300 group-hover:scale-105">
+          <div 
+            className="w-full h-full relative transition-transform duration-700" 
+            style={{ transformStyle: 'preserve-3d', transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)' }}
+          >
+          {/* Front */}
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center" style={{ backfaceVisibility: 'hidden' }}>
+            <CardDisplay card={card} size="md" />
           </div>
           
-          {/* Bordure interne façon carte de jeu */}
-          <div className="absolute inset-2 border-2 border-white/5 rounded-xl pointer-events-none"></div>
-          
-          {/* Subtle shine on hover */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+          {/* Back */}
+          <div 
+            className="absolute inset-0 w-full h-full rounded-2xl border-2 border-purple-500/30 flex items-center justify-center overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.8)]" 
+            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: 'radial-gradient(circle at center, #1e1b4b 0%, #0a0a0f 100%)' }}
+          >
+            {/* Textures pour remplir toute la carte */}
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-60 mix-blend-screen pointer-events-none"></div>
+            
+            {/* Cercle magique central */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-2 border-dashed border-purple-500/20 animate-[spin_20s_linear_infinite] pointer-events-none"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border border-purple-400/30 animate-[spin_15s_linear_infinite_reverse] pointer-events-none"></div>
+
+            <div className="relative z-10 flex flex-col items-center justify-center pointer-events-none w-full px-4">
+              <img src="/Paranoia_logo.png" className="w-[85%] h-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
+            </div>
+            
+            {/* Bordure interne façon carte de jeu */}
+            <div className="absolute inset-2 border-2 border-white/5 rounded-xl pointer-events-none"></div>
+            
+            {/* Subtle shine on hover */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+          </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -110,13 +150,13 @@ export default function PackOpenerClient({
     return () => clearInterval(interval);
   }, [serverPlayers, currentUserMCName]);
 
-  const buyBooster = async (type: string, price: number) => {
+const buyBooster = async (type: string, price: number) => {
     if (!isLoggedIn) {
-      alert("Vous devez être connecté.");
+      toast("Vous devez être connecté.", { icon: '⚠️', position: 'top-center' });
       return;
     }
     if (coins < price) {
-      alert("Fonds insuffisants !");
+      toast.error("Fonds insuffisants !", { position: 'top-center' });
       return;
     }
     setIsBuying(true);
@@ -136,7 +176,7 @@ export default function PackOpenerClient({
         return [...prev, { boxType: type, amount: 1 }];
       });
     } catch (e: any) {
-      alert(e.message);
+      toast.error(e.message, { position: 'top-center' });
     } finally {
       setIsBuying(false);
     }
@@ -144,13 +184,13 @@ export default function PackOpenerClient({
 
   const openPack = async () => {
     if (!isLoggedIn) {
-      alert("Vous devez être connecté pour ouvrir des boosters.");
+      toast("Vous devez être connecté pour ouvrir des boosters.", { icon: '⚠️', position: 'top-center' });
       return;
     }
 
     const userBox = boxes.find(b => b.boxType === selectedBoxType);
     if (!userBox || userBox.amount <= 0) {
-      alert(`Vous ne possédez aucun Booster ${selectedBoxType}.`);
+      toast(`Vous ne possédez aucun Booster ${selectedBoxType}.`, { icon: '⚠️', position: 'top-center' });
       return;
     }
     
@@ -205,7 +245,7 @@ export default function PackOpenerClient({
       }, 1400);
 
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message, { position: 'top-center' });
       setIsOpening(false);
     }
   };
@@ -312,10 +352,10 @@ export default function PackOpenerClient({
       <div className="relative mb-12 flex flex-col md:flex-row justify-between items-center gap-6 z-20">
         
         {/* Glowing backdrop for tabs */}
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-fuchsia-500/10 blur-3xl -z-10 rounded-full" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.15)_0%,_transparent_70%)] -z-10 rounded-full" />
         
         {/* Premium Tabs */}
-        <div className="flex gap-2 p-1.5 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl">
+        <div className="flex gap-2 p-1.5 bg-black/60 border border-white/10 rounded-2xl shadow-2xl">
           <button 
             onClick={() => setActiveTab("opener")}
             className={`relative flex items-center gap-3 px-8 py-3.5 font-bold rounded-xl transition-all duration-300 overflow-hidden ${activeTab === 'opener' ? 'text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}`}
@@ -338,7 +378,7 @@ export default function PackOpenerClient({
             onClick={() => setActiveTab("catalogue")}
             className={`relative flex items-center gap-3 px-8 py-3.5 font-bold rounded-xl transition-all duration-300 overflow-hidden ${activeTab === 'catalogue' ? 'text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/5'}`}
           >
-            {activeTab === 'catalogue' && <div className="absolute inset-0 bg-gradient-to-r from-rose-600/80 to-red-600/80 shadow-[0_0_20px_rgba(225,29,72,0.5)]" />}
+            {activeTab === 'catalogue' && <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-600/80 to-purple-600/80 shadow-[0_0_20px_rgba(192,38,211,0.5)]" />}
             <BookOpen className="w-5 h-5 relative z-10" /> 
             <span className="relative z-10 tracking-wide">Catalogue</span>
           </button>
@@ -348,24 +388,14 @@ export default function PackOpenerClient({
         {isLoggedIn && (
           <div className="flex items-center gap-3 bg-black/50 backdrop-blur-md border border-amber-500/20 px-6 py-3 rounded-2xl shadow-[0_0_15px_rgba(245,158,11,0.15)] group hover:shadow-[0_0_25px_rgba(245,158,11,0.3)] transition-all">
             <div className="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center border border-amber-500/40 group-hover:scale-110 transition-transform duration-300">
-              <img src="/Paracoin.png" alt="PARA Coins" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse-glow" />
+              <img src="/Paracoin.png" alt="PARA Coins" className="w-6 h-6 object-contain drop-shadow-[0_0_8px_rgba(245,158,11,0.8)] " />
             </div>
             <div className="flex flex-col items-start justify-center">
               <span className="text-xs text-amber-500/70 font-bold uppercase tracking-wider">Solde</span>
               <span className="font-outfit font-black text-white text-2xl leading-none tracking-tight">{coins.toLocaleString()}</span>
             </div>
             
-            {/* DEBUG BUTTON: to remove later */}
-            <button 
-              onClick={async () => {
-                const res = await fetch("/api/boosters/add-coins", { method: "POST" });
-                const data = await res.json();
-                if(data.coins) setCoins(data.coins);
-              }}
-              className="ml-4 text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-white/50 hover:text-white transition-colors"
-            >
-              +1000
-            </button>
+
           </div>
         )}
       </div>
@@ -377,105 +407,130 @@ export default function PackOpenerClient({
 
 
           {!showReveal && (
-            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-10 mb-4 z-10 mt-14 relative">
-              {/* LEFT COLUMN: Booster Selection List */}
-              <div className="w-full lg:w-1/3 flex flex-col gap-3 z-20">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2 px-2">
-                  <Layers className="w-5 h-5 text-indigo-400" /> Sélecteur de Boosters
-                </h3>
+            <div className="w-full flex flex-col items-center z-10 mt-4 relative">
+              
+              {/* Dynamic Background matching the active booster */}
+              <div className={`absolute inset-0 opacity-20 blur-xl rounded-[100px] transition-colors duration-1000 ${activeBox.glow} pointer-events-none`} />
+
+
+
+              {/* Carousel Container */}
+              <div className="relative w-full max-w-5xl h-[320px] md:h-[400px] flex items-center justify-center">
                 
-                {Object.keys(boxesData).map(key => {
-                  const box = boxesData[key];
-                  const isSelected = selectedBoxType === key;
-                  return (
-                    <div 
-                      key={key}
-                      onClick={() => !isOpening && setSelectedBoxType(key)}
-                      className={`relative flex items-center gap-5 py-3 px-4 transition-all duration-500 cursor-pointer overflow-hidden rounded-xl group ${
-                        isSelected 
-                        ? 'bg-white/[0.03] shadow-inner' 
-                        : 'hover:bg-white/[0.02]'
-                      }`}
-                    >
-                      {/* Active indicator pill */}
-                      {isSelected && (
-                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 rounded-r-full ${box.glow} shadow-[0_0_15px_currentColor]`} />
-                      )}
+                {/* Navigation Arrows */}
+                <button 
+                  onClick={() => !isOpening && setSelectedBoxType(Object.keys(boxesData)[(Object.keys(boxesData).indexOf(selectedBoxType) - 1 + Object.keys(boxesData).length) % Object.keys(boxesData).length])}
+                  className="absolute left-2 md:left-12 z-30 p-4 rounded-full bg-black/50 border border-white/10 hover:bg-white/10 text-white backdrop-blur-md transition-all hover:scale-110"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                
+                <button 
+                  onClick={() => !isOpening && setSelectedBoxType(Object.keys(boxesData)[(Object.keys(boxesData).indexOf(selectedBoxType) + 1) % Object.keys(boxesData).length])}
+                  className="absolute right-2 md:right-12 z-30 p-4 rounded-full bg-black/50 border border-white/10 hover:bg-white/10 text-white backdrop-blur-md transition-all hover:scale-110"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+
+                <div className="relative w-full h-full flex items-center justify-center perspective-[1200px]">
+                  <AnimatePresence initial={false}>
+                    {Object.keys(boxesData).map((key, index) => {
+                      const box = boxesData[key];
+                      const keys = Object.keys(boxesData);
+                      const activeIndex = keys.indexOf(selectedBoxType);
+                      const n = keys.length;
                       
-                      <div className={`relative w-14 h-14 flex items-center justify-center shrink-0 transition-transform duration-500 ${isSelected ? 'scale-110 drop-shadow-2xl' : 'opacity-60 grayscale-[50%] group-hover:grayscale-[20%] group-hover:opacity-100'}`}>
-                        {isSelected && <div className={`absolute inset-0 ${box.glow} opacity-30 blur-xl rounded-full scale-150`}></div>}
-                        <img src={box.image} alt={box.name} className={`w-12 h-12 object-contain relative z-10 ${box.hueRotate}`} />
-                        {key === 'mythic' && (
-                          <div className="absolute top-0 right-0 bg-red-500 rounded-full w-2.5 h-2.5 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse z-20" />
-                        )}
-                      </div>
-                      
-                      <div className="flex flex-col flex-1 relative z-10">
-                        <h4 className={`text-base tracking-widest transition-all duration-300 ${isSelected ? `font-black ${box.text}` : 'font-medium text-gray-400'}`}>
-                          {box.name}
-                        </h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <div className={`w-1.5 h-1.5 rounded-full ${box.owned > 0 ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'bg-gray-600'}`} />
-                          <span className={`text-xs font-medium tracking-wider ${box.owned > 0 ? 'text-green-400' : 'text-gray-500'}`}>
-                            Stock: {box.owned}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                      // Correct index logic for wrapping
+                      let offset = (index - activeIndex + n) % n;
+                      if (offset === 3) offset = -1; // Specific for 4 items
+
+                      const isActive = offset === 0;
+                      const isVisible = Math.abs(offset) <= 1;
+
+                      if (!isVisible) return null;
+
+                      // Tailwind v4 uses standard filter names directly, but combining them needs to be done on the img tag class.
+                      // The red dot bug is fixed by wrapping the img in a relative inline-block div.
+                      return (
+                        <motion.div
+                          key={key}
+                          onClick={() => {
+                            if (!isOpening && !isActive) setSelectedBoxType(key);
+                          }}
+                          initial={false}
+                          animate={{
+                            x: offset * 320, 
+                            scale: isActive ? 1.2 : 0.75,
+                            opacity: isActive ? 1 : 0.4,
+                            rotateY: offset * -15,
+                            zIndex: isActive ? 20 : 10,
+                          }}
+                          transition={{ type: "spring", stiffness: 100, damping: 20, mass: 1.2 }}
+                          className={`absolute flex flex-col items-center justify-center cursor-pointer ${isActive ? 'pointer-events-auto' : 'pointer-events-auto hover:opacity-80'}`}
+                          drag={isActive ? "x" : false}
+                          dragConstraints={{ left: 0, right: 0 }}
+                          dragElastic={0.2}
+                          onDragEnd={(e, { offset, velocity }) => {
+                            const swipe = offset.x;
+                            if (swipe < -50) {
+                              setSelectedBoxType(keys[(activeIndex + 1) % n]);
+                            } else if (swipe > 50) {
+                              setSelectedBoxType(keys[(activeIndex - 1 + n) % n]);
+                            }
+                          }}
+                        >
+                          <div className={`relative flex justify-center ${isActive && isOpening ? 'animate-shake' : isActive ? 'animate-float' : ''}`}>
+                            {isActive && <div className={`absolute inset-0 opacity-50 blur-3xl rounded-full ${box.glow} transition-all duration-700 ${isOpening ? 'scale-150' : ''}`} />}
+                            
+                            <div className="relative inline-block">
+                              <img 
+                                src={box.image} 
+                                alt={box.name} 
+                                className={`w-48 md:w-56 h-auto drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] relative z-10 ${box.hueRotate ? box.hueRotate : ''} ${isActive && isOpening ? 'brightness-150 contrast-125' : ''}`}
+                                draggable={false}
+                              />
+                            </div>
+                            
+                            {isActive && isOpening && (
+                              <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+                                <Sparkles className={`w-40 h-40 animate-ping ${box.text}`} />
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
               </div>
 
-              {/* RIGHT COLUMN: The Stage */}
-              <div className="w-full lg:w-2/3 relative flex flex-col items-center justify-center p-8 rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden min-h-[500px]">
-                {/* Dynamic Background Glow */}
-                <div className={`absolute inset-0 opacity-10 blur-3xl rounded-full ${activeBox.glow} transition-colors duration-700 pointer-events-none`} />
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none mix-blend-overlay"></div>
-
-                {/* Booster Info Header */}
-                <div className="absolute top-6 left-6 z-20 pointer-events-none">
-                  <h2 className={`text-3xl font-black uppercase tracking-wider ${activeBox.text} drop-shadow-lg`}>
-                    Booster {activeBox.name}
-                  </h2>
-                  <p className="text-white/60 text-sm font-medium mt-1">
-                    {activeBox.owned > 0 ? 'Prêt à être ouvert' : 'Achetez pour obtenir de nouvelles cartes'}
-                  </p>
-                </div>
-
-                {/* Drop Rates Table */}
-                <div className="absolute top-6 right-6 z-20 bg-black/60 border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-md hidden sm:block pointer-events-none">
-                  <h4 className={`text-xs font-black uppercase tracking-widest mb-3 border-b border-white/10 pb-2 ${activeBox.text} flex items-center gap-2`}>
-                    <Sparkles className="w-3.5 h-3.5" />
-                    Taux de Drop
-                  </h4>
-                  <ul className="text-xs space-y-2 w-44 font-medium">
-                    {activeBox.rates.map((rate: any, idx: number) => (
-                      <li key={idx} className={`flex justify-between items-center ${rate.c}`}>
-                        <span className="tracking-wide drop-shadow-md">{rate.r}</span>
-                        <span className="font-mono bg-black/50 px-1.5 py-0.5 rounded border border-white/10 shadow-inner font-bold tracking-wider">{rate.p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* The Booster Image */}
-                <div className="relative mt-12 mb-4 z-10 w-full flex justify-center pointer-events-none">
-                  <div className={`absolute inset-0 opacity-40 blur-3xl rounded-full ${activeBox.glow} transition-all duration-700 ${isOpening ? 'scale-150' : ''}`} />
-                  <img 
-                    src={activeBox.image} 
-                    alt={activeBox.name} 
-                    className={`w-64 h-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-all duration-500 ease-in-out relative z-10 ${isOpening ? 'animate-shake scale-110' : 'animate-float'} ${activeBox.hueRotate}`} 
-                    style={isOpening ? { filter: 'brightness(1.5) contrast(1.2)' } : {}}
-                  />
-                  {isOpening && (
-                    <div className="absolute inset-0 z-20 flex items-center justify-center">
-                       <Sparkles className={`w-40 h-40 animate-ping ${activeBox.text}`} />
+              {/* Action Area & Sleek Drop Rates */}
+              <div className="w-full max-w-3xl mt-4 px-4 flex flex-col items-center justify-center relative z-20">
+                
+                {/* Title & Stock info moved ABOVE ACTION BUTTONS */}
+              <div className="mb-6 text-center z-20 h-20">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeBox.name}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h2 className={`text-4xl font-black uppercase tracking-widest ${activeBox.text} drop-shadow-2xl`}>
+                      {activeBox.name}
+                    </h2>
+                    <div className="flex items-center justify-center gap-2 mt-2 bg-black/60 px-4 py-1.5 rounded-full border border-white/10 w-fit mx-auto shadow-xl">
+                      <div className={`w-2.5 h-2.5 rounded-full ${activeBox.owned > 0 ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'}`} />
+                      <span className={`text-sm font-bold tracking-wider ${activeBox.owned > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        STOCK: {activeBox.owned}
+                      </span>
                     </div>
-                  )}
-                </div>
-
-                {/* Action Area */}
-                <div className="mt-auto pt-8 w-full max-w-sm relative z-20 flex flex-col gap-3">
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              {/* Center: Action Buttons */}
+                <div className="w-full md:w-[400px] flex flex-col gap-3 mb-6">
                   {!isOpening && activeBox.owned > 0 && (
                     <button 
                       onClick={openPack}
@@ -494,15 +549,15 @@ export default function PackOpenerClient({
                     coins < activeBox.price ? (
                       <button 
                         onClick={(e) => { e.stopPropagation(); router.push('/shop'); }}
-                        className={`flex items-center justify-center gap-2 w-full bg-gray-800 hover:bg-gray-700 rounded-xl font-bold text-white transition-all shadow-lg border-t border-x border-b-4 border-gray-600 hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-0 ${activeBox.owned > 0 ? 'py-3 text-xs uppercase' : 'py-4 text-lg'}`}
+                        className={`flex items-center justify-center gap-2 w-full bg-red-950/80 hover:bg-red-900/80 rounded-xl font-bold text-white transition-all shadow-lg border-t border-x border-b-4 border-red-800 hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-0 ${activeBox.owned > 0 ? 'py-3 text-xs uppercase' : 'py-4 text-lg'}`}
                       >
-                        Fonds insuffisants - Boutique
+                        <Lock className="w-4 h-4" /> Fonds insuffisants - Boutique
                       </button>
                     ) : (
                       <button 
                         onClick={(e) => { e.stopPropagation(); buyBooster(selectedBoxType, activeBox.price); }} 
                         disabled={isBuying} 
-                        className={`group relative overflow-hidden flex items-center justify-center gap-2 w-full rounded-xl font-black text-white transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-0 shadow-lg border-t border-x border-b-4 ${activeBox.border} bg-black/40 ${activeBox.owned > 0 ? 'py-3 text-sm' : 'py-4 text-xl'}`}
+                        className={`group relative overflow-hidden flex items-center justify-center gap-2 w-full rounded-xl font-black text-white transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-0 shadow-lg border-t border-x border-b-4 ${activeBox.border} bg-black/60 ${activeBox.owned > 0 ? 'py-3 text-sm' : 'py-4 text-xl'}`}
                       >
                         <div className={`absolute inset-0 ${activeBox.glow} opacity-10 group-hover:opacity-30 transition-opacity`} />
                         <span className="relative flex items-center gap-2 drop-shadow-md uppercase tracking-widest">
@@ -517,6 +572,24 @@ export default function PackOpenerClient({
                     </div>
                   )}
                 </div>
+
+                {/* Sleek Drop Rates Row using CSS Grid for perfect wrapping */}
+                <div className="w-full mt-2 flex flex-col items-center">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 mb-3 flex items-center gap-2">
+                    <span className="w-8 h-[1px] bg-white/10"></span>
+                    Probabilités d'obtention
+                    <span className="w-8 h-[1px] bg-white/10"></span>
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 w-full max-w-xl">
+                    {activeBox.rates.map((rate: any, idx: number) => (
+                      <div key={idx} className={`flex justify-between items-center px-3 py-1.5 rounded-lg border border-white/5 bg-black/40 backdrop-blur-sm shadow-inner ${rate.c}`}>
+                        <span className="text-xs font-bold uppercase tracking-wider truncate mr-2">{rate.r}</span>
+                        <span className="text-xs font-mono font-black opacity-80">{rate.p}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             </div>
           )}
@@ -529,8 +602,21 @@ export default function PackOpenerClient({
               'bg-black/90'
             }`}>
               <div className="animate-booster-open relative flex items-center justify-center">
-                {openingGlow && (
-                   <div className={`absolute inset-0 z-0 animate-pulse-glow blur-2xl ${
+  
+              {/* HUGE TEXT OVERLAY FOR BIG WINS */}
+              {showReveal && (openingGlow === 'MYTHIC' || openingGlow === 'LEGENDARY') && (
+                <div className="fixed inset-0 z-[160] flex items-center justify-center pointer-events-none">
+                  <h2 className={`font-black uppercase tracking-widest animate-huge-reveal ${
+                    openingGlow === 'MYTHIC' ? 'text-red-500 drop-shadow-[0_0_80px_rgba(239,68,68,1)] text-stroke-mythic' : 
+                    'text-yellow-400 drop-shadow-[0_0_80px_rgba(250,204,21,1)] text-stroke-legendary'
+                  }`} style={{ WebkitTextStroke: '3px white', filter: 'drop-shadow(0px 10px 20px rgba(0,0,0,0.8))' }}>
+                    {openingGlow === 'MYTHIC' ? 'MYTHIQUE !' : 'LÉGENDAIRE !'}
+                  </h2>
+                </div>
+              )}
+
+              {openingGlow && (
+                   <div className={`absolute inset-0 z-0  blur-lg ${
                      openingGlow === 'MYTHIC' ? 'bg-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.5)]' :
                      openingGlow === 'LEGENDARY' ? 'bg-yellow-400/30 shadow-[0_0_50px_rgba(250,204,21,0.5)]' :
                      'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'
@@ -551,6 +637,19 @@ export default function PackOpenerClient({
             <div className="z-10 flex flex-col items-center animate-slide-up relative mt-2 w-full max-w-7xl mx-auto">
               
               {/* BIG WIN EXPLOSION (Sparkles & Flash) */}
+
+              {/* HUGE TEXT OVERLAY FOR BIG WINS */}
+              {showReveal && (openingGlow === 'MYTHIC' || openingGlow === 'LEGENDARY') && (
+                <div className="fixed inset-0 z-[160] flex items-center justify-center pointer-events-none">
+                  <h2 className={`font-black uppercase tracking-widest animate-huge-reveal ${
+                    openingGlow === 'MYTHIC' ? 'text-red-500 drop-shadow-[0_0_80px_rgba(239,68,68,1)] text-stroke-mythic' : 
+                    'text-yellow-400 drop-shadow-[0_0_80px_rgba(250,204,21,1)] text-stroke-legendary'
+                  }`} style={{ WebkitTextStroke: '3px white', filter: 'drop-shadow(0px 10px 20px rgba(0,0,0,0.8))' }}>
+                    {openingGlow === 'MYTHIC' ? 'MYTHIQUE !' : 'LÉGENDAIRE !'}
+                  </h2>
+                </div>
+              )}
+
               {openingGlow && (
                 <div className="fixed inset-0 z-[150] pointer-events-none flex items-center justify-center">
                   <div className={`absolute inset-0 animate-flash-fade ${
@@ -608,7 +707,7 @@ export default function PackOpenerClient({
         <div className="animate-fade-in">
 
           <div className="relative mb-12 p-[1px] rounded-2xl bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-fuchsia-500/30 shadow-2xl">
-            <div className="bg-black/60 backdrop-blur-2xl rounded-2xl p-6 flex flex-col lg:flex-row gap-6 items-center justify-between sticky top-4 z-40">
+            <div className="bg-[#111118] border border-white/5 rounded-2xl p-6 flex flex-col lg:flex-row gap-6 items-center justify-between sticky top-4 z-40">
               <div className="flex flex-col items-center lg:items-start gap-1 w-full lg:w-auto">
                 <h2 className="text-3xl font-outfit font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-purple-300 flex items-center gap-3">
                   <Layers className="w-8 h-8 text-indigo-400" /> Ma Collection
@@ -707,7 +806,7 @@ export default function PackOpenerClient({
                               <CardDisplay card={item.card} size="md" />
                             </div>
                             {item.count > 1 && (
-                              <div className="absolute -top-3 -right-3 z-50 bg-red-600 text-white font-black text-sm px-2.5 py-1 rounded-full border-2 border-[#111118] shadow-[0_0_10px_rgba(220,38,38,0.6)] animate-pulse-glow">
+                              <div className="absolute -top-3 -right-3 z-50 bg-red-600 text-white font-black text-sm px-2.5 py-1 rounded-full border-2 border-[#111118] shadow-[0_0_10px_rgba(220,38,38,0.6)] ">
                                 x{item.count}
                               </div>
                             )}
@@ -726,10 +825,10 @@ export default function PackOpenerClient({
 
       {activeTab === "catalogue" && (
         <div className="animate-fade-in">
-          <div className="relative mb-12 p-[1px] rounded-2xl bg-gradient-to-r from-rose-500/30 via-red-500/30 to-orange-500/30 shadow-2xl">
-            <div className="bg-black/60 backdrop-blur-2xl rounded-2xl p-6 flex flex-col lg:flex-row gap-6 items-center justify-between sticky top-4 z-40">
+          <div className="relative mb-12 p-[1px] rounded-2xl bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-blue-500/30 shadow-2xl">
+            <div className="bg-[#111118] border border-white/5 rounded-2xl p-6 flex flex-col lg:flex-row gap-6 items-center justify-between sticky top-4 z-40">
               <div className="flex flex-col items-center lg:items-start gap-1 w-full lg:w-auto">
-                <h2 className="text-3xl font-outfit font-black text-transparent bg-clip-text bg-gradient-to-r from-rose-300 to-red-300 flex items-center gap-3">
+                <h2 className="text-3xl font-outfit font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-300 flex items-center gap-3">
                   <BookOpen className="w-8 h-8 text-rose-400" /> Catalogue Complet
                 </h2>
                 <span className="text-rose-200/50 font-medium tracking-wider uppercase text-sm ml-11">
@@ -778,7 +877,7 @@ export default function PackOpenerClient({
                           >
                             <CardDisplay card={card as any} size="md" />
                             {!isOwned && (
-                              <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center backdrop-blur-[1px]">
+                              <div className="absolute inset-0 bg-black/40 rounded-xl flex items-center justify-center ">
                                 <Lock className="w-10 h-10 text-white/50" />
                               </div>
                             )}
@@ -802,7 +901,7 @@ export default function PackOpenerClient({
 
       {selectedCard && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 animate-in fade-in duration-300"
           onClick={() => setSelectedCard(null)}
         >
           <div 
@@ -811,7 +910,7 @@ export default function PackOpenerClient({
           >
             <button 
               onClick={() => setSelectedCard(null)}
-              className="absolute -top-16 right-0 md:-top-6 md:-right-16 text-white/50 hover:text-white transition-colors z-50 bg-white/5 hover:bg-red-500/20 p-3 rounded-full border border-white/10"
+              className="absolute -top-16 right-0 md:-top-6 md:-right-16 text-white/50 hover:text-white transition-colors z-50 bg-white/5 hover:bg-purple-500/20 p-3 rounded-full border border-white/10"
             >
               <X className="w-8 h-8" />
             </button>
@@ -826,7 +925,7 @@ export default function PackOpenerClient({
             {/* Info Pane Side */}
             <div className="flex-1 w-full bg-gradient-to-br from-[#161622] to-[#0a0a0f] border border-[var(--color-border-color)] rounded-3xl p-8 flex flex-col shadow-2xl relative overflow-hidden">
               {/* Background decorative element */}
-              <div className="absolute -right-20 -top-20 w-64 h-64 bg-[var(--color-accent-purple)] rounded-full blur-[120px] opacity-20 pointer-events-none"></div>
+              <div className="absolute -right-20 -top-20 w-64 h-64 bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.2)_0%,_transparent_70%)] rounded-full pointer-events-none"></div>
               
               <h3 className="text-4xl font-outfit font-black text-white mb-4 relative z-10">{selectedCard.title}</h3>
               
@@ -878,7 +977,7 @@ export default function PackOpenerClient({
       {/* FOMO Rates Modal */}
       {showRatesModal && (
         <div 
-          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 p-4 animate-in fade-in duration-300"
           onClick={() => setShowRatesModal(false)}
         >
           <div 
@@ -889,7 +988,7 @@ export default function PackOpenerClient({
             
             <button 
               onClick={() => setShowRatesModal(false)}
-              className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-50 bg-white/5 hover:bg-red-500/20 p-2 rounded-full border border-white/10"
+              className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors z-50 bg-white/5 hover:bg-purple-500/20 p-2 rounded-full border border-white/10"
             >
               <X className="w-6 h-6" />
             </button>
@@ -953,7 +1052,7 @@ export default function PackOpenerClient({
             <div className="mt-8 text-center relative z-10">
               <button 
                 onClick={() => { setShowRatesModal(false); setSelectedBoxType('mythic'); }}
-                className="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.7)] hover:-translate-y-1"
+                className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)] hover:shadow-[0_0_30px_rgba(147,51,234,0.7)] hover:-translate-y-1"
               >
                 Tenter la Mythique (5% !)
               </button>

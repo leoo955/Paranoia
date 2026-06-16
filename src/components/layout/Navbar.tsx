@@ -88,7 +88,7 @@ export default function Navbar() {
               <div className="w-24 h-10 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
             ) : session ? (
               <div className="flex items-center space-x-4">
-                {/* @ts-ignore */}
+                {/* @ts-expect-error */}
                 {session.user?.role === "ADMIN" && (
                   <Link href="/admin" className="flex items-center gap-2 text-[var(--color-accent-purple)] hover:text-white transition-colors text-sm font-bold">
                     <ShieldAlert className="w-4 h-4" /> Admin
@@ -150,7 +150,7 @@ export default function Navbar() {
               <div className="w-full h-12 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
             ) : session ? (
               <div className="space-y-3">
-                {/* @ts-ignore */}
+                {/* @ts-expect-error */}
                 {session.user?.role === "ADMIN" && (
                   <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center space-x-2 py-3 bg-[var(--color-bg-elevated)] rounded-lg text-[var(--color-accent-purple)] font-bold">
                     <ShieldAlert className="w-5 h-5" />

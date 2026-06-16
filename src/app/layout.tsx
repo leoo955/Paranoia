@@ -6,6 +6,8 @@ import Footer from "@/components/layout/Footer";
 
 import { Providers } from "@/components/providers";
 
+import { Toaster } from 'react-hot-toast';
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
@@ -23,6 +25,36 @@ export default function RootLayout({
     <html lang="fr" className="dark">
       <body className={`${inter.variable} ${outfit.variable} flex flex-col min-h-screen bg-[var(--color-bg-primary)]`}>
         <Providers>
+          <Toaster 
+            position="bottom-right"
+            toastOptions={{
+              className: '',
+              duration: 4000,
+              style: {
+                background: 'rgba(22, 22, 31, 0.85)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                color: '#fff',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.6), 0 0 15px rgba(168, 85, 247, 0.15)',
+                borderRadius: '12px',
+                fontWeight: '600',
+                padding: '16px 20px',
+              },
+              success: {
+                iconTheme: {
+                  primary: 'var(--color-accent-purple)',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: 'var(--color-accent-red)',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
           <Navbar />
           <main className="flex-grow pt-20">
             {children}

@@ -112,7 +112,7 @@ export async function POST(req: Request) {
       return pool[Math.floor(Math.random() * pool.length)];
     };
 
-    let drawnCards = [];
+    const drawnCards = [];
     for (let i = 0; i < numCards; i++) {
       drawnCards.push(drawCard());
     }

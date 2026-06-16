@@ -10,7 +10,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const prisma = new PrismaClient();
 
 async function getUserByDiscordId(discordId: string) {
-  let user = await prisma.user.findUnique({ where: { discordId } });
+  const user = await prisma.user.findUnique({ where: { discordId } });
   if (user) return user;
   const account = await prisma.account.findFirst({
     where: { provider: 'discord', providerAccountId: discordId },
@@ -61,7 +61,7 @@ async function buildCardListMessage(discordId: string, page: number, targetDisco
     .setDescription(`**${currentItem.tradingCard.title}**\nRareté: ${currentItem.tradingCard.rarity}\nUUID: \`#${shortUuid}\``)
     .setFooter({ text: `Page ${page + 1}/${totalPages}` });
 
-  let files: any[] = [];
+  const files: any[] = [];
   
   if (currentItem.tradingCard.renderedImageUrl) {
     const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';

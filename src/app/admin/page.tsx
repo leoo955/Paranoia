@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Users, LayoutList, Trash2, ShieldAlert, Sparkles, Layers, PackageOpen, ImagePlus, UploadCloud } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, Users, LayoutList, Trash2, ShieldAlert, Sparkles, Layers, PackageOpen, ImagePlus, UploadCloud, Upload } from "lucide-react";
 import CardDisplay from "@/components/cards/CardDisplay";
 import { toBlob } from "html-to-image";
+import toast from 'react-hot-toast';
 
 type Player = {
   id: string;
@@ -20,6 +21,29 @@ type CustomBadge = {
 };
 
 export default function AdminPage() {
+  const confirmToast = (message: string, onConfirm: () => void) => {
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <span className="font-bold text-white">{message}</span>
+        <div className="flex gap-2 justify-end">
+          <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1.5 bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg text-white text-sm hover:bg-gray-700 transition-colors">Annuler</button>
+          <button onClick={() => { toast.dismiss(t.id); onConfirm(); }} className="px-3 py-1.5 bg-red-600 hover:bg-red-500 rounded-lg text-white text-sm font-bold transition-colors">Confirmer</button>
+        </div>
+      </div>
+    ), { duration: Infinity, style: { background: 'var(--color-bg-primary)', border: '1px solid var(--color-border-color)' } });
+  };
+  const dragRawPos = useRef<{x: number, y: number} | null>(null);
+
+  // Preset Badges for Dock
+  const presetBadges = [
+    { url: 'https://cdn-icons-png.flaticon.com/512/1055/1055673.png', name: 'Couronne' },
+    { url: 'https://cdn-icons-png.flaticon.com/512/119/119068.png', name: 'Épée' },
+    { url: 'https://cdn-icons-png.flaticon.com/512/833/833472.png', name: 'Bouclier' },
+    { url: 'https://cdn-icons-png.flaticon.com/512/2111/2111370.png', name: 'Crâne' },
+    { url: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png', name: 'Étoile' },
+    { url: 'https://cdn-icons-png.flaticon.com/512/5969/5969427.png', name: 'Feu' }
+  ];
+
   const [activeTab, setActiveTab] = useState("players");
   const [players, setPlayers] = useState<Player[]>([]);
   const [newPlayerName, setNewPlayerName] = useState("");
@@ -48,6 +72,15 @@ export default function AdminPage() {
   
   // New Full Art & Color States
   const [isFullArt, setIsFullArt] = useState(false);
+  const [hideCharacter, setHideCharacter] = useState(false);
+  const [hideLevelIcon, setHideLevelIcon] = useState(false);
+  const [hideRarityBox, setHideRarityBox] = useState(false);
+  const [hideSideText, setHideSideText] = useState(false);
+  const [hideDescription, setHideDescription] = useState(false);
+  const [hideNameplate, setHideNameplate] = useState(false);
+  const [hideRole, setHideRole] = useState(false);
+  const [hideTitle, setHideTitle] = useState(false);
+  const [hideBottomText, setHideBottomText] = useState(false);
   const [cardEdition, setCardEdition] = useState("Standard");
   const [cardEffect, setCardEffect] = useState("");
   const [titleColor, setTitleColor] = useState("");
@@ -67,9 +100,14 @@ export default function AdminPage() {
   const [rarityBadgePos, setRarityBadgePos] = useState({ x: 15, y: 65, scale: 100 });
   const [levelTextPos, setLevelTextPos] = useState({ x: 50, y: 82, scale: 100 });
   const [levelBadgePos, setLevelBadgePos] = useState({ x: 10, y: 8, scale: 100 });
+  const [editionBadgePos, setEditionBadgePos] = useState({ x: 85, y: 73, scale: 100 });
   const [levelBadgeUrl, setLevelBadgeUrl] = useState("");
   const [editionBadgeUrl, setEditionBadgeUrl] = useState("");
   const [draggingItem, setDraggingItem] = useState<{type: string, id: string} | null>(null);
+
+  const [showVGuide, setShowVGuide] = useState(false);
+  const [showHGuide, setShowHGuide] = useState(false);
+
   
   const [templates, setTemplates] = useState<any[]>([]);
   const [editions, setEditions] = useState<any[]>([]);
@@ -82,24 +120,31 @@ export default function AdminPage() {
   const [godBoxAmount, setGodBoxAmount] = useState(1);
 
   const handleGodAction = async (action: string) => {
-    if (action.includes("ALL") && !window.confirm(`Êtes-vous sûr de vouloir exécuter l'action ${action} ? C'est irréversible !`)) return;
-    try {
-      const user = appUsers.find(u => u.id === godPlayerId);
-      const minecraftName = user ? user.minecraftName : null;
-      const res = await fetch("/api/admin/cards/manage", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, cardId: godCardId, minecraftName, userId: godPlayerId })
-      });
-      if (res.ok) alert("Action exécutée avec succès !");
-      else alert(await res.text());
-    } catch (e) {
-      alert("Erreur");
+    const execute = async () => {
+      try {
+        const user = appUsers.find(u => u.id === godPlayerId);
+        const minecraftName = user ? user.minecraftName : null;
+        const res = await fetch("/api/admin/cards/manage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action, cardId: godCardId, minecraftName, userId: godPlayerId })
+        });
+        if (res.ok) toast.success("Action exécutée avec succès !");
+        else toast(await res.text(), { icon: '⚠️' });
+      } catch (e) {
+        toast.error("Erreur");
+      }
+    };
+
+    if (action.includes("ALL")) {
+      confirmToast(`Êtes-vous sûr de vouloir exécuter l'action ${action} ? C'est irréversible !`, execute);
+    } else {
+      execute();
     }
   };
 
   const handleGiveBox = async () => {
-    if (!godPlayerId) return alert("Sélectionnez un utilisateur");
+    if (!godPlayerId) return toast("Sélectionnez un utilisateur", { icon: '⚠️' });
     try {
       const res = await fetch("/api/admin/cards/manage", {
         method: "POST",
@@ -112,10 +157,10 @@ export default function AdminPage() {
           cardId: "box" // dummy value to pass validation
         })
       });
-      if (res.ok) alert(`Box ${godBoxType} (x${godBoxAmount}) donnée avec succès !`);
-      else alert(await res.text());
+      if (res.ok) toast(`Box ${godBoxType} (x${godBoxAmount}, { icon: '⚠️' }) donnée avec succès !`);
+      else toast(await res.text(), { icon: '⚠️' });
     } catch (e) {
-      alert("Erreur lors de l'attribution de la box");
+      toast.error("Erreur lors de l'attribution de la box");
     }
   };
 
@@ -164,15 +209,15 @@ export default function AdminPage() {
       });
       
       if (res.ok) {
-        alert("Action effectuée avec succès !");
+        toast.success("Action effectuée avec succès !");
         setSelectedUserEconomy(null);
         fetchUsers();
       } else {
         const msg = await res.text();
-        alert("Erreur: " + msg);
+        toast.error("Erreur: " + msg);
       }
     } catch (err) {
-      alert("Erreur de connexion");
+      toast.error("Erreur de connexion");
     } finally {
       setIsUpdatingEconomy(false);
     }
@@ -187,13 +232,13 @@ export default function AdminPage() {
       });
       if (res.ok) {
         fetchUsers();
-        alert("Rôle mis à jour avec succès !");
+        toast.success("Rôle mis à jour avec succès !");
       } else {
         const msg = await res.text();
-        alert("Erreur: " + msg);
+        toast.error("Erreur: " + msg);
       }
     } catch (err) {
-      alert("Erreur de connexion");
+      toast.error("Erreur de connexion");
     }
   };
 
@@ -277,26 +322,103 @@ export default function AdminPage() {
       const deltaX = (e.movementX / 300) * 100;
       const deltaY = (e.movementY / 420) * 100;
       
+      let isXCenter = false;
+      let isYCenter = false;
+
+      const calcSnap = (val: number, isShift: boolean, isX: boolean) => {
+        if (isShift) return val;
+        let snapped = val;
+        
+        // Snap to center (50)
+        if (Math.abs(val - 50) < 2.5) {
+           snapped = 50;
+           if (isX) isXCenter = true;
+           else isYCenter = true;
+        }
+        
+        // Snap to edges (0, 100)
+        if (Math.abs(val - 0) < 3) snapped = 0;
+        if (Math.abs(val - 100) < 3) snapped = 100;
+        
+        return snapped;
+      };
+
       if (draggingItem.type === 'character') {
-         setCharPosX(prev => prev + deltaX);
-         setCharPosY(prev => prev + deltaY);
+         setCharPosX(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: prev, y: 0 };
+            dragRawPos.current.x += deltaX;
+            return calcSnap(dragRawPos.current.x, e.shiftKey, true);
+         });
+         setCharPosY(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: 0, y: prev };
+            dragRawPos.current.y += deltaY;
+            return calcSnap(dragRawPos.current.y, e.shiftKey, false);
+         });
       } else if (draggingItem.type === 'title') {
-         setTitlePos(prev => ({ ...prev, x: prev.x + deltaX, y: prev.y + deltaY }));
+         setTitlePos(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: prev.x, y: prev.y };
+            dragRawPos.current.x += deltaX;
+            dragRawPos.current.y += deltaY;
+            return { ...prev, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
+         });
       } else if (draggingItem.type === 'desc') {
-         setDescPos(prev => ({ ...prev, x: prev.x + deltaX, y: prev.y + deltaY }));
+         setDescPos(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: prev.x, y: prev.y };
+            dragRawPos.current.x += deltaX;
+            dragRawPos.current.y += deltaY;
+            return { ...prev, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
+         });
       } else if (draggingItem.type === 'rarityBadge') {
-         setRarityBadgePos(prev => ({ ...prev, x: prev.x + deltaX, y: prev.y + deltaY }));
+         setRarityBadgePos(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: prev.x, y: prev.y };
+            dragRawPos.current.x += deltaX;
+            dragRawPos.current.y += deltaY;
+            return { ...prev, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
+         });
       } else if (draggingItem.type === 'levelText') {
-         setLevelTextPos(prev => ({ ...prev, x: prev.x + deltaX, y: prev.y + deltaY }));
+         setLevelTextPos(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: prev.x, y: prev.y };
+            dragRawPos.current.x += deltaX;
+            dragRawPos.current.y += deltaY;
+            return { ...prev, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
+         });
       } else if (draggingItem.type === 'levelBadge') {
-         setLevelBadgePos(prev => ({ ...prev, x: prev.x + deltaX, y: prev.y + deltaY }));
+         setLevelBadgePos(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: prev.x, y: prev.y };
+            dragRawPos.current.x += deltaX;
+            dragRawPos.current.y += deltaY;
+            return { ...prev, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
+         });
+      } else if (draggingItem.type === 'editionBadge') {
+         setEditionBadgePos(prev => {
+            if (!dragRawPos.current) dragRawPos.current = { x: prev.x, y: prev.y };
+            dragRawPos.current.x += deltaX;
+            dragRawPos.current.y += deltaY;
+            return { ...prev, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
+         });
       } else if (draggingItem.type === 'customBadge') {
-         setCardCustomBadges(prev => prev.map((b, i) => String(i) === draggingItem.id || b.id === draggingItem.id ? { ...b, x: b.x + deltaX, y: b.y + deltaY } : b));
+         setCardCustomBadges(prev => prev.map((b, i) => {
+            if (String(i) === draggingItem.id || b.id === draggingItem.id) {
+               if (!dragRawPos.current) dragRawPos.current = { x: b.x, y: b.y };
+               dragRawPos.current.x += deltaX;
+               dragRawPos.current.y += deltaY;
+               return { ...b, x: calcSnap(dragRawPos.current.x, e.shiftKey, true), y: calcSnap(dragRawPos.current.y, e.shiftKey, false) };
+            }
+            return b;
+         }));
       }
+
+      // Update guide visibility (we use a setTimeout or direct state if React batches it. 
+      // In a raw DOM event, React 18 auto-batches setState!)
+      setShowVGuide(isXCenter);
+      setShowHGuide(isYCenter);
     };
     
     const handleGlobalMouseUp = () => {
       setDraggingItem(null);
+      dragRawPos.current = null;
+      setShowVGuide(false);
+      setShowHGuide(false);
     };
 
     if (draggingItem) {
@@ -320,6 +442,7 @@ export default function AdminPage() {
       if (type === 'rarityBadge') setRarityBadgePos(prev => ({...prev, scale: Math.max(10, Math.min(300, prev.scale + delta))}));
       if (type === 'levelText') setLevelTextPos(prev => ({...prev, scale: Math.max(10, Math.min(300, prev.scale + delta))}));
       if (type === 'levelBadge') setLevelBadgePos(prev => ({...prev, scale: Math.max(10, Math.min(300, prev.scale + delta))}));
+      if (type === 'editionBadge') setEditionBadgePos(prev => ({...prev, scale: Math.max(10, Math.min(300, prev.scale + delta))}));
       if (type === 'customBadge') {
          setCardCustomBadges(prev => prev.map((b, i) => String(i) === id || b.id === id ? { ...b, size: Math.max(10, Math.min(200, b.size + delta)) } : b));
       }
@@ -384,10 +507,10 @@ export default function AdminPage() {
       
       // Update local state
       setCards(cards.map(c => c.id === editingCardId ? { ...c, renderedImageUrl: url } : c));
-      alert("Image Discord générée et sauvegardée avec succès !");
+      toast.success("Image Discord générée et sauvegardée avec succès !");
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la capture : " + err);
+      toast.error("Erreur lors de la capture : " + err);
     } finally {
       setIsCapturing(false);
     }
@@ -451,6 +574,8 @@ export default function AdminPage() {
         imageUrl: cardImageUrl,
         renderedImageUrl: capturedImageUrl,
         customBadges: cardCustomBadges,
+                      showVGuide,
+                      showHGuide,
         characterPosition: { x: charPosX, y: charPosY, scale: charScale },
         attributes: {
           bgPosX, bgPosY, bgScale,
@@ -462,9 +587,19 @@ export default function AdminPage() {
           frameUrl: cardFrameUrl,
           titlePos, descPos, rarityBadgePos, levelTextPos,
           levelBadgePos,
+          editionBadgePos,
           levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
           isFullArt,
+          hideCharacter,
+          hideLevelIcon,
+          hideRarityBox,
+          hideSideText,
+          hideDescription,
+          hideNameplate,
+          hideRole,
+          hideTitle,
+          hideBottomText,
           effect: cardEffect,
           titleColor,
           descColor,
@@ -548,6 +683,15 @@ export default function AdminPage() {
       setCardFrameUrl(attrs.frameUrl || "");
       
       setIsFullArt(attrs.isFullArt || false);
+      setHideCharacter(attrs.hideCharacter || false);
+      setHideLevelIcon(attrs.hideLevelIcon || false);
+      setHideRarityBox(attrs.hideRarityBox || false);
+      setHideSideText(attrs.hideSideText || false);
+      setHideDescription(attrs.hideDescription || false);
+      setHideNameplate(attrs.hideNameplate || false);
+      setHideRole(attrs.hideRole || false);
+      setHideTitle(attrs.hideTitle || false);
+      setHideBottomText(attrs.hideBottomText || false);
       setCardEffect(attrs.effect || "");
       setCardEffect(attrs.effect || "");
       setTitleColor(attrs.titleColor || "");
@@ -561,6 +705,7 @@ export default function AdminPage() {
 
       setTitlePos(attrs.titlePos || { x: 50, y: 75, scale: 100 }); setDescPos(attrs.descPos || { x: 50, y: 92, scale: 100 }); setRarityBadgePos(attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 }); setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
       setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
+      setEditionBadgePos(attrs.editionBadgePos || { x: 85, y: 73, scale: 100 });
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
     } catch {
@@ -642,10 +787,10 @@ export default function AdminPage() {
         const data = await res.json();
         setCardCustomBg(data.url);
       } else {
-        alert("Erreur lors de l'upload");
+        toast.error("Erreur lors de l'upload");
       }
     } catch (err) {
-      alert("Erreur de connexion");
+      toast.error("Erreur de connexion");
     } finally {
       setUploadingBg(false);
     }
@@ -668,11 +813,11 @@ export default function AdminPage() {
         const data = await res.json();
         setCardImageUrl(data.url);
       } else {
-        alert("Erreur lors de l'upload du skin");
+        toast.error("Erreur lors de l'upload du skin");
       }
     } catch (err) {
       console.error(err);
-      alert("Erreur de connexion");
+      toast.error("Erreur de connexion");
     } finally {
       setUploadingSkin(false);
     }
@@ -695,11 +840,11 @@ export default function AdminPage() {
         const data = await res.json();
         setCardFrameUrl(data.url);
       } else {
-        alert("Erreur lors de l'upload du cadre");
+        toast.error("Erreur lors de l'upload du cadre");
       }
     } catch (err) {
       console.error(err);
-      alert("Erreur de connexion");
+      toast.error("Erreur de connexion");
     } finally {
       setUploadingFrame(false);
     }
@@ -721,35 +866,37 @@ export default function AdminPage() {
         const data = await res.json();
         setLevelBadgeUrl(data.url);
       } else {
-        alert("Erreur lors de l'upload du badge custom");
+        toast.error("Erreur lors de l'upload du badge custom");
       }
     } catch (err) {
       console.error(err);
-      alert("Erreur de connexion");
+      toast.error("Erreur de connexion");
     }
   };
 
-  const handleDeleteCard = async (id: string) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette carte ?")) return;
-    try {
-      const res = await fetch(`/api/cards?id=${id}`, { method: "DELETE" });
-      if (res.ok) fetchCards();
-      else alert("Erreur lors de la suppression.");
-    } catch (e) {
-      console.error(e);
-    }
+  const handleDeleteCard = (id: string) => {
+    confirmToast("Êtes-vous sûr de vouloir supprimer cette carte ?", async () => {
+      try {
+        const res = await fetch(`/api/cards?id=${id}`, { method: "DELETE" });
+        if (res.ok) fetchCards();
+        else toast.error("Erreur lors de la suppression.");
+      } catch (e) {
+        console.error(e);
+      }
+    });
   };
 
   
-  const handleDeleteTemplate = async (id: string) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce template ?")) return;
-    try {
-      const res = await fetch(`/api/templates?id=${id}`, { method: "DELETE" });
-      if (res.ok) fetchTemplates();
-      else alert("Erreur lors de la suppression.");
-    } catch (e) {
-      console.error(e);
-    }
+  const handleDeleteTemplate = (id: string) => {
+    confirmToast("Êtes-vous sûr de vouloir supprimer ce template ?", async () => {
+      try {
+        const res = await fetch(`/api/templates?id=${id}`, { method: "DELETE" });
+        if (res.ok) fetchTemplates();
+        else toast.error("Erreur lors de la suppression.");
+      } catch (e) {
+        console.error(e);
+      }
+    });
   };
 
   const handleSaveTemplate = async () => {
@@ -762,6 +909,8 @@ export default function AdminPage() {
           name,
           customBackground: cardCustomBg,
           customBadges: cardCustomBadges,
+                      showVGuide,
+                      showHGuide,
           characterPosition: { x: charPosX, y: charPosY, scale: charScale },
           level: cardLevel,
         edition: cardEdition,
@@ -774,9 +923,19 @@ export default function AdminPage() {
             frameUrl: cardFrameUrl,
             titlePos, descPos, rarityBadgePos, levelTextPos,
             levelBadgePos,
+            editionBadgePos,
             levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
             isFullArt,
+          hideCharacter,
+          hideLevelIcon,
+          hideRarityBox,
+          hideSideText,
+          hideDescription,
+          hideNameplate,
+          hideRole,
+          hideTitle,
+          hideBottomText,
           effect: cardEffect,
             titleColor,
             descColor,
@@ -790,7 +949,7 @@ export default function AdminPage() {
         })
       });
       if (res.ok) {
-        alert("Template sauvegardé !");
+        toast.success("Template sauvegardé !");
         fetchTemplates();
     fetchEditions();
       }
@@ -819,6 +978,15 @@ export default function AdminPage() {
       setRarityBadgeColor(attrs.rarityBadgeColor || "");
       setCardFrameUrl(attrs.frameUrl || "");
       setIsFullArt(attrs.isFullArt || false);
+      setHideCharacter(attrs.hideCharacter || false);
+      setHideLevelIcon(attrs.hideLevelIcon || false);
+      setHideRarityBox(attrs.hideRarityBox || false);
+      setHideSideText(attrs.hideSideText || false);
+      setHideDescription(attrs.hideDescription || false);
+      setHideNameplate(attrs.hideNameplate || false);
+      setHideRole(attrs.hideRole || false);
+      setHideTitle(attrs.hideTitle || false);
+      setHideBottomText(attrs.hideBottomText || false);
       setCardEffect(attrs.effect || "");
       setCardEffect(attrs.effect || "");
       setTitleColor(attrs.titleColor || "");
@@ -835,10 +1003,29 @@ export default function AdminPage() {
       setRarityBadgePos(attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 }); 
       setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
       setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
+      setEditionBadgePos(attrs.editionBadgePos || { x: 85, y: 73, scale: 100 });
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
     } catch {}
   };
+  const handleEditionIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        setNewEditionIconUrl(data.url);
+      } else {
+        toast.error("Erreur lors de l'upload");
+      }
+    } catch (err) {
+      toast.error("Erreur réseau");
+    }
+  };
+
   const handleCreateEdition = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEditionName) return;
@@ -854,7 +1041,7 @@ export default function AdminPage() {
         setNewEditionIconUrl("");
         fetchEditions();
       } else {
-        alert("Erreur lors de la création de l'édition.");
+        toast.error("Erreur lors de la création de l'édition.");
       }
     } catch (err) {
       console.error(err);
@@ -863,15 +1050,16 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeleteEdition = async (id: string) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette édition ?")) return;
-    try {
-      const res = await fetch(`/api/editions?id=${id}`, { method: "DELETE" });
-      if (res.ok) fetchEditions();
-      else alert("Erreur lors de la suppression.");
-    } catch (e) {
-      console.error(e);
-    }
+  const handleDeleteEdition = (id: string) => {
+    confirmToast("Êtes-vous sûr de vouloir supprimer cette édition ?", async () => {
+      try {
+        const res = await fetch(`/api/editions?id=${id}`, { method: "DELETE" });
+        if (res.ok) fetchEditions();
+        else toast.error("Erreur lors de la suppression.");
+      } catch (e) {
+        console.error(e);
+      }
+    });
   };
 
   const handleAddPlayer = async (e: React.FormEvent) => {
@@ -902,92 +1090,92 @@ export default function AdminPage() {
     }
   };
 
-  const handleDeletePlayer = async (id: string) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer ce joueur de la base de données ?")) return;
-    
-    try {
-      const res = await fetch(`/api/players?id=${id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        fetchPlayers();
+  const handleDeletePlayer = (id: string) => {
+    confirmToast("Êtes-vous sûr de vouloir supprimer ce joueur de la base de données ?", async () => {
+      try {
+        const res = await fetch(`/api/players?id=${id}`, { method: "DELETE" });
+        if (res.ok) {
+          toast.success("Joueur supprimé !");
+          fetchPlayers();
+        } else toast.error("Erreur lors de la suppression.");
+      } catch (e) {
+        console.error(e);
       }
-    } catch (err) {
-      console.error("Failed to delete", err);
-    }
+    });
   };
+
   const [isBatchGenerating, setIsBatchGenerating] = useState(false);
   const [batchProgress, setBatchProgress] = useState(0);
   const [batchTotal, setBatchTotal] = useState(0);
 
-  const handleGenerateMissingImages = async () => {
+  const handleGenerateMissingImages = () => {
     const missing = cards.filter(c => !c.renderedImageUrl || c.renderedImageUrl.startsWith('/uploads'));
     if (missing.length === 0) {
-      alert("Toutes les cartes ont déjà leur image Discord !");
+      toast("Toutes les cartes ont déjà leur image Discord !", { icon: '⚠️' });
       return;
     }
 
-    if (!confirm(`Voulez-vous générer l'image Discord pour ${missing.length} cartes ? Cela peut prendre du temps.`)) return;
+    confirmToast(`Voulez-vous générer l'image Discord pour ${missing.length} cartes ? Cela peut prendre du temps.`, async () => {
+      setIsBatchGenerating(true);
+      setBatchTotal(missing.length);
+      setBatchProgress(0);
 
-    setIsBatchGenerating(true);
-    setBatchTotal(missing.length);
-    setBatchProgress(0);
+      for (let i = 0; i < missing.length; i++) {
+        const card = missing[i];
+        // 1. Set the card in the editor
+        startEditCard(card);
+        
+        // 2. Wait for React to re-render the CardDisplay with the new states
+        await new Promise(r => setTimeout(r, 1000));
 
-    for (let i = 0; i < missing.length; i++) {
-      const card = missing[i];
-      // 1. Set the card in the editor
-      startEditCard(card);
-      
-      // 2. Wait for React to re-render the CardDisplay with the new states
-      await new Promise(r => setTimeout(r, 1000));
-
-      // 3. Capture
-      try {
-        const cardElement = document.getElementById("live-preview-card");
-        if (cardElement) {
-          await waitForVideo(cardElement);
-          const blob = await toBlob(cardElement, {
-            pixelRatio: 2,
-            backgroundColor: 'transparent',
-            filter: (node) => {
-              if (node instanceof HTMLElement && typeof node.className === 'string') {
-                return !node.className.includes('transparenttextures');
+        // 3. Capture
+        try {
+          const cardElement = document.getElementById("live-preview-card");
+          if (cardElement) {
+            await waitForVideo(cardElement);
+            const blob = await toBlob(cardElement, {
+              pixelRatio: 2,
+              backgroundColor: 'transparent',
+              filter: (node) => {
+                if (node instanceof HTMLElement && typeof node.className === 'string') {
+                  return !node.className.includes('transparenttextures');
+                }
+                return true;
               }
-              return true;
-            }
-          });
-          if (blob) {
-            const file = new File([blob], `card_${card.id}_discord.png`, { type: 'image/png' });
-            const formData = new FormData();
-            formData.append('file', file);
-            const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
-            if (uploadRes.ok) {
-              const { url } = await uploadRes.json();
-              await fetch('/api/cards', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: card.id, renderedImageUrl: url }),
-              });
+            });
+            if (blob) {
+              const file = new File([blob], `card_${card.id}_discord.png`, { type: 'image/png' });
+              const formData = new FormData();
+              formData.append('file', file);
+              const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+              if (uploadRes.ok) {
+                const { url } = await uploadRes.json();
+                await fetch('/api/cards', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id: card.id, renderedImageUrl: url }),
+                });
+              }
             }
           }
+        } catch (err) {
+          console.error("Failed for card", card.id, err);
         }
-      } catch (err) {
-        console.error("Failed for card", card.id, err);
+        setBatchProgress(i + 1);
       }
-      setBatchProgress(i + 1);
-    }
 
-    // Refresh cards
-    const res = await fetch('/api/cards');
-    if (res.ok) {
-      const data = await res.json();
-      setCards(data);
-    }
-    
-    // Clear editor
-    cancelEdit();
-    setIsBatchGenerating(false);
-    alert("Génération terminée !");
+      // Refresh cards
+      const res = await fetch('/api/cards');
+      if (res.ok) {
+        const data = await res.json();
+        setCards(data);
+      }
+      
+      // Clear editor
+      cancelEdit();
+      setIsBatchGenerating(false);
+      toast.success("Génération terminée !");
+    });
   };
 
   return (
@@ -1152,9 +1340,14 @@ export default function AdminPage() {
                     onChange={(e) => {
                       const newRarity = e.target.value;
                       setCardRarity(newRarity);
-                      if (newRarity !== 'LEGENDARY' && newRarity !== 'MYTHIC') {
-                        setIsFullArt(false);
-                      }
+                      
+                      // Auto-assign probabilities based on rarity
+                      if (newRarity === 'COMMON') setCardProba(45);
+                      else if (newRarity === 'UNCOMMON') setCardProba(35);
+                      else if (newRarity === 'RARE') setCardProba(15);
+                      else if (newRarity === 'EPIC') setCardProba(3);
+                      else if (newRarity === 'LEGENDARY') setCardProba(1);
+                      else if (newRarity === 'MYTHIC') setCardProba(0.2);
                     }}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
                     disabled={creatingCard}
@@ -1374,7 +1567,7 @@ export default function AdminPage() {
                   <h4 className="text-sm font-bold text-white mb-4">Mode Full Art & Visibilité</h4>
                   
                   <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-[var(--color-accent-purple)] font-bold">
-                    <input type="checkbox" disabled={cardRarity !== 'LEGENDARY' && cardRarity !== 'MYTHIC'} checked={isFullArt} onChange={(e) => {
+                    <input type="checkbox" checked={isFullArt} onChange={(e) => {
                       const checked = e.target.checked;
                       setIsFullArt(checked);
                       if (checked) {
@@ -1387,8 +1580,43 @@ export default function AdminPage() {
                         setLevelTextPos({ x: 50, y: 82, scale: 100 });
                       }
                     }} className="rounded border-gray-600 bg-gray-700" />
-                    Activer le Mode "Full Art" (Mythique/Légendaire uniquement)
+                    Activer le Mode "Full Art"
                   </label>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                      <input type="checkbox" checked={hideCharacter} onChange={(e) => setHideCharacter(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                      Cacher le personnage (buste)
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                      <input type="checkbox" checked={hideRarityBox} onChange={(e) => setHideRarityBox(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                      Cacher la boîte de rareté (Haut-Droite)
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                      <input type="checkbox" checked={hideSideText} onChange={(e) => setHideSideText(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                      Cacher le texte latéral (Paranoia SMP)
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                      <input type="checkbox" checked={hideDescription} onChange={(e) => setHideDescription(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                      Cacher la description
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                      <input type="checkbox" checked={hideNameplate} onChange={(e) => setHideNameplate(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                      Cacher TOUT le bloc du bas (Nom, Rôle, etc.)
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                      <input type="checkbox" disabled={hideNameplate} checked={hideRole} onChange={(e) => setHideRole(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                      Cacher le tag Édition/Rôle
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                      <input type="checkbox" disabled={hideNameplate} checked={hideTitle} onChange={(e) => setHideTitle(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                      Cacher le Titre (Nom)
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-300">
+                      <input type="checkbox" disabled={hideNameplate} checked={hideBottomText} onChange={(e) => setHideBottomText(e.target.checked)} className="rounded border-gray-600 bg-gray-700" />
+                      Cacher le sous-titre (Tier & Faction)
+                    </label>
+                  </div>
 
                   
                   <div className="mb-4">
@@ -1515,6 +1743,8 @@ export default function AdminPage() {
                     customBackground: cardCustomBg,
                     imageUrl: cardImageUrl,
                     customBadges: cardCustomBadges,
+                      showVGuide,
+                      showHGuide,
                     characterPosition: { x: charPosX, y: charPosY, scale: charScale },
                     attributes: JSON.stringify({ 
                       borderColor: cardBorderColor,
@@ -1525,9 +1755,19 @@ export default function AdminPage() {
                       frameUrl: cardFrameUrl,
                       titlePos, descPos, rarityBadgePos, levelTextPos,
                       levelBadgePos,
+                      editionBadgePos,
                       levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
                       isFullArt,
+          hideCharacter,
+          hideLevelIcon,
+          hideRarityBox,
+          hideSideText,
+          hideDescription,
+          hideNameplate,
+          hideRole,
+          hideTitle,
+          hideBottomText,
           effect: cardEffect,
                       titleColor,
                       descColor,
@@ -1568,9 +1808,19 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-[var(--color-bg-elevated)] p-6 rounded-xl border border-[var(--color-border-color)]">
                   <h3 className="text-lg font-bold text-white mb-4">Créer une Édition</h3>
-                  <form onSubmit={handleCreateEdition} className="flex gap-2">
-                    <input type="text" value={newEditionName} onChange={e => setNewEditionName(e.target.value)} placeholder="Nom de l'édition..." className="flex-1 bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]" />
-                    <button type="submit" disabled={loading} className="btn-primary px-4 py-2">Créer</button>
+                  <form onSubmit={handleCreateEdition} className="flex flex-col gap-2">
+                    <input type="text" value={newEditionName} onChange={e => setNewEditionName(e.target.value)} placeholder="Nom de l'édition..." className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]" />
+                    
+                    <div className="flex gap-2 items-center">
+                      <input type="text" value={newEditionIconUrl} onChange={e => setNewEditionIconUrl(e.target.value)} placeholder="URL du badge (optionnel)..." className="flex-1 bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)] text-sm" />
+                      
+                      <label className="bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] hover:border-[var(--color-accent-purple)] px-3 py-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center">
+                        <Upload size={18} className="text-[var(--color-accent-purple)]" />
+                        <input type="file" accept="image/png, image/jpeg, image/gif" className="hidden" onChange={handleEditionIconUpload} />
+                      </label>
+                    </div>
+
+                    <button type="submit" disabled={loading} className="btn-primary px-4 py-2 w-full mt-2">Créer l'édition</button>
                   </form>
                 </div>
                 <div className="bg-[var(--color-bg-elevated)] p-6 rounded-xl border border-[var(--color-border-color)]">
@@ -1578,7 +1828,10 @@ export default function AdminPage() {
                   <div className="max-h-40 overflow-y-auto space-y-2">
                     {editions.map(ed => (
                       <div key={ed.id} className="flex justify-between items-center bg-[var(--color-bg-primary)] p-2 rounded-lg border border-[var(--color-border-color)]">
-                        <span className="text-white">{ed.name}</span>
+                                                <span className="text-white flex items-center gap-2">
+                          {ed.iconUrl && <img src={ed.iconUrl} alt="Badge" className="w-6 h-6 object-contain" />}
+                          {ed.name}
+                        </span>
                         <button onClick={() => handleDeleteEdition(ed.id)} className="text-red-400 hover:text-red-300 text-sm">Supprimer</button>
                       </div>
                     ))}
