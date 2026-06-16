@@ -61,8 +61,27 @@ export default async function CardsPage() {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background Ambience */}
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-20 pointer-events-none mix-blend-screen" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] max-w-6xl h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/40 via-[#0a0a0f]/0 to-transparent pointer-events-none" />
+      <div className="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-30 pointer-events-none mix-blend-screen animate-pulse-slow" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-7xl h-[800px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/50 via-purple-900/20 to-transparent pointer-events-none" />
+      <div className="fixed bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none z-0" />
+      
+      {/* Floating particles */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        {[...Array(20)].map((_, i) => (
+          <div 
+            key={i} 
+            className="absolute rounded-full bg-indigo-400/20 blur-sm animate-float"
+            style={{
+              width: Math.random() * 10 + 5 + 'px',
+              height: Math.random() * 10 + 5 + 'px',
+              left: Math.random() * 100 + '%',
+              top: Math.random() * 100 + '%',
+              animationDuration: (Math.random() * 10 + 10) + 's',
+              animationDelay: (Math.random() * 5) + 's',
+            }}
+          />
+        ))}
+      </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10 animate-slide-up">
         

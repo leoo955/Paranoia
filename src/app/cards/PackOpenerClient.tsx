@@ -11,7 +11,7 @@ import confetti from 'canvas-confetti';
 
 type Player = { id: string; minecraftName: string };
 type TradingCard = { id: string; title: string; rarity: string; level: string; edition: string; description: string | null; player: Player | null; attributes?: string };
-type UserCard = { id: string; obtainedAt: Date; tradingCard: TradingCard };
+type UserCard = { id: string; obtainedAt: Date; tradingCard: TradingCard; specialEffect?: string | null };
 
 const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: number, boxType: string }) => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -116,10 +116,13 @@ export default function PackOpenerClient({
   const [coins, setCoins] = useState<number>(initialCoins || 0);
   const [selectedBoxType, setSelectedBoxType] = useState<string>("standard");
   const [isOpening, setIsOpening] = useState(false);
+  const [shake, setShake] = useState(false);
+  const [flash, setFlash] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   const [drawnCards, setDrawnCards] = useState<TradingCard[]>([]);
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
+  const [selectedUserCardEffect, setSelectedUserCardEffect] = useState<string | null>(null);
   const [openingGlow, setOpeningGlow] = useState<string | null>(null);
   const [showRatesModal, setShowRatesModal] = useState(false);
   
@@ -128,6 +131,9 @@ export default function PackOpenerClient({
 
   const [activeTab, setActiveTab] = useState<"opener" | "collection" | "catalogue">("opener");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterRarity, setFilterRarity] = useState("ALL");
+  const [filterEdition, setFilterEdition] = useState("ALL");
+  const [filterEffect, setFilterEffect] = useState("ALL");
   const [rarityFilter, setRarityFilter] = useState("ALL");
   const router = useRouter();
 
@@ -957,9 +963,37 @@ const buyBooster = async (type: string, price: number) => {
                 {(() => {
                    try {
                       const attrs = typeof selectedCard.attributes === 'string' ? JSON.parse(selectedCard.attributes) : (selectedCard.attributes || {});
-                      if (attrs.parentCardTitle) {
-                         return <p className="mt-4 text-sm font-bold text-fuchsia-400 bg-fuchsia-500/10 px-3 py-2 rounded-lg border border-fuchsia-500/20 inline-block">✨ Variante de : {attrs.parentCardTitle}</p>;
-                      }
+                      
+                      // Find if this card is a parent (has evolutions)
+                      const evolutions = allCards.filter(c => {
+                         try {
+                            return JSON.parse(c.attributes || '{}').parentCardId === selectedCard.id;
+                         } catch { return false; }
+                      });
+
+                      return (
+                        <div className="flex flex-col gap-2 mt-4">
+                          {attrs.parentCardTitle && (
+                            <p className="text-sm font-bold text-fuchsia-400 bg-fuchsia-500/10 px-3 py-2 rounded-lg border border-fuchsia-500/20 inline-block w-fit">
+                              ✨ Variante de : {attrs.parentCardTitle}
+                            </p>
+                          )}
+                          {evolutions.length > 0 && (
+                            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3">
+                              <p className="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <Sparkles className="w-3 h-3" /> Évolution(s) Possible(s)
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {evolutions.map(evo => (
+                                  <span key={evo.id} className="text-sm bg-black/40 text-indigo-200 px-3 py-1 rounded-full border border-indigo-500/30">
+                                    ➡️ {evo.title || evo.player?.minecraftName}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
                    } catch (e) {}
                    return null;
                 })()}

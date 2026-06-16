@@ -129,12 +129,22 @@ export async function POST(req: Request) {
     // Sort so the best card is last
     drawnCards.sort((a, b) => (rarityWeight[a.rarity] || 0) - (rarityWeight[b.rarity] || 0));
 
+    const SPECIAL_EFFECTS = ["Holographique", "Doré", "Ombré"];
+    const EFFECT_DROP_CHANCE = 0.02; // 2% chance
+
     const userCards = [];
     for (const card of drawnCards) {
+      // Roll for special effect
+      let specialEffect = null;
+      if (Math.random() < EFFECT_DROP_CHANCE) {
+        specialEffect = SPECIAL_EFFECTS[Math.floor(Math.random() * SPECIAL_EFFECTS.length)];
+      }
+
       const userCard = await prisma.userCard.create({
         data: {
           userId: userId,
           tradingCardId: card.id,
+          specialEffect: specialEffect,
         },
         include: {
           tradingCard: {

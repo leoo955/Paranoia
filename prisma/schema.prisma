@@ -167,6 +167,7 @@ model UserCard {
   tradingCardId String
   tradingCard   TradingCard @relation(fields: [tradingCardId], references: [id], onDelete: Cascade)
   obtainedAt    DateTime    @default(now())
+  specialEffect String?
 }
 
 model Player {

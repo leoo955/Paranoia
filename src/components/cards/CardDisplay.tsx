@@ -189,11 +189,17 @@ export default function CardDisplay({
   card, 
   size = "md",
   isEditing = false,
+  isOwned = false,
+  disableTilt = false,
+  specialEffect = null,
   onUpdateElement
 }: { 
   card: any, 
   size?: "sm" | "md" | "lg",
   isEditing?: boolean,
+  isOwned?: boolean,
+  disableTilt?: boolean,
+  specialEffect?: string | null,
   onUpdateElement?: (type: string, id: string, data: any) => void
 }) {
   // Define sizing classes based on 'size' prop
@@ -442,10 +448,19 @@ export default function CardDisplay({
           <img src={attrs.frameUrl} alt="Card Frame" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
         )}
 
-        {/* Special Effects Overlay */}
+        {/* Special Effects Overlay (From base card) */}
         {attrs.effect && attrs.effect !== "none" && (
           <div className="absolute inset-0 pointer-events-none rounded-xl z-50 overflow-hidden" style={{ transform: 'translateZ(40px)' }}>
             <div className={`absolute inset-0 w-full h-full ${attrs.effect === 'holo' ? 'effect-holo' : attrs.effect === 'shiny' ? 'effect-shiny' : attrs.effect === 'glitch' ? 'effect-glitch' : attrs.effect === 'paillettes' ? 'effect-paillettes' : ''}`} />
+          </div>
+        )}
+
+        {/* UserCard Instance Special Effect */}
+        {specialEffect && (
+          <div className="absolute inset-0 pointer-events-none rounded-xl z-[70] overflow-hidden" style={{ transform: 'translateZ(50px)' }}>
+            {specialEffect === "Holographique" && <div className="absolute inset-0 w-full h-full effect-holo opacity-80 mix-blend-color-dodge" />}
+            {specialEffect === "Doré" && <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-yellow-500/20 via-yellow-200/40 to-yellow-600/20 mix-blend-overlay shadow-[inset_0_0_20px_rgba(234,179,8,0.5)]" />}
+            {specialEffect === "Ombré" && <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-black/80 via-black/20 to-transparent mix-blend-multiply" />}
           </div>
         )}
 </InteractiveCard>
