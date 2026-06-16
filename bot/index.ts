@@ -75,15 +75,18 @@ async function buildCardListMessage(discordId: string, page: number) {
     if (res.ok) {
       const arrayBuffer = await res.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const attachment = new AttachmentBuilder(buffer, { name: 'card.png' });
-      embed.setImage('attachment://card.png');
+      const fileName = `card_${Date.now()}.png`;
+      const attachment = new AttachmentBuilder(buffer, { name: fileName });
+      embed.setImage(`attachment://${fileName}`);
       files.push(attachment);
     } else {
-      const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}`;
+      const timestamp = Date.now();
+      const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}?v=${timestamp}`;
       embed.setImage(bgImage);
     }
   } catch (error) {
-    const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}`;
+    const timestamp = Date.now();
+    const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}?v=${timestamp}`;
     embed.setImage(bgImage);
   }
 

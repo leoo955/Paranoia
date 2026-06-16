@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db';
 import { NextRequest } from 'next/server';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // We fetch fonts or just use default Satori fonts.
 // To keep it simple, we'll use default Satori sans-serif.
@@ -36,8 +38,9 @@ export async function GET(req: NextRequest) {
 
     const color = rarityColors[card.rarity] || '#94a3b8';
 
-    // Image URL fallback (crafty render)
-    const bgImage = card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || 'Steve'}`;
+    // Image URL fallback (crafty render) with cache buster
+    const timestamp = Date.now();
+    const bgImage = card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || 'Steve'}?v=${timestamp}`;
 
     return new ImageResponse(
       (
