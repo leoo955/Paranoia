@@ -1461,17 +1461,12 @@ export default function AdminPage() {
                   </select>
                 </div>
 
-                {/* Encadrement pour la Variante */}
-                <div className="mt-6 border-2 border-indigo-500/50 rounded-xl p-4 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.2)] relative">
-                  <div className="absolute -top-3 left-4 bg-[var(--color-bg-elevated)] px-2 text-indigo-400 font-bold text-sm flex items-center gap-2">
-                    ✨ Variante de Carte
-                  </div>
-                  <p className="text-xs text-[var(--color-text-secondary)] mb-3">Si cette carte est une variante spéciale (ex: signée, holographique...), ajoutez le badge ici.</p>
+                <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Carte d'origine (Optionnel)</label>
                   <select 
                     value={parentCardId}
                     onChange={(e) => setParentCardId(e.target.value)}
-                    className="w-full bg-black/40 border border-indigo-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-400 mb-4"
+                    className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
                     disabled={creatingCard}
                   >
                     <option value="" className="bg-[var(--color-bg-elevated)] text-white">-- Aucune (C'est une carte de base) --</option>
@@ -1479,8 +1474,10 @@ export default function AdminPage() {
                       <option key={c.id} value={c.id} className="bg-[var(--color-bg-elevated)] text-white">{c.title || c.playerName || "Carte sans nom"}</option>
                     ))}
                   </select>
-                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge de Variante (Profil existant ou Image Custom)</label>
-                  <div className="flex gap-2">
+                </div>
+                <div>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge de Variante</label>
+                  <div className="flex flex-col gap-2">
                     <select
                       value={variants.find(v => v.iconUrl === variantBadgeUrl)?.name || (variantBadgeUrl ? "custom" : "")}
                       onChange={(e) => {
@@ -1494,7 +1491,7 @@ export default function AdminPage() {
                            if (v) setVariantBadgeUrl(v.iconUrl || "");
                         }
                       }}
-                      className="bg-black/40 border border-indigo-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-400"
+                      className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
                       disabled={creatingCard}
                     >
                       <option value="" className="bg-[var(--color-bg-elevated)] text-white">-- Aucun --</option>
@@ -1504,30 +1501,34 @@ export default function AdminPage() {
                       <option value="custom" className="bg-[var(--color-bg-elevated)] text-white">URL Personnalisée</option>
                     </select>
 
-                    <input 
-                      type="text"
-                      value={variantBadgeUrl}
-                      onChange={(e) => setVariantBadgeUrl(e.target.value)}
-                      className="flex-1 bg-black/40 border border-indigo-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-400"
-                      placeholder="URL de l'image..."
-                      disabled={creatingCard}
-                    />
-                    <label className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg px-4 py-2 cursor-pointer flex items-center justify-center transition-colors font-bold shadow-lg shadow-indigo-500/20">
-                      Upload
-                      <input type="file" accept="image/png, image/jpeg, image/gif" className="hidden" onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const formData = new FormData();
-                        formData.append("file", file);
-                        try {
-                          const res = await fetch("/api/upload", { method: "POST", body: formData });
-                          if (res.ok) {
-                            const data = await res.json();
-                            setVariantBadgeUrl(data.url);
-                          }
-                        } catch (err) {}
-                      }} />
-                    </label>
+                    {(!variants.find(v => v.iconUrl === variantBadgeUrl) && variantBadgeUrl !== "" || variants.length === 0) && (
+                      <div className="flex gap-2 mt-2">
+                        <input 
+                          type="text"
+                          value={variantBadgeUrl}
+                          onChange={(e) => setVariantBadgeUrl(e.target.value)}
+                          className="flex-1 bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
+                          placeholder="URL de l'image..."
+                          disabled={creatingCard}
+                        />
+                        <label className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg px-4 py-2 cursor-pointer flex items-center justify-center transition-colors font-bold shadow-lg shadow-indigo-500/20">
+                          Upload
+                          <input type="file" accept="image/png, image/jpeg, image/gif" className="hidden" onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const formData = new FormData();
+                            formData.append("file", file);
+                            try {
+                              const res = await fetch("/api/upload", { method: "POST", body: formData });
+                              if (res.ok) {
+                                const data = await res.json();
+                                setVariantBadgeUrl(data.url);
+                              }
+                            } catch (err) {}
+                          }} />
+                        </label>
+                      </div>
+                    )}
                   </div>
                 </div>
 
