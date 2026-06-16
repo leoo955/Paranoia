@@ -64,11 +64,8 @@ async function buildCardListMessage(discordId: string, page: number) {
   };
 
   const embed = new EmbedBuilder()
-    .setTitle(currentCard.card.title)
     .setColor(colors[currentCard.card.rarity] || 0x94a3b8)
-    .setDescription(`**Possédée en x${currentCard.count} exemplaire(s)**\n\n${currentCard.card.description || ''}`)
-    .addFields({ name: 'Rareté', value: currentCard.card.rarity, inline: true })
-    .setFooter({ text: `Carte ${page + 1} / ${totalPages}` });
+    .setFooter({ text: `${currentCard.card.title} (x${currentCard.count}) | Page ${page + 1}/${totalPages}` });
 
   if (currentCard.card.imageUrl) {
     embed.setImage(currentCard.card.imageUrl);
