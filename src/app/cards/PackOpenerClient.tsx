@@ -13,7 +13,7 @@ type Player = { id: string; minecraftName: string };
 type TradingCard = { id: string; title: string; rarity: string; level: string; edition: string; description: string | null; player: Player | null; attributes?: string };
 type UserCard = { id: string; obtainedAt: Date; tradingCard: TradingCard; specialEffect?: string | null };
 
-const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: number, boxType: string }) => {
+const FlippableCard = ({ card, index, boxType, allCards }: { card: TradingCard, index: number, boxType: string, allCards: any[] }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showWow, setShowWow] = useState(false);
 
@@ -687,7 +687,7 @@ const buyBooster = async (type: string, price: number) => {
 
               <div className="flex flex-row justify-center items-center gap-6 md:gap-10 px-4 flex-wrap w-fit mx-auto max-w-full overflow-visible">
                 {drawnCards.map((card, i) => (
-                  <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} />
+                  <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} allCards={allCards} />
                 ))}
               </div>
               

@@ -1871,6 +1871,13 @@ export default function AdminPage() {
                 <CardDisplay 
                   isEditing={true}
                   onUpdateElement={handleUpdateElement}
+                  childVariantBadges={cards.filter(c => {
+                    try { return JSON.parse(c.attributes || '{}').parentCardId === editingCardId; } 
+                    catch { return false; }
+                  }).map(c => {
+                    try { return JSON.parse(c.attributes || '{}').variantBadgeUrl; } 
+                    catch { return null; }
+                  }).filter(Boolean)}
                   card={{
                     id: "preview",
                     title: cardTitle || players.find(p => p.id === cardPlayerId)?.minecraftName || "Joueur Inconnu",

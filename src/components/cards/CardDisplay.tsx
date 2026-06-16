@@ -192,6 +192,7 @@ export default function CardDisplay({
   isOwned = false,
   disableTilt = false,
   specialEffect = null,
+  childVariantBadges = [],
   onUpdateElement
 }: { 
   card: any, 
@@ -200,6 +201,7 @@ export default function CardDisplay({
   isOwned?: boolean,
   disableTilt?: boolean,
   specialEffect?: string | null,
+  childVariantBadges?: string[],
   onUpdateElement?: (type: string, id: string, data: any) => void
 }) {
   // Define sizing classes based on 'size' prop
@@ -353,23 +355,28 @@ export default function CardDisplay({
           />
         )}
 
-        {/* Variant Badge */}
-        {attrs.variantBadgeUrl && (
-          <img 
-            src={attrs.variantBadgeUrl} 
-            alt="Variant Badge"
-            className={`absolute z-[70] object-contain drop-shadow-md ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
-            style={{
-              left: `${variantBadgePos.x}%`,
-              top: `${variantBadgePos.y}%`,
-              width: `${variantBadgePos.scale * 0.15}cqi`,
-              transform: `translate(-50%, -50%) translateZ(70px)`
-            }}
-            onMouseDown={(e) => handleMouseDown(e, 'variantBadge')}
-            onWheel={(e) => handleWheel(e, 'variantBadge')}
-            draggable={false}
-          />
-        )}
+        {/* Fixed Variant Badges Container */}
+        <div className="absolute top-[2cqi] right-[2cqi] flex flex-row gap-[1cqi] z-[70] pointer-events-none items-center">
+          {attrs.variantBadgeUrl && (
+            <img 
+              src={attrs.variantBadgeUrl} 
+              alt="Variant Badge"
+              className="object-contain drop-shadow-md"
+              style={{ width: '15cqi', height: '15cqi' }}
+              draggable={false}
+            />
+          )}
+          {childVariantBadges.map((badgeUrl, idx) => (
+            <img 
+              key={idx}
+              src={badgeUrl} 
+              alt={`Variant Badge ${idx}`}
+              className="object-contain drop-shadow-md"
+              style={{ width: '15cqi', height: '15cqi' }}
+              draggable={false}
+            />
+          ))}
+        </div>
 
         {/* Side Text (Card ID or SMP branding) */}
         {!attrs.hideSideText && <div 
