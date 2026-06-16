@@ -267,11 +267,11 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         const row = new ActionRowBuilder<ButtonBuilder>()
           .addComponents(
             new ButtonBuilder()
-              .setCustomId(`trade_accept_${proposer.id}_${receiver.id}_${proposerCard.id}_${receiverCard.id}`)
+              .setCustomId(`trade_accept_${proposerCard.id}_${receiverCard.id}`)
               .setLabel('Accepter')
               .setStyle(ButtonStyle.Success),
             new ButtonBuilder()
-              .setCustomId(`trade_decline_${proposer.id}_${receiver.id}`)
+              .setCustomId(`trade_decline_${proposerCard.id}_${receiverCard.id}`)
               .setLabel('Refuser')
               .setStyle(ButtonStyle.Danger)
           );
@@ -444,10 +444,19 @@ client.on('interactionCreate', async (interaction: Interaction) => {
       if (interaction.customId.startsWith('trade_')) {
         const parts = interaction.customId.split('_');
         const action = parts[1]; // accept or decline
-        const proposerId = parts[2];
-        const receiverId = parts[3];
-        const proposerCardId = parts[4]; // userCard id (uuid)
-        const receiverCardId = parts[5]; // userCard id (uuid)
+        const proposerCardId = parts[2];
+        const receiverCardId = parts[3];
+
+        // Fetch cards to find owners
+        const rCard = await prisma.userCard.findUnique({ where: { id: receiverCardId }, include: { tradingCard: true } });
+        const pCard = await prisma.userCard.findUnique({ where: { id: proposerCardId }, include: { tradingCard: true } });
+
+        if (!rCard || !pCard) {
+            return await interaction.reply({ content: "Une des cartes n'est plus disponible (déjà échangée ?).", ephemeral: true });
+        }
+
+        const receiverId = rCard.userId;
+        const proposerId = pCard.userId;
 
         // Check if the person clicking is the intended receiver
         const currentUser = await getUserByDiscordId(interaction.user.id);
@@ -465,13 +474,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         }
 
         if (action === 'accept') {
-          // Verify both cards still exist and belong to their respective owners
-          const pCard = await prisma.userCard.findFirst({ where: { id: proposerCardId, userId: proposerId }, include: { tradingCard: true } });
-          const rCard = await prisma.userCard.findFirst({ where: { id: receiverCardId, userId: receiverId }, include: { tradingCard: true } });
-
-          if (!pCard || !rCard) {
-            return await interaction.reply({ content: 'Une des cartes n\'est plus disponible (déjà échangée ?).', ephemeral: true });
-          }
+          // Cards already verified above
 
           // Swap
           await prisma.$transaction([
