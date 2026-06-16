@@ -919,11 +919,11 @@ const buyBooster = async (type: string, price: number) => {
 
       {selectedCard && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[100] flex items-start md:items-center justify-center bg-black/95 p-4 overflow-y-auto animate-in fade-in duration-300 custom-scrollbar"
           onClick={() => setSelectedCard(null)}
         >
           <div 
-            className="relative w-full max-w-5xl flex flex-col md:flex-row items-center md:items-stretch gap-8 animate-slide-up"
+            className="relative w-full max-w-5xl flex flex-col md:flex-row items-center md:items-stretch gap-8 animate-slide-up my-auto py-8 md:py-0"
             onClick={(e) => e.stopPropagation()}
           >
             <button 
@@ -941,7 +941,7 @@ const buyBooster = async (type: string, price: number) => {
             </div>
 
             {/* Info Pane Side */}
-            <div className="flex-1 w-full bg-gradient-to-br from-[#161622] to-[#0a0a0f] border border-[var(--color-border-color)] rounded-3xl p-8 flex flex-col shadow-2xl relative overflow-hidden">
+            <div className="flex-1 w-full max-h-[80vh] overflow-y-auto custom-scrollbar bg-gradient-to-br from-[#161622] to-[#0a0a0f] border border-[var(--color-border-color)] rounded-3xl p-8 flex flex-col shadow-2xl relative">
               {/* Background decorative element */}
               <div className="absolute -right-20 -top-20 w-64 h-64 bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.2)_0%,_transparent_70%)] rounded-full pointer-events-none"></div>
               
@@ -984,18 +984,17 @@ const buyBooster = async (type: string, price: number) => {
                       return (
                         <div className="flex flex-col gap-2 mt-4">
                           {attrs.parentCardTitle && (
-                            <p className="text-sm font-bold text-fuchsia-400 bg-fuchsia-500/10 px-3 py-2 rounded-lg border border-fuchsia-500/20 inline-block w-fit">
-                              ✨ Variante de : {attrs.parentCardTitle}
-                            </p>
+                            <div className="mt-4 p-4 border border-[var(--color-accent-purple)] bg-[var(--color-accent-purple)]/10 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.3)] w-full text-center">
+                              <h4 className="text-[var(--color-accent-purple)] text-sm font-bold uppercase tracking-widest mb-1 break-words">Cette carte est une variante de</h4>
+                              <span className="text-white text-xl md:text-2xl font-black drop-shadow-md break-words block">✨ {attrs.parentCardTitle}</span>
+                            </div>
                           )}
                           {evolutions.length > 0 && (
-                            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3">
-                              <p className="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-2">
-                                <Sparkles className="w-3 h-3" /> Évolution(s) Possible(s)
-                              </p>
-                              <div className="flex flex-wrap gap-2">
+                            <div className="mt-4 p-4 border border-indigo-500 bg-indigo-500/10 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.3)] w-full text-center">
+                              <h4 className="text-indigo-400 text-sm font-bold uppercase tracking-widest mb-1 break-words">Évolution(s) Possible(s)</h4>
+                              <div className="flex flex-wrap justify-center gap-2 mt-2">
                                 {evolutions.map(evo => (
-                                  <span key={evo.id} className="text-sm bg-black/40 text-indigo-200 px-3 py-1 rounded-full border border-indigo-500/30">
+                                  <span key={evo.id} className="text-sm bg-black/40 text-indigo-200 px-3 py-1 rounded-full border border-indigo-500/30 break-words">
                                     ➡️ {evo.title || evo.player?.minecraftName}
                                   </span>
                                 ))}
