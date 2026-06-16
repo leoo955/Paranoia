@@ -3,14 +3,13 @@
 import { useState, useRef } from "react";
 
 export const getRarityGlow = (rarity: string) => {
-  switch(rarity) {
-    case "LEGENDARY": return "animate-pulse-glow-legendary";
-    case "MYTHIC": return "animate-pulse-glow-mythic";
-    case "EPIC": return "animate-pulse-glow-epic";
-    case "RARE": return "animate-pulse-glow-rare";
-    case "UNCOMMON": return "animate-pulse-glow-uncommon";
-    default: return "animate-pulse-glow-common";
-  }
+  const r = rarity.toUpperCase();
+  if (r === "MYTHIC" || r === "MYTHIQUE") return "animate-pulse-glow-mythic";
+  if (r === "LEGENDARY" || r === "LÉGENDAIRE" || r === "LEGENDAIRE") return "animate-pulse-glow-legendary";
+  if (r === "EPIC" || r === "ÉPIQUE" || r === "EPIQUE") return "animate-pulse-glow-epic";
+  if (r === "RARE") return "animate-pulse-glow-rare";
+  if (r === "UNCOMMON" || r === "PEU COMMUNE") return "animate-pulse-glow-uncommon";
+  return "animate-pulse-glow-common";
 };
 
 export const getLevelStyle = (level: string): React.CSSProperties => {
@@ -47,15 +46,13 @@ export const getLevelIcon = (level: string) => {
 };
 
 export const getRarityBadge = (rarity: string) => {
-  switch(rarity) {
-    case 'COMMON': return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
-    case 'UNCOMMON': return 'bg-green-500/20 text-green-400 border-green-500/50';
-    case 'RARE': return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
-    case 'EPIC': return 'bg-purple-500/20 text-purple-400 border-purple-500/50';
-    case 'LEGENDARY': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
-    case 'MYTHIC': return 'bg-red-500/20 text-red-500 border-red-500/50 font-black shadow-[0_0_10px_rgba(239,68,68,0.5)]';
-    default: return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
-  }
+  const r = rarity.toUpperCase();
+  if (r === "MYTHIC" || r === "MYTHIQUE") return 'bg-red-500/20 text-red-500 border-red-500/50 font-black shadow-[0_0_10px_rgba(239,68,68,0.5)]';
+  if (r === "LEGENDARY" || r === "LÉGENDAIRE" || r === "LEGENDAIRE") return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50';
+  if (r === "EPIC" || r === "ÉPIQUE" || r === "EPIQUE") return 'bg-purple-500/20 text-purple-400 border-purple-500/50';
+  if (r === "RARE") return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
+  if (r === "UNCOMMON" || r === "PEU COMMUNE") return 'bg-green-500/20 text-green-400 border-green-500/50';
+  return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
 }
 
 export const InteractiveCard = ({ card, children, className = "", style: customStyle = {} }: { card: any, children: React.ReactNode, className?: string, style?: React.CSSProperties }) => {
@@ -95,9 +92,9 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
     transformStyle: "preserve-3d",
   };
 
-  const isRare = card.rarity === "RARE" || card.rarity === "EPIC" || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
-  const isEpicOrLegendary = card.rarity === "EPIC" || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
-  const isLegendary = card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
+  const isRare = ["RARE", "EPIC", "ÉPIQUE", "EPIQUE", "LEGENDARY", "LÉGENDAIRE", "LEGENDAIRE", "MYTHIC", "MYTHIQUE"].includes(card.rarity.toUpperCase());
+  const isEpicOrLegendary = ["EPIC", "ÉPIQUE", "EPIQUE", "LEGENDARY", "LÉGENDAIRE", "LEGENDAIRE", "MYTHIC", "MYTHIQUE"].includes(card.rarity.toUpperCase());
+  const isLegendary = ["LEGENDARY", "LÉGENDAIRE", "LEGENDAIRE", "MYTHIC", "MYTHIQUE"].includes(card.rarity.toUpperCase());
 
   const hasVideoBg = card?.customBackground && (card.customBackground.includes('.mp4') || card.customBackground.includes('.webm'));
   const attrs = typeof card?.attributes === 'string' ? JSON.parse(card.attributes) : (card?.attributes || {});
@@ -224,7 +221,7 @@ export default function CardDisplay({
     attrs = typeof card.attributes === 'string' ? JSON.parse(card.attributes) : (card.attributes || {});
   } catch (e) {}
 
-  const isPremiumLayout = attrs.isFullArt || card.rarity === "LEGENDARY" || card.rarity === "MYTHIC";
+  const isPremiumLayout = attrs.isFullArt || ["LEGENDARY", "LÉGENDAIRE", "LEGENDAIRE", "MYTHIC", "MYTHIQUE"].includes(card.rarity.toUpperCase());
 
   // Full Art no longer overrides default positions rigidly, positions are managed by Admin state
   const titlePos = attrs.titlePos || { x: 50, y: 75, scale: 100 };
