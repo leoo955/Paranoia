@@ -985,15 +985,21 @@ const buyBooster = async (type: string, price: number) => {
                       return (
                         <div className="flex flex-col gap-2 mt-4">
                           {attrs.parentCardTitle && (
-                            <div className="mt-4 p-4 border border-[var(--color-accent-purple)] bg-[var(--color-accent-purple)]/10 rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.3)] w-full text-center">
-                              <h4 className="text-[var(--color-accent-purple)] text-sm font-bold uppercase tracking-widest mb-1 break-words">Cette carte est une variante de</h4>
-                              <span className="text-white text-xl md:text-2xl font-black drop-shadow-md break-words block">✨ {attrs.parentCardTitle}</span>
+                            <div className="bg-fuchsia-500/10 border border-fuchsia-500/20 rounded-lg p-3">
+                              <p className="text-xs font-bold text-fuchsia-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <Sparkles className="w-3 h-3" /> Variante de
+                              </p>
+                              <span className="text-sm font-bold text-white bg-black/40 px-3 py-1.5 rounded-lg border border-fuchsia-500/30 break-words inline-block">
+                                {attrs.parentCardTitle}
+                              </span>
                             </div>
                           )}
                           {evolutions.length > 0 && (
-                            <div className="mt-4 p-4 border border-indigo-500 bg-indigo-500/10 rounded-xl shadow-[0_0_15px_rgba(99,102,241,0.3)] w-full text-center">
-                              <h4 className="text-indigo-400 text-sm font-bold uppercase tracking-widest mb-1 break-words">Évolution(s) Possible(s)</h4>
-                              <div className="flex flex-wrap justify-center gap-2 mt-2">
+                            <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-3 mt-2">
+                              <p className="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                <Sparkles className="w-3 h-3" /> Évolution(s) Possible(s)
+                              </p>
+                              <div className="flex flex-wrap gap-2">
                                 {evolutions.map(evo => (
                                   <span key={evo.id} className="text-sm bg-black/40 text-indigo-200 px-3 py-1 rounded-full border border-indigo-500/30 break-words">
                                     ➡️ {evo.title || evo.player?.minecraftName}
