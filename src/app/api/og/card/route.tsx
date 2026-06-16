@@ -2,7 +2,6 @@ import { ImageResponse } from 'next/og';
 import { prisma } from '@/lib/db';
 import { NextRequest } from 'next/server';
 
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
