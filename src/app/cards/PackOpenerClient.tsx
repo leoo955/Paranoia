@@ -374,19 +374,7 @@ export default function PackOpenerClient({
         <div className="bg-[#0f0f16] border border-indigo-500/20 rounded-3xl p-4 lg:p-6 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0f0f16] to-[#0f0f16] pointer-events-none" />
           
-          {/* FOMO TICKER */}
-          <div className="absolute top-4 w-full flex justify-center z-20">
-            <div className="bg-red-500/10 border border-red-500/30 backdrop-blur-md px-6 py-2 rounded-full flex items-center gap-3 animate-pulse-glow">
-              <Flame className="w-5 h-5 text-red-500" />
-              <p className="text-sm font-bold text-white tracking-wide">
-                <span className="text-red-400">{fomoDrop.player}</span> vient d'obtenir une carte <span className={
-                  fomoDrop.rarity === 'Mythique' ? 'text-red-500 font-black' :
-                  fomoDrop.rarity === 'Légendaire' ? 'text-yellow-400 font-black' : 'text-purple-400 font-black'
-                }>{fomoDrop.rarity}</span> ! 
-                <span className="text-white/40 ml-2 font-normal text-xs">il y a {fomoDrop.time} min</span>
-              </p>
-            </div>
-          </div>
+
 
           {!showReveal && (
             <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6 lg:gap-10 mb-4 z-10 mt-14 relative">
