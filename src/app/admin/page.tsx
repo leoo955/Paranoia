@@ -1108,20 +1108,20 @@ export default function AdminPage() {
   const [batchProgress, setBatchProgress] = useState(0);
   const [batchTotal, setBatchTotal] = useState(0);
 
-  const handleGenerateMissingImages = () => {
-    const missing = cards.filter(c => !c.renderedImageUrl || c.renderedImageUrl.startsWith('/uploads'));
-    if (missing.length === 0) {
+  const handleGenerateImages = (regenerateAll = false) => {
+    const targetCards = regenerateAll ? cards : cards.filter(c => !c.renderedImageUrl || c.renderedImageUrl.startsWith('/uploads'));
+    if (targetCards.length === 0) {
       toast("Toutes les cartes ont déjà leur image Discord !", { icon: '⚠️' });
       return;
     }
 
-    confirmToast(`Voulez-vous générer l'image Discord pour ${missing.length} cartes ? Cela peut prendre du temps.`, async () => {
+    confirmToast(`Voulez-vous ${regenerateAll ? 'regénérer' : 'générer'} l'image Discord pour ${targetCards.length} cartes ? Cela peut prendre du temps.`, async () => {
       setIsBatchGenerating(true);
-      setBatchTotal(missing.length);
+      setBatchTotal(targetCards.length);
       setBatchProgress(0);
 
-      for (let i = 0; i < missing.length; i++) {
-        const card = missing[i];
+      for (let i = 0; i < targetCards.length; i++) {
+        const card = targetCards[i];
         // 1. Set the card in the editor
         startEditCard(card);
         
@@ -1844,23 +1844,42 @@ export default function AdminPage() {
             <div className="pt-8 border-t border-[var(--color-border-color)]">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold font-outfit text-white">Cartes Créées ({cards.length})</h2>
-                <button 
-                  onClick={handleGenerateMissingImages}
-                  disabled={isBatchGenerating}
-                  className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm"
-                >
-                  {isBatchGenerating ? (
-                    <>
-                      <span className="animate-spin text-lg">↻</span>
-                      Génération... ({batchProgress}/{batchTotal})
-                    </>
-                  ) : (
-                    <>
-                      <ImagePlus size={16} />
-                      Générer les images Discord manquantes
-                    </>
-                  )}
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleGenerateImages(false)}
+                    disabled={isBatchGenerating}
+                    className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm"
+                  >
+                    {isBatchGenerating ? (
+                      <>
+                        <span className="animate-spin text-lg">↻</span>
+                        Génération... ({batchProgress}/{batchTotal})
+                      </>
+                    ) : (
+                      <>
+                        <ImagePlus size={16} />
+                        Générer manquantes
+                      </>
+                    )}
+                  </button>
+                  <button 
+                    onClick={() => handleGenerateImages(true)}
+                    disabled={isBatchGenerating}
+                    className="bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm"
+                  >
+                    {isBatchGenerating ? (
+                      <>
+                        <span className="animate-spin text-lg">↻</span>
+                        Génération...
+                      </>
+                    ) : (
+                      <>
+                        <ImagePlus size={16} />
+                        Tout Regénérer
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {cards.map(card => (
