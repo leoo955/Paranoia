@@ -314,7 +314,7 @@ export default function PackOpenerClient({
       </div>
 
       {activeTab === "opener" && (
-        <div className="bg-[#0f0f16] border border-indigo-500/20 rounded-3xl p-8 lg:p-16 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
+        <div className="bg-[#0f0f16] border border-indigo-500/20 rounded-3xl p-6 lg:p-10 flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0f0f16] to-[#0f0f16] pointer-events-none" />
           
           {/* FOMO TICKER */}
@@ -331,34 +331,42 @@ export default function PackOpenerClient({
             </div>
           </div>
 
-          <h2 className="text-4xl lg:text-5xl font-outfit font-black text-white mt-10 mb-4 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Ouvrir des Boosters</h2>
+          <h2 className="text-3xl lg:text-4xl font-outfit font-black text-white mt-4 mb-2 z-10 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 drop-shadow-lg">Ouvrir des Boosters</h2>
           
-          <div className="flex flex-col items-center gap-4 mb-12 z-10">
-            <p className="text-[var(--color-text-secondary)] max-w-xl text-lg">
+          <div className="flex flex-col items-center gap-2 mb-6 z-10">
+            <p className="text-[var(--color-text-secondary)] max-w-xl text-base">
               Sélectionnez un booster et ouvrez-le pour obtenir de nouvelles cartes !
             </p>
-            <button 
-              onClick={() => setShowRatesModal(true)}
-              className="text-sm bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-lg text-white/70 hover:text-white transition-colors flex items-center gap-2"
-            >
-              <Search className="w-4 h-4" /> Voir les Drop Rates
-            </button>
           </div>
 
           {!showReveal && (
-            <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 z-10">
+            <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 z-10">
               {/* Standard Box */}
               <div 
                 onClick={() => setSelectedBoxType("standard")}
                 className={`p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "standard" ? "bg-blue-900/30 border-blue-400 shadow-[0_0_30px_rgba(59,130,246,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-blue-500/50 opacity-80 hover:opacity-100"}`}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
                 <div className="w-24 h-24 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
                   <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
                   <img src="/StandardB.png" alt="Standard" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] relative z-10" />
                 </div>
                 <div className="relative z-10 text-center">
-                  <h3 className="text-2xl font-black text-blue-300 drop-shadow-md tracking-wide font-outfit uppercase">Standard</h3>
+                  <div className="flex items-center justify-center gap-2 group/info relative">
+                    <h3 className="text-2xl font-black text-blue-300 drop-shadow-md tracking-wide font-outfit uppercase">Standard</h3>
+                    <div className="w-5 h-5 rounded-full border border-blue-400/50 flex items-center justify-center text-blue-400 text-xs font-bold cursor-help hover:bg-blue-400/20">?</div>
+                    <div className="absolute bottom-full mb-2 w-48 bg-black/95 border border-white/10 rounded-xl p-3 shadow-2xl opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-50 left-1/2 -translate-x-1/2">
+                      <h4 className="font-bold text-blue-400 mb-1 uppercase tracking-wider text-xs border-b border-white/10 pb-1">Taux de Drop</h4>
+                      <ul className="text-[10px] text-left w-full space-y-1 font-medium">
+                        <li className="flex justify-between text-gray-400"><span>Commune</span><span>40%</span></li>
+                        <li className="flex justify-between text-green-400"><span>Peu Commune</span><span>30%</span></li>
+                        <li className="flex justify-between text-blue-400"><span>Rare</span><span>20%</span></li>
+                        <li className="flex justify-between text-purple-400"><span>Épique</span><span>8%</span></li>
+                        <li className="flex justify-between text-yellow-400"><span>Légendaire</span><span>2%</span></li>
+                      </ul>
+                    </div>
+                  </div>
                   <p className="text-xs text-blue-200/70 mt-2 font-medium">Toutes les raretés</p>
                 </div>
                 <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
@@ -383,12 +391,26 @@ export default function PackOpenerClient({
                 className={`p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "premium" ? "bg-purple-900/30 border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-purple-500/50 opacity-80 hover:opacity-100"}`}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
                 <div className="w-24 h-24 rounded-full bg-purple-500/20 flex items-center justify-center border border-purple-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
                   <div className="absolute inset-0 bg-purple-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
                   <img src="/PreniumB.png" alt="Premium" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(168,85,247,0.6)] relative z-10" />
                 </div>
                 <div className="relative z-10 text-center">
-                  <h3 className="text-2xl font-black text-purple-300 drop-shadow-md tracking-wide font-outfit uppercase">Premium</h3>
+                  <div className="flex items-center justify-center gap-2 group/info relative">
+                    <h3 className="text-2xl font-black text-purple-300 drop-shadow-md tracking-wide font-outfit uppercase">Premium</h3>
+                    <div className="w-5 h-5 rounded-full border border-purple-400/50 flex items-center justify-center text-purple-400 text-xs font-bold cursor-help hover:bg-purple-400/20">?</div>
+                    <div className="absolute bottom-full mb-2 w-48 bg-black/95 border border-white/10 rounded-xl p-3 shadow-2xl opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-50 left-1/2 -translate-x-1/2">
+                      <h4 className="font-bold text-purple-400 mb-1 uppercase tracking-wider text-xs border-b border-white/10 pb-1">Taux de Drop</h4>
+                      <ul className="text-[10px] text-left w-full space-y-1 font-medium">
+                        <li className="flex justify-between text-gray-400"><span>Commune</span><span>20%</span></li>
+                        <li className="flex justify-between text-green-400"><span>Peu Commune</span><span>25%</span></li>
+                        <li className="flex justify-between text-blue-400"><span>Rare</span><span>35%</span></li>
+                        <li className="flex justify-between text-purple-400"><span>Épique</span><span>15%</span></li>
+                        <li className="flex justify-between text-yellow-400"><span>Légendaire</span><span>5%</span></li>
+                      </ul>
+                    </div>
+                  </div>
                   <p className="text-xs text-purple-200/70 mt-2 font-medium">Mini. Rare garanti</p>
                 </div>
                 <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
@@ -413,12 +435,26 @@ export default function PackOpenerClient({
                 className={`p-6 rounded-3xl border-2 transition-all duration-500 flex flex-col items-center gap-4 cursor-pointer relative overflow-hidden group ${selectedBoxType === "legendary" ? "bg-amber-900/30 border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.4)] scale-105" : "bg-black/40 backdrop-blur-md border-white/10 hover:border-amber-500/50 opacity-80 hover:opacity-100"}`}
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
                 <div className="w-24 h-24 rounded-full bg-amber-500/20 flex items-center justify-center border border-amber-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500">
                   <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
                   <img src="/StandardB.png" alt="Legendary" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(245,158,11,0.8)] hue-rotate-180 brightness-150 relative z-10" />
                 </div>
                 <div className="relative z-10 text-center">
-                  <h3 className="text-2xl font-black text-amber-400 drop-shadow-md tracking-wide font-outfit uppercase">Légendaire</h3>
+                  <div className="flex items-center justify-center gap-2 group/info relative">
+                    <h3 className="text-2xl font-black text-amber-400 drop-shadow-md tracking-wide font-outfit uppercase">Légendaire</h3>
+                    <div className="w-5 h-5 rounded-full border border-amber-400/50 flex items-center justify-center text-amber-400 text-xs font-bold cursor-help hover:bg-amber-400/20">?</div>
+                    <div className="absolute bottom-full mb-2 w-48 bg-black/95 border border-white/10 rounded-xl p-3 shadow-2xl opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-50 left-1/2 -translate-x-1/2">
+                      <h4 className="font-bold text-amber-400 mb-1 uppercase tracking-wider text-xs border-b border-white/10 pb-1">Taux de Drop</h4>
+                      <ul className="text-[10px] text-left w-full space-y-1 font-medium">
+                        <li className="flex justify-between text-gray-400"><span>Commune</span><span>10%</span></li>
+                        <li className="flex justify-between text-green-400"><span>Peu Commune</span><span>15%</span></li>
+                        <li className="flex justify-between text-blue-400"><span>Rare</span><span>40%</span></li>
+                        <li className="flex justify-between text-purple-400"><span>Épique</span><span>25%</span></li>
+                        <li className="flex justify-between text-yellow-400"><span>Légendaire</span><span>10%</span></li>
+                      </ul>
+                    </div>
+                  </div>
                   <p className="text-xs text-amber-200/70 mt-2 font-medium">Mini. Épique garanti</p>
                 </div>
                 <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
@@ -446,14 +482,25 @@ export default function PackOpenerClient({
                   <Clock className="w-3 h-3" /> Offre Flash
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-b from-red-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
                 <div className="w-24 h-24 rounded-full bg-red-500/20 flex items-center justify-center border border-red-500/50 relative z-10 group-hover:scale-110 transition-transform duration-500 mt-2">
                   <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
                   <img src="/MythiqueB.png" alt="Mythique" className="w-20 h-20 object-contain drop-shadow-[0_0_15px_rgba(239,68,68,0.8)] relative z-10 animate-pulse-glow" />
                 </div>
                 <div className="relative z-10 text-center">
-                  <h3 className="text-2xl font-black text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,1)] tracking-wide font-outfit uppercase">Mythique</h3>
+                  <div className="flex items-center justify-center gap-2 group/info relative">
+                    <h3 className="text-2xl font-black text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,1)] tracking-wide font-outfit uppercase">Mythique</h3>
+                    <div className="w-5 h-5 rounded-full border border-red-500/50 flex items-center justify-center text-red-500 text-xs font-bold cursor-help hover:bg-red-500/20">?</div>
+                    <div className="absolute bottom-full mb-2 w-48 bg-black/95 border border-white/10 rounded-xl p-3 shadow-2xl opacity-0 group-hover/info:opacity-100 transition-opacity duration-200 pointer-events-none z-50 left-1/2 -translate-x-1/2">
+                      <h4 className="font-bold text-red-500 mb-1 uppercase tracking-wider text-xs border-b border-white/10 pb-1">Taux de Drop</h4>
+                      <ul className="text-[10px] text-left w-full space-y-1 font-medium">
+                        <li className="flex justify-between text-purple-400"><span>Épique</span><span>75%</span></li>
+                        <li className="flex justify-between text-yellow-400"><span>Légendaire</span><span>20%</span></li>
+                        <li className="flex justify-between text-red-500"><span>Mythique</span><span>5%</span></li>
+                      </ul>
+                    </div>
+                  </div>
                   <p className="text-xs text-red-200/70 mt-2 font-medium">Légendaire ou Mythique</p>
-                  <p className="text-[10px] text-red-400 font-bold mt-1 bg-red-500/20 rounded-full px-2 py-0.5 inline-block">Il n'en reste que 3 !</p>
                 </div>
                 <div className="mt-4 w-full flex flex-col gap-3 relative z-10">
                   <div className="px-4 py-1.5 mx-auto rounded-full bg-black/60 border border-white/10 font-mono font-bold text-white shadow-inner">

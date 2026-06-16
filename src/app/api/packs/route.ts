@@ -92,9 +92,22 @@ export async function POST(req: Request) {
       }
 
       // If no cards exist for that rarity, fallback to a lower one
-      const pool = cardsByRarity[selectedRarity] && cardsByRarity[selectedRarity].length > 0 
-        ? cardsByRarity[selectedRarity] 
-        : cards; 
+      const fallbackOrder = ['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'];
+      let startIndex = fallbackOrder.indexOf(selectedRarity);
+      if (startIndex === -1) startIndex = fallbackOrder.length - 1;
+
+      let pool = cardsByRarity[selectedRarity];
+      if (!pool || pool.length === 0) {
+        // Try stepping down to lower rarities
+        for (let i = startIndex + 1; i < fallbackOrder.length; i++) {
+          if (cardsByRarity[fallbackOrder[i]] && cardsByRarity[fallbackOrder[i]].length > 0) {
+            pool = cardsByRarity[fallbackOrder[i]];
+            break;
+          }
+        }
+        // If still nothing, fallback to all cards
+        if (!pool || pool.length === 0) pool = cards;
+      }
 
       return pool[Math.floor(Math.random() * pool.length)];
     };
