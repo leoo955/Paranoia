@@ -959,7 +959,7 @@ const buyBooster = async (type: string, price: number) => {
               {selectedCard.player && (
                 <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between relative z-10 bg-white/5 rounded-xl p-4">
                   <div className="flex items-center gap-4">
-                    <img src={`https://vzge.me/bust/256/${selectedCard.player.minecraftName}.png`} alt="Skin" className="w-12 h-12 object-contain drop-shadow-lg" />
+                    <img src={`https://vzge.me/bust/512/${selectedCard.player.minecraftName}.png`} alt="Skin" className="w-12 h-12 object-contain drop-shadow-lg" />
                     <div>
                       <span className="text-xs text-[var(--color-text-secondary)] block uppercase tracking-wider font-bold">Joueur Associé</span>
                       <span className="text-lg font-black text-white">{selectedCard.player.minecraftName}</span>

@@ -189,7 +189,7 @@ export default function TierListPage() {
                     onDragStart={(e) => handleDragStart(e, item)}
                     className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] px-3 py-2 rounded shadow-sm text-sm font-medium text-white flex flex-col items-center gap-1 cursor-grab hover:border-[var(--color-accent-purple)] transition-colors relative group"
                   >
-                    <img src={`https://vzge.me/bust/256/${item}.png`} alt={item} className="w-12 h-12 object-contain pointer-events-none" />
+                    <img src={`https://vzge.me/bust/512/${item}.png`} alt={item} className="w-12 h-12 object-contain pointer-events-none" />
                     <span>{item}</span>
                     <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 cursor-pointer" onClick={() => handleRemoveFromTier(item)}>
                       <Trash2 className="w-3 h-3 text-red-500 hover:text-red-400" />
@@ -222,7 +222,7 @@ export default function TierListPage() {
                onDragStart={(e) => handleDragStart(e, item)}
                className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] px-3 py-2 rounded shadow-sm text-sm font-medium text-white flex flex-col items-center gap-1 cursor-grab hover:border-[var(--color-accent-purple)] transition-colors relative group"
             >
-               <img src={`https://vzge.me/bust/256/${item}.png`} alt={item} className="w-12 h-12 object-contain pointer-events-none" />
+               <img src={`https://vzge.me/bust/512/${item}.png`} alt={item} className="w-12 h-12 object-contain pointer-events-none" />
                <span>{item}</span>
             </div>
           ))}
