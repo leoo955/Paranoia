@@ -391,6 +391,32 @@ export default function AdminPage() {
     setCardError("");
 
     try {
+      let capturedImageUrl: string | undefined = undefined;
+      try {
+        const cardElement = document.getElementById("live-preview-card");
+        if (cardElement) {
+          const canvas = await html2canvas(cardElement, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            scale: 2
+          });
+          const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+          if (blob) {
+            const file = new File([blob], `card_${Date.now()}_discord.png`, { type: 'image/png' });
+            const formData = new FormData();
+            formData.append('file', file);
+            const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+            if (uploadRes.ok) {
+              const { url } = await uploadRes.json();
+              capturedImageUrl = url;
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Auto-capture failed:", err);
+      }
+
       const player = players.find(p => p.id === cardPlayerId);
       const url = "/api/cards";
       const method = editingCardId ? "PUT" : "POST";
@@ -406,6 +432,7 @@ export default function AdminPage() {
         description: cardDesc,
         customBackground: cardCustomBg,
         imageUrl: cardImageUrl,
+        renderedImageUrl: capturedImageUrl,
         customBadges: cardCustomBadges,
         characterPosition: { x: charPosX, y: charPosY, scale: charScale },
         attributes: {
@@ -871,6 +898,75 @@ export default function AdminPage() {
     } catch (err) {
       console.error("Failed to delete", err);
     }
+  };
+  const [isBatchGenerating, setIsBatchGenerating] = useState(false);
+  const [batchProgress, setBatchProgress] = useState(0);
+  const [batchTotal, setBatchTotal] = useState(0);
+
+  const handleGenerateMissingImages = async () => {
+    const missing = cards.filter(c => !c.renderedImageUrl);
+    if (missing.length === 0) {
+      alert("Toutes les cartes ont déjà leur image Discord !");
+      return;
+    }
+
+    if (!confirm(`Voulez-vous générer l'image Discord pour ${missing.length} cartes ? Cela peut prendre du temps.`)) return;
+
+    setIsBatchGenerating(true);
+    setBatchTotal(missing.length);
+    setBatchProgress(0);
+
+    for (let i = 0; i < missing.length; i++) {
+      const card = missing[i];
+      // 1. Set the card in the editor
+      startEditCard(card);
+      
+      // 2. Wait for React to re-render the CardDisplay with the new states
+      await new Promise(r => setTimeout(r, 1000));
+
+      // 3. Capture
+      try {
+        const cardElement = document.getElementById("live-preview-card");
+        if (cardElement) {
+          const canvas = await html2canvas(cardElement, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            scale: 2
+          });
+          const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+          if (blob) {
+            const file = new File([blob], `card_${card.id}_discord.png`, { type: 'image/png' });
+            const formData = new FormData();
+            formData.append('file', file);
+            const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+            if (uploadRes.ok) {
+              const { url } = await uploadRes.json();
+              await fetch('/api/cards', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: card.id, renderedImageUrl: url }),
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Failed for card", card.id, err);
+      }
+      setBatchProgress(i + 1);
+    }
+
+    // Refresh cards
+    const res = await fetch('/api/cards');
+    if (res.ok) {
+      const data = await res.json();
+      setCards(data);
+    }
+    
+    // Clear editor
+    cancelEdit();
+    setIsBatchGenerating(false);
+    alert("Génération terminée !");
   };
 
   return (
@@ -1472,7 +1568,26 @@ export default function AdminPage() {
             </div>
 
             <div className="pt-8 border-t border-[var(--color-border-color)]">
-              <h2 className="text-2xl font-bold font-outfit text-white mb-6">Cartes Créées ({cards.length})</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold font-outfit text-white">Cartes Créées ({cards.length})</h2>
+                <button 
+                  onClick={handleGenerateMissingImages}
+                  disabled={isBatchGenerating}
+                  className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm"
+                >
+                  {isBatchGenerating ? (
+                    <>
+                      <span className="animate-spin text-lg">↻</span>
+                      Génération... ({batchProgress}/{batchTotal})
+                    </>
+                  ) : (
+                    <>
+                      <ImagePlus size={16} />
+                      Générer les images Discord manquantes
+                    </>
+                  )}
+                </button>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {cards.map(card => (
                   <div key={card.id} className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg p-4 flex flex-col gap-2 relative overflow-hidden group">
