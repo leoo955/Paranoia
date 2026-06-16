@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, ChannelType, PermissionsBitField, TextChannel } from 'discord.js';
+import { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, Interaction, ChannelType, PermissionsBitField, TextChannel, AttachmentBuilder } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
 import path from 'path';
@@ -67,8 +67,24 @@ async function buildCardListMessage(discordId: string, page: number) {
     .setColor(colors[currentCard.card.rarity] || 0x94a3b8)
     .setFooter({ text: `${currentCard.card.title} (x${currentCard.count}) | Page ${page + 1}/${totalPages}` });
 
-  const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}`;
-  embed.setImage(bgImage);
+  let files: any[] = [];
+  try {
+    const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const res = await fetch(`${appUrl}/api/og/card?id=${currentCard.card.id}`);
+    if (res.ok) {
+      const arrayBuffer = await res.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const attachment = new AttachmentBuilder(buffer, { name: 'card.png' });
+      embed.setImage('attachment://card.png');
+      files.push(attachment);
+    } else {
+      const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}`;
+      embed.setImage(bgImage);
+    }
+  } catch (error) {
+    const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}`;
+    embed.setImage(bgImage);
+  }
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
@@ -83,7 +99,7 @@ async function buildCardListMessage(discordId: string, page: number) {
       .setDisabled(page === totalPages - 1)
   );
 
-  return { embeds: [embed], components: [row] };
+  return { embeds: [embed], components: [row], files };
 }
 
 const token = process.env.DISCORD_TOKEN;
