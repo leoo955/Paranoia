@@ -325,10 +325,12 @@ export default function CardDisplay({
 
         {/* Top-Right: Rarity Box */}
         {!attrs.hideRarityBox && <div 
-          className={`absolute z-30 flex items-center ${rarityBgColor} border-white rounded-bl-xl rounded-tr-md shadow-lg overflow-hidden`}
+          className={`absolute z-30 flex items-center ${rarityBgColor} border-white shadow-lg overflow-hidden`}
           style={{ 
-            top: '2%', right: '2%',
-            borderWidth: '0.4cqi',
+            top: '0', right: '0',
+            borderBottomWidth: '0.4cqi',
+            borderLeftWidth: '0.4cqi',
+            borderBottomLeftRadius: '2cqi',
             transform: `translateZ(${translateZ})`
           }}
         >
