@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Users, LayoutList, Trash2, ShieldAlert, Sparkles, Layers, PackageOpen } from "lucide-react";
+import { Plus, Users, LayoutList, Trash2, ShieldAlert, Sparkles, Layers, PackageOpen, ImagePlus, UploadCloud } from "lucide-react";
 import CardDisplay from "@/components/cards/CardDisplay";
+import html2canvas from "html2canvas";
 
 type Player = {
   id: string;
@@ -322,6 +323,60 @@ export default function AdminPage() {
       if (type === 'customBadge') {
          setCardCustomBadges(prev => prev.map((b, i) => String(i) === id || b.id === id ? { ...b, size: Math.max(10, Math.min(200, b.size + delta)) } : b));
       }
+    }
+  };
+
+  const [isCapturing, setIsCapturing] = useState(false);
+
+  const handleCaptureDiscordImage = async () => {
+    if (!editingCardId) return;
+    
+    setIsCapturing(true);
+    try {
+      const cardElement = document.getElementById("live-preview-card");
+      if (!cardElement) throw new Error("Card element not found");
+
+      // We wait for any images to be fully loaded
+      const canvas = await html2canvas(cardElement, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: null, // Keep transparency
+        scale: 2 // High resolution
+      });
+
+      // Convert to blob
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error("Could not create image blob");
+
+      const file = new File([blob], `card_${editingCardId}_discord.png`, { type: 'image/png' });
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadRes.ok) throw new Error("Upload failed");
+      const { url } = await uploadRes.json();
+
+      // Update card with rendered image
+      const updateRes = await fetch('/api/cards', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editingCardId, renderedImageUrl: url }),
+      });
+
+      if (!updateRes.ok) throw new Error("Failed to save image url to card");
+      
+      // Update local state
+      setCards(cards.map(c => c.id === editingCardId ? { ...c, renderedImageUrl: url } : c));
+      alert("Image Discord générée et sauvegardée avec succès !");
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de la capture : " + err);
+    } finally {
+      setIsCapturing(false);
     }
   };
 
@@ -1372,8 +1427,23 @@ export default function AdminPage() {
                   }} 
                   size="lg" 
                 />
+                </div>
+                {editingCardId && (
+                  <button 
+                    type="button" 
+                    onClick={handleCaptureDiscordImage} 
+                    disabled={isCapturing}
+                    className="mt-6 w-full max-w-[350px] btn-primary py-3 flex items-center justify-center gap-2"
+                  >
+                    {isCapturing ? (
+                      <span className="animate-spin text-xl">↻</span>
+                    ) : (
+                      <ImagePlus size={18} />
+                    )}
+                    {isCapturing ? "Génération en cours..." : "Figer la carte pour Discord"}
+                  </button>
+                )}
               </div>
-            </div>
             </div>
 
             <div className="pt-8 border-t border-[var(--color-border-color)] mb-8">

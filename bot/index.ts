@@ -69,22 +69,14 @@ async function buildCardListMessage(discordId: string, page: number) {
     .setFooter({ text: `${currentCard.card.title} (x${currentCard.count}) | Page ${page + 1}/${totalPages}` });
 
   let files: any[] = [];
-  try {
-    const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const res = await fetch(`${appUrl}/api/og/card?id=${currentCard.card.id}`);
-    if (res.ok) {
-      const arrayBuffer = await res.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const fileName = `card_${Date.now()}.png`;
-      const attachment = new AttachmentBuilder(buffer, { name: fileName });
-      embed.setImage(`attachment://${fileName}`);
-      files.push(attachment);
-    } else {
-      const timestamp = Date.now();
-      const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}?v=${timestamp}`;
-      embed.setImage(bgImage);
-    }
-  } catch (error) {
+  
+  if (currentCard.card.renderedImageUrl) {
+    // If we have a fully generated HD image from the site, use it directly!
+    // We add a timestamp to prevent Discord from caching it if it was updated recently.
+    const timestamp = Date.now();
+    embed.setImage(`${currentCard.card.renderedImageUrl}?v=${timestamp}`);
+  } else {
+    // Fallback if no HD image is generated yet
     const timestamp = Date.now();
     const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}?v=${timestamp}`;
     embed.setImage(bgImage);
