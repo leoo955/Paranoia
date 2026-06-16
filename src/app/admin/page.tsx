@@ -921,7 +921,7 @@ export default function AdminPage() {
   const [batchTotal, setBatchTotal] = useState(0);
 
   const handleGenerateMissingImages = async () => {
-    const missing = cards.filter(c => !c.renderedImageUrl);
+    const missing = cards.filter(c => !c.renderedImageUrl || c.renderedImageUrl.startsWith('/uploads'));
     if (missing.length === 0) {
       alert("Toutes les cartes ont déjà leur image Discord !");
       return;
