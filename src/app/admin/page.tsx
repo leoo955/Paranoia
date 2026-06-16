@@ -1236,7 +1236,7 @@ export default function AdminPage() {
                 {players.map(player => (
                   <div key={player.id} className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg p-4 flex items-center justify-between group">
                     <div className="flex items-center gap-3">
-                      <img src={`https://render.crafty.gg/3d/bust/${player.minecraftName}`} alt={player.minecraftName} className="w-10 h-10 object-contain" />
+                      <img src={`https://vzge.me/bust/256/${player.minecraftName}.png`} alt={player.minecraftName} className="w-10 h-10 object-contain" />
                       <span className="font-bold text-white">{player.minecraftName}</span>
                     </div>
                     <button onClick={() => handleDeletePlayer(player.id)} className="text-[var(--color-text-secondary)] hover:text-red-500 transition-colors p-2 opacity-0 group-hover:opacity-100">
@@ -1866,7 +1866,7 @@ export default function AdminPage() {
                 {cards.map(card => (
                   <div key={card.id} className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg p-4 flex flex-col gap-2 relative overflow-hidden group">
                     <div className="flex items-center gap-3">
-                      <img src={`https://render.crafty.gg/3d/bust/${card.title}`} alt={card.title} className="w-10 h-10 object-contain" />
+                      <img src={`https://vzge.me/bust/256/${card.title}.png`} alt={card.title} className="w-10 h-10 object-contain" />
                       <div>
                         <span className="font-bold text-white block">{card.title}</span>
                         <span className="text-xs text-[var(--color-text-secondary)] flex items-center gap-1 mt-1">

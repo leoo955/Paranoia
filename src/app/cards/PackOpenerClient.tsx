@@ -414,6 +414,31 @@ const buyBooster = async (type: string, price: number) => {
 
 
 
+              
+                
+                {/* Title & Stock info moved TO TOP */}
+              <div className="mb-2 text-center z-20 h-20">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeBox.name}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h2 className={`text-4xl font-black uppercase tracking-widest ${activeBox.text} drop-shadow-2xl`}>
+                      {activeBox.name}
+                    </h2>
+                    <div className="flex items-center justify-center gap-2 mt-2 bg-black/60 px-4 py-1.5 rounded-full border border-white/10 w-fit mx-auto shadow-xl">
+                      <div className={`w-2.5 h-2.5 rounded-full ${activeBox.owned > 0 ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'}`} />
+                      <span className={`text-sm font-bold tracking-wider ${activeBox.owned > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        STOCK: {activeBox.owned}
+                      </span>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              
               {/* Carousel Container */}
               <div className="relative w-full max-w-5xl h-[320px] md:h-[400px] flex items-center justify-center">
                 
@@ -506,30 +531,7 @@ const buyBooster = async (type: string, price: number) => {
 
               {/* Action Area & Sleek Drop Rates */}
               <div className="w-full max-w-3xl mt-4 px-4 flex flex-col items-center justify-center relative z-20">
-                
-                {/* Title & Stock info moved ABOVE ACTION BUTTONS */}
-              <div className="mb-6 text-center z-20 h-20">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeBox.name}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <h2 className={`text-4xl font-black uppercase tracking-widest ${activeBox.text} drop-shadow-2xl`}>
-                      {activeBox.name}
-                    </h2>
-                    <div className="flex items-center justify-center gap-2 mt-2 bg-black/60 px-4 py-1.5 rounded-full border border-white/10 w-fit mx-auto shadow-xl">
-                      <div className={`w-2.5 h-2.5 rounded-full ${activeBox.owned > 0 ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]'}`} />
-                      <span className={`text-sm font-bold tracking-wider ${activeBox.owned > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                        STOCK: {activeBox.owned}
-                      </span>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-              {/* Center: Action Buttons */}
+                {/* Center: Action Buttons */}
                 <div className="w-full md:w-[400px] flex flex-col gap-3 mb-6">
                   {!isOpening && activeBox.owned > 0 && (
                     <button 
@@ -957,7 +959,7 @@ const buyBooster = async (type: string, price: number) => {
               {selectedCard.player && (
                 <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between relative z-10 bg-white/5 rounded-xl p-4">
                   <div className="flex items-center gap-4">
-                    <img src={`https://render.crafty.gg/3d/bust/${selectedCard.player.minecraftName}`} alt="Skin" className="w-12 h-12 object-contain drop-shadow-lg" />
+                    <img src={`https://vzge.me/bust/256/${selectedCard.player.minecraftName}.png`} alt="Skin" className="w-12 h-12 object-contain drop-shadow-lg" />
                     <div>
                       <span className="text-xs text-[var(--color-text-secondary)] block uppercase tracking-wider font-bold">Joueur Associé</span>
                       <span className="text-lg font-black text-white">{selectedCard.player.minecraftName}</span>

@@ -288,7 +288,7 @@ export default function CardDisplay({
           {!attrs.hideCharacter && (
             (card.imageUrl || card.player?.minecraftName || card.title) ? (
               <img 
-                src={card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || card.title}`} 
+                src={card.imageUrl || `https://vzge.me/bust/256/${card.player?.minecraftName || card.title}.png`} 
                 alt={card.title} 
                 className={`w-[120%] h-[85%] object-cover object-top drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`} 
                 onMouseDown={(e) => handleMouseDown(e, 'character')}

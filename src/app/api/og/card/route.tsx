@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 
     // Image URL fallback (crafty render) with cache buster
     const timestamp = Date.now();
-    const bgImage = card.imageUrl || `https://render.crafty.gg/3d/bust/${card.player?.minecraftName || 'Steve'}?v=${timestamp}`;
+    const bgImage = card.imageUrl || `https://vzge.me/bust/256/${card.player?.minecraftName || 'Steve'}.png?v=${timestamp}`;
 
     return new ImageResponse(
       (
