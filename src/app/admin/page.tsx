@@ -107,6 +107,7 @@ export default function AdminPage() {
   const [levelBadgeUrl, setLevelBadgeUrl] = useState("");
   const [editionBadgeUrl, setEditionBadgeUrl] = useState("");
   const [variantBadgeUrl, setVariantBadgeUrl] = useState("");
+  const [parentCardId, setParentCardId] = useState("");
   const [draggingItem, setDraggingItem] = useState<{type: string, id: string} | null>(null);
 
   const [showVGuide, setShowVGuide] = useState(false);
@@ -605,6 +606,8 @@ export default function AdminPage() {
           levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
           variantBadgeUrl,
+          parentCardId,
+          parentCardTitle: parentCardId ? cards.find(c => c.id === parentCardId)?.title || cards.find(c => c.id === parentCardId)?.playerName || "" : "",
           isFullArt,
           isHolo,
           hideCharacter,
@@ -728,6 +731,7 @@ export default function AdminPage() {
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
       setVariantBadgeUrl(attrs.variantBadgeUrl || "");
+      setParentCardId(attrs.parentCardId || "");
     } catch {
       setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor(""); setFactionColor("");
       setBgPosX(50); setBgPosY(50); setBgScale(100);
@@ -949,6 +953,8 @@ export default function AdminPage() {
             levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
           variantBadgeUrl,
+          parentCardId,
+          parentCardTitle: parentCardId ? cards.find(c => c.id === parentCardId)?.title || cards.find(c => c.id === parentCardId)?.playerName || "" : "",
             isFullArt,
             isHolo,
           hideCharacter,
@@ -1034,6 +1040,7 @@ export default function AdminPage() {
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
       setVariantBadgeUrl(attrs.variantBadgeUrl || "");
+      setParentCardId(attrs.parentCardId || "");
     } catch {}
   };
   const handleEditionIconUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1410,6 +1417,18 @@ export default function AdminPage() {
                     ✨ Variante de Carte
                   </div>
                   <p className="text-xs text-[var(--color-text-secondary)] mb-3">Si cette carte est une variante spéciale (ex: signée, holographique...), ajoutez le badge ici.</p>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Carte d'origine (Optionnel)</label>
+                  <select 
+                    value={parentCardId}
+                    onChange={(e) => setParentCardId(e.target.value)}
+                    className="w-full bg-black/40 border border-indigo-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-400 mb-4"
+                    disabled={creatingCard}
+                  >
+                    <option value="" className="bg-[var(--color-bg-elevated)] text-white">-- Aucune (C'est une carte de base) --</option>
+                    {cards.filter(c => c.id !== editingCardId).map(c => (
+                      <option key={c.id} value={c.id} className="bg-[var(--color-bg-elevated)] text-white">{c.title || c.playerName || "Carte sans nom"}</option>
+                    ))}
+                  </select>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge de Variante (Image)</label>
                   <div className="flex gap-2">
                     <input 
@@ -1438,6 +1457,28 @@ export default function AdminPage() {
                     </label>
                   </div>
                 </div>
+
+                {editingCardId && cards.some(c => { try { return JSON.parse(c.attributes || '{}').parentCardId === editingCardId; } catch { return false; } }) && (
+                  <div className="mt-6 border-2 border-fuchsia-500/50 rounded-xl p-4 bg-fuchsia-500/10 shadow-[0_0_15px_rgba(217,70,239,0.2)] relative">
+                    <div className="absolute -top-3 left-4 bg-[var(--color-bg-elevated)] px-2 text-fuchsia-400 font-bold text-sm flex items-center gap-2">
+                      ✨ Variantes de cette carte
+                    </div>
+                    <div className="flex flex-col gap-2 mt-2">
+                      {cards.filter(c => { try { return JSON.parse(c.attributes || '{}').parentCardId === editingCardId; } catch { return false; } }).map(variant => (
+                         <div key={variant.id} className="flex items-center gap-3 bg-black/40 p-2 rounded-lg border border-fuchsia-500/30">
+                            {variant.imageUrl && <img src={variant.imageUrl} className="w-8 h-8 rounded object-cover border border-white/20" />}
+                            <div className="flex-1">
+                               <p className="text-sm font-bold text-white">{variant.title || variant.playerName}</p>
+                               <p className="text-xs text-[var(--color-text-secondary)]">{variant.rarity} - {variant.edition}</p>
+                            </div>
+                            <button type="button" onClick={() => startEditCard(variant)} className="text-xs bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-3 py-1 rounded">
+                               Modifier
+                            </button>
+                         </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                   </div>
                 </details>
@@ -1784,6 +1825,28 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {editingCardId && cards.some(c => { try { return JSON.parse(c.attributes || '{}').parentCardId === editingCardId; } catch { return false; } }) && (
+                  <div className="mt-6 border-2 border-fuchsia-500/50 rounded-xl p-4 bg-fuchsia-500/10 shadow-[0_0_15px_rgba(217,70,239,0.2)] relative">
+                    <div className="absolute -top-3 left-4 bg-[var(--color-bg-elevated)] px-2 text-fuchsia-400 font-bold text-sm flex items-center gap-2">
+                      ✨ Variantes de cette carte
+                    </div>
+                    <div className="flex flex-col gap-2 mt-2">
+                      {cards.filter(c => { try { return JSON.parse(c.attributes || '{}').parentCardId === editingCardId; } catch { return false; } }).map(variant => (
+                         <div key={variant.id} className="flex items-center gap-3 bg-black/40 p-2 rounded-lg border border-fuchsia-500/30">
+                            {variant.imageUrl && <img src={variant.imageUrl} className="w-8 h-8 rounded object-cover border border-white/20" />}
+                            <div className="flex-1">
+                               <p className="text-sm font-bold text-white">{variant.title || variant.playerName}</p>
+                               <p className="text-xs text-[var(--color-text-secondary)]">{variant.rarity} - {variant.edition}</p>
+                            </div>
+                            <button type="button" onClick={() => startEditCard(variant)} className="text-xs bg-fuchsia-600 hover:bg-fuchsia-500 text-white px-3 py-1 rounded">
+                               Modifier
+                            </button>
+                         </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                   </div>
                 </details>
 
@@ -1835,6 +1898,8 @@ export default function AdminPage() {
                       levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
           variantBadgeUrl,
+          parentCardId,
+          parentCardTitle: parentCardId ? cards.find(c => c.id === parentCardId)?.title || cards.find(c => c.id === parentCardId)?.playerName || "" : "",
                       isFullArt,
             isHolo,
           hideCharacter,

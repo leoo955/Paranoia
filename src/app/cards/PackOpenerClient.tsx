@@ -10,7 +10,7 @@ import confetti from 'canvas-confetti';
 
 
 type Player = { id: string; minecraftName: string };
-type TradingCard = { id: string; title: string; rarity: string; level: string; edition: string; description: string | null; player: Player | null };
+type TradingCard = { id: string; title: string; rarity: string; level: string; edition: string; description: string | null; player: Player | null; attributes?: string };
 type UserCard = { id: string; obtainedAt: Date; tradingCard: TradingCard };
 
 const FlippableCard = ({ card, index, boxType }: { card: TradingCard, index: number, boxType: string }) => {
@@ -954,6 +954,15 @@ const buyBooster = async (type: string, price: number) => {
                 <p className="text-white/90 whitespace-pre-wrap leading-relaxed font-medium text-lg">
                   {selectedCard.description || "Une aura mystérieuse entoure cette relique. Son histoire reste à écrire..."}
                 </p>
+                {(() => {
+                   try {
+                      const attrs = typeof selectedCard.attributes === 'string' ? JSON.parse(selectedCard.attributes) : (selectedCard.attributes || {});
+                      if (attrs.parentCardTitle) {
+                         return <p className="mt-4 text-sm font-bold text-fuchsia-400 bg-fuchsia-500/10 px-3 py-2 rounded-lg border border-fuchsia-500/20 inline-block">✨ Variante de : {attrs.parentCardTitle}</p>;
+                      }
+                   } catch (e) {}
+                   return null;
+                })()}
               </div>
 
               {selectedCard.player && (
