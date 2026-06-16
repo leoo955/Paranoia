@@ -73,6 +73,7 @@ export default function AdminPage() {
   
   // New Full Art & Color States
   const [isFullArt, setIsFullArt] = useState(false);
+  const [isHolo, setIsHolo] = useState(false);
   const [hideCharacter, setHideCharacter] = useState(false);
   const [hideLevelIcon, setHideLevelIcon] = useState(false);
   const [hideRarityBox, setHideRarityBox] = useState(false);
@@ -593,6 +594,7 @@ export default function AdminPage() {
           levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
           isFullArt,
+          isHolo,
           hideCharacter,
           hideLevelIcon,
           hideRarityBox,
@@ -637,7 +639,7 @@ export default function AdminPage() {
         setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor(""); setFactionColor("");
         setBgPosX(50); setBgPosY(50); setBgScale(100);
         setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
-        setIsFullArt(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
+        setIsFullArt(false); setIsHolo(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
         setCardFrameUrl("");
         setCardCustomBadges([]);
         setCharPosX(50);
@@ -686,6 +688,7 @@ export default function AdminPage() {
       setCardFrameUrl(attrs.frameUrl || "");
       
       setIsFullArt(attrs.isFullArt || false);
+      setIsHolo(attrs.isHolo || false);
       setHideCharacter(attrs.hideCharacter || false);
       setHideLevelIcon(attrs.hideLevelIcon || false);
       setHideRarityBox(attrs.hideRarityBox || false);
@@ -715,7 +718,7 @@ export default function AdminPage() {
       setCardBorderColor(""); setCardBgColor(""); setCardGlowColor(""); setMainColor(""); setRarityBadgeColor(""); setFactionColor("");
       setBgPosX(50); setBgPosY(50); setBgScale(100);
       setShowTitle(true); setShowDesc(true); setShowRarityBadge(true); setShowLevelText(true); setShowLevelIcon(true);
-      setIsFullArt(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
+      setIsFullArt(false); setIsHolo(false); setCardEffect(""); setTitleColor(""); setDescColor(""); setLevelColor("");
       setCardFrameUrl("");
       setTitlePos({ x: 50, y: 75, scale: 100 }); setDescPos({ x: 50, y: 92, scale: 100 }); setRarityBadgePos({ x: 15, y: 65, scale: 100 }); setLevelTextPos({ x: 50, y: 82, scale: 100 });
       setLevelBadgePos({ x: 10, y: 8, scale: 100 });
@@ -931,6 +934,7 @@ export default function AdminPage() {
             levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
             isFullArt,
+            isHolo,
           hideCharacter,
           hideLevelIcon,
           hideRarityBox,
@@ -983,6 +987,7 @@ export default function AdminPage() {
       setRarityBadgeColor(attrs.rarityBadgeColor || "");
       setCardFrameUrl(attrs.frameUrl || "");
       setIsFullArt(attrs.isFullArt || false);
+      setIsHolo(attrs.isHolo || false);
       setHideCharacter(attrs.hideCharacter || false);
       setHideLevelIcon(attrs.hideLevelIcon || false);
       setHideRarityBox(attrs.hideRarityBox || false);
@@ -1775,6 +1780,7 @@ export default function AdminPage() {
                       levelBadgeUrl,
           editionBadgeUrl: editionBadgeUrl || editions.find(e => e.name === cardEdition)?.iconUrl || "",
                       isFullArt,
+            isHolo,
           hideCharacter,
           hideLevelIcon,
           hideRarityBox,

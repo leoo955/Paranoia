@@ -147,6 +147,20 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
         {children}
       </div>
       
+      {/* Holographic Foil Effect (Shattered Glass / Rainbow) */}
+      {attrs.isHolo && (
+        <div 
+          className="absolute inset-0 pointer-events-none z-[15] rounded-xl overflow-hidden mix-blend-color-dodge opacity-60"
+          style={{
+            backgroundImage: `linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.7) 30%, rgba(255, 0, 200, 0.5) 40%, rgba(0, 200, 255, 0.5) 50%, rgba(255, 255, 255, 0.7) 60%, transparent 80%), url('https://grainy-gradients.vercel.app/noise.svg')`,
+            backgroundSize: '200% 200%, 150px 150px',
+            backgroundPosition: `${glarePosition.x * 2}% ${glarePosition.y * 2}%`,
+            opacity: isHovered ? 0.9 : 0.4,
+            transition: 'opacity 0.3s ease',
+          }}
+        />
+      )}
+      
       {/* Glare Effect */}
       {isHovered && (
         <div 
