@@ -391,28 +391,32 @@ export default function PackOpenerClient({
                     <div 
                       key={key}
                       onClick={() => !isOpening && setSelectedBoxType(key)}
-                      className={`relative flex items-center gap-4 py-3 px-4 transition-all duration-300 cursor-pointer overflow-hidden ${
+                      className={`relative flex items-center gap-5 py-3 px-4 transition-all duration-500 cursor-pointer overflow-hidden rounded-xl group ${
                         isSelected 
-                        ? `bg-gradient-to-r from-white/5 to-transparent border-l-4 ${box.border}` 
-                        : 'border-l-4 border-transparent hover:bg-white/5'
+                        ? 'bg-white/[0.03] shadow-inner' 
+                        : 'hover:bg-white/[0.02]'
                       }`}
                     >
-                      {isSelected && <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-white to-transparent pointer-events-none" />}
+                      {/* Active indicator pill */}
+                      {isSelected && (
+                        <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 rounded-r-full ${box.glow} shadow-[0_0_15px_currentColor]`} />
+                      )}
                       
-                      <div className={`relative w-14 h-14 rounded-xl flex items-center justify-center shrink-0 overflow-hidden ${isSelected ? 'bg-black/50' : 'bg-transparent'}`}>
-                        {isSelected && <div className={`absolute inset-0 ${box.glow} opacity-20 blur-md`}></div>}
-                        <img src={box.image} alt={box.name} className={`w-10 h-10 object-contain drop-shadow-lg relative z-10 ${box.hueRotate} ${!isSelected && 'opacity-60 grayscale-[30%]'}`} />
+                      <div className={`relative w-14 h-14 flex items-center justify-center shrink-0 transition-transform duration-500 ${isSelected ? 'scale-110 drop-shadow-2xl' : 'opacity-60 grayscale-[50%] group-hover:grayscale-[20%] group-hover:opacity-100'}`}>
+                        {isSelected && <div className={`absolute inset-0 ${box.glow} opacity-30 blur-xl rounded-full scale-150`}></div>}
+                        <img src={box.image} alt={box.name} className={`w-12 h-12 object-contain relative z-10 ${box.hueRotate}`} />
                         {key === 'mythic' && (
-                          <div className="absolute -top-1 -right-1 bg-red-600 rounded-full w-4 h-4 flex items-center justify-center shadow-lg animate-pulse z-20">
-                            <Clock className="w-2.5 h-2.5 text-white" />
-                          </div>
+                          <div className="absolute top-0 right-0 bg-red-500 rounded-full w-2.5 h-2.5 shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse z-20" />
                         )}
                       </div>
                       
                       <div className="flex flex-col flex-1 relative z-10">
-                        <h4 className={`text-base font-bold uppercase tracking-wide transition-colors ${isSelected ? box.text : 'text-gray-400'}`}>{box.name}</h4>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${box.owned > 0 ? 'bg-green-500/10 text-green-400' : 'text-gray-600'}`}>
+                        <h4 className={`text-base tracking-widest transition-all duration-300 ${isSelected ? `font-black ${box.text}` : 'font-medium text-gray-400'}`}>
+                          {box.name}
+                        </h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className={`w-1.5 h-1.5 rounded-full ${box.owned > 0 ? 'bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'bg-gray-600'}`} />
+                          <span className={`text-xs font-medium tracking-wider ${box.owned > 0 ? 'text-green-400' : 'text-gray-500'}`}>
                             Stock: {box.owned}
                           </span>
                         </div>
