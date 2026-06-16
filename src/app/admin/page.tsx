@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Users, LayoutList, Trash2, ShieldAlert, Sparkles, Layers, PackageOpen, ImagePlus, UploadCloud } from "lucide-react";
 import CardDisplay from "@/components/cards/CardDisplay";
-import html2canvas from "html2canvas";
+import { toBlob } from "html-to-image";
 
 type Player = {
   id: string;
@@ -336,16 +336,16 @@ export default function AdminPage() {
       const cardElement = document.getElementById("live-preview-card");
       if (!cardElement) throw new Error("Card element not found");
 
-      // We wait for any images to be fully loaded
-      const canvas = await html2canvas(cardElement, {
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null, // Keep transparency
-        scale: 2 // High resolution
+      const blob = await toBlob(cardElement, {
+        pixelRatio: 2,
+        backgroundColor: 'transparent',
+        filter: (node) => {
+          if (node instanceof HTMLElement && typeof node.className === 'string') {
+            return !node.className.includes('transparenttextures');
+          }
+          return true;
+        }
       });
-
-      // Convert to blob
-      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error("Could not create image blob");
 
       const file = new File([blob], `card_${editingCardId}_discord.png`, { type: 'image/png' });
@@ -395,13 +395,16 @@ export default function AdminPage() {
       try {
         const cardElement = document.getElementById("live-preview-card");
         if (cardElement) {
-          const canvas = await html2canvas(cardElement, {
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: null,
-            scale: 2
+          const blob = await toBlob(cardElement, {
+            pixelRatio: 2,
+            backgroundColor: 'transparent',
+            filter: (node) => {
+              if (node instanceof HTMLElement && typeof node.className === 'string') {
+                return !node.className.includes('transparenttextures');
+              }
+              return true;
+            }
           });
-          const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
           if (blob) {
             const file = new File([blob], `card_${Date.now()}_discord.png`, { type: 'image/png' });
             const formData = new FormData();
@@ -928,13 +931,16 @@ export default function AdminPage() {
       try {
         const cardElement = document.getElementById("live-preview-card");
         if (cardElement) {
-          const canvas = await html2canvas(cardElement, {
-            useCORS: true,
-            allowTaint: true,
-            backgroundColor: null,
-            scale: 2
+          const blob = await toBlob(cardElement, {
+            pixelRatio: 2,
+            backgroundColor: 'transparent',
+            filter: (node) => {
+              if (node instanceof HTMLElement && typeof node.className === 'string') {
+                return !node.className.includes('transparenttextures');
+              }
+              return true;
+            }
           });
-          const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'));
           if (blob) {
             const file = new File([blob], `card_${card.id}_discord.png`, { type: 'image/png' });
             const formData = new FormData();
