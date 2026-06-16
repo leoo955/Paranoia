@@ -318,7 +318,7 @@ const buyBooster = async (type: string, price: number) => {
     },
     legendary: {
       name: "Légendaire",
-      image: "/StandardB.png",
+      image: "/LegendaireB.png",
       price: 400,
       owned: ownedLegendary,
       glow: "bg-amber-500",
