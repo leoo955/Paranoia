@@ -7,7 +7,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Menu, X, MessageSquare, Trophy, FileText, Sparkles, Home, LogIn, LogOut, ShieldAlert, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Dock from "@/components/ui/Dock";
 
 const navLinks = [
   { name: "Accueil", href: "/", icon: Home },
@@ -83,55 +82,100 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Login Button (Desktop & Mobile) */}
-          <div className="flex items-center space-x-2 md:space-x-4">
+          {/* Login Button (Desktop) */}
+          <div className="hidden md:flex items-center space-x-4">
             {status === "loading" ? (
-              <div className="w-10 md:w-24 h-10 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
+              <div className="w-24 h-10 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
             ) : session ? (
-              <div className="flex items-center space-x-2 md:space-x-4">
+              <div className="flex items-center space-x-4">
                 {/* @ts-ignore */}
                 {session.user?.role === "ADMIN" && (
-                  <Link href="/admin" className="hidden md:flex items-center gap-2 text-[var(--color-accent-purple)] hover:text-white transition-colors text-sm font-bold">
+                  <Link href="/admin" className="flex items-center gap-2 text-[var(--color-accent-purple)] hover:text-white transition-colors text-sm font-bold">
                     <ShieldAlert className="w-4 h-4" /> Admin
                   </Link>
                 )}
                 <div className="flex items-center space-x-2">
-                  <img src={session.user?.image || ""} alt="Avatar" className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-[var(--color-border-color)]" />
-                  <span className="hidden md:inline text-sm font-medium text-white">{(session.user as any)?.minecraftName || session.user?.name}</span>
+                  <img src={session.user?.image || ""} alt="Avatar" className="w-8 h-8 rounded-full border border-[var(--color-border-color)]" />
+                  <span className="text-sm font-medium text-white">{(session.user as any)?.minecraftName || session.user?.name}</span>
                 </div>
                 <button onClick={() => signOut()} className="text-[var(--color-text-secondary)] hover:text-red-500 transition-colors p-2" title="Déconnexion">
-                  <LogOut className="w-5 h-5 md:w-4 md:h-4" />
+                  <LogOut className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <button onClick={() => signIn("discord")} className="btn-primary flex items-center space-x-2 text-sm px-3 py-1.5 md:px-4 md:py-2">
+              <button onClick={() => signIn("discord")} className="btn-primary flex items-center space-x-2 text-sm">
                 <LogIn className="w-4 h-4" />
-                <span className="hidden sm:inline">Connexion</span>
+                <span>Connexion</span>
               </button>
             )}
+          </div>
+
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-[var(--color-text-secondary)] hover:text-white focus:outline-none p-2"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Dock Navigation */}
-      <div className="md:hidden">
-        <Dock 
-          items={navLinks.map(link => {
+      {/* Mobile Navigation */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden panel-matte border-t-0 animate-slide-up origin-top absolute top-20 left-0 right-0 p-4 space-y-2">
+          {navLinks.map((link) => {
             const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
             const Icon = link.icon;
-            return {
-              icon: <Icon size={20} className={isActive ? "text-[var(--color-accent-red)]" : "text-gray-300"} />,
-              label: link.name,
-              onClick: () => router.push(link.href),
-              className: isActive ? "active" : ""
-            };
+            return (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={cn(
+                  "flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-colors",
+                  isActive
+                    ? "bg-[rgba(179,102,255,0.1)] text-white border-l-4 border-[var(--color-accent-red)]"
+                    : "text-[var(--color-text-secondary)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
+                )}
+              >
+                <Icon className={cn("w-5 h-5", isActive ? "text-[var(--color-accent-red)]" : "")} />
+                <span>{link.name}</span>
+              </Link>
+            );
           })}
-          panelHeight={60}
-          baseItemSize={45}
-          magnification={60}
-          distance={100}
-        />
-      </div>
+          <div className="pt-4 border-t border-[var(--color-border-color)]">
+            {status === "loading" ? (
+              <div className="w-full h-12 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
+            ) : session ? (
+              <div className="space-y-3">
+                {/* @ts-ignore */}
+                {session.user?.role === "ADMIN" && (
+                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center space-x-2 py-3 bg-[var(--color-bg-elevated)] rounded-lg text-[var(--color-accent-purple)] font-bold">
+                    <ShieldAlert className="w-5 h-5" />
+                    <span>Panel Admin</span>
+                  </Link>
+                )}
+                <div className="flex items-center justify-between bg-[var(--color-bg-elevated)] p-3 rounded-lg border border-[var(--color-border-color)]">
+                  <div className="flex items-center space-x-3">
+                    <img src={session.user?.image || ""} alt="Avatar" className="w-10 h-10 rounded-full" />
+                    <span className="font-medium text-white">{(session.user as any)?.minecraftName || session.user?.name}</span>
+                  </div>
+                  <button onClick={() => signOut()} className="text-red-400 hover:text-red-300 p-2">
+                    <LogOut className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => signIn("discord")} className="w-full btn-primary flex justify-center items-center space-x-2 py-3">
+                <LogIn className="w-5 h-5" />
+                <span>Connexion Discord</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
