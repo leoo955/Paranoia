@@ -308,8 +308,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
             .setTitle(card.title)
             .setColor(colors[card.rarity] || 0x94a3b8)
             .addFields(
-              { name: 'Rareté', value: card.rarity, inline: true },
-              { name: 'Saison', value: card.season || '1', inline: true }
+              { name: 'Rareté', value: card.rarity, inline: true }
             );
 
           if (card.description) {
