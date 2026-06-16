@@ -23,7 +23,7 @@ async function buildCardListMessage(discordId: string, page: number) {
 
   const inventory = await prisma.userCard.findMany({
     where: { userId: user.id },
-    include: { tradingCard: true }
+    include: { tradingCard: { include: { player: true } } }
   });
 
   if (inventory.length === 0) {
@@ -67,9 +67,8 @@ async function buildCardListMessage(discordId: string, page: number) {
     .setColor(colors[currentCard.card.rarity] || 0x94a3b8)
     .setFooter({ text: `${currentCard.card.title} (x${currentCard.count}) | Page ${page + 1}/${totalPages}` });
 
-  if (currentCard.card.imageUrl) {
-    embed.setImage(currentCard.card.imageUrl);
-  }
+  const bgImage = currentCard.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentCard.card.player?.minecraftName || 'Steve'}`;
+  embed.setImage(bgImage);
 
   const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
