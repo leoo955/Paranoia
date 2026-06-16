@@ -326,7 +326,7 @@ const buyBooster = async (type: string, price: number) => {
       border: "border-amber-500",
       bgBase: "bg-amber-900/20",
       shadow: "shadow-[0_0_20px_rgba(245,158,11,0.3)]",
-      hueRotate: "hue-rotate-180 brightness-150",
+      hueRotate: "",
       rates: [ {r: "Commune", p: "10%", c: "text-gray-400"}, {r: "Peu Commune", p: "15%", c: "text-green-400"}, {r: "Rare", p: "40%", c: "text-blue-400"}, {r: "Épique", p: "23%", c: "text-purple-400"}, {r: "Légendaire", p: "10%", c: "text-yellow-400"}, {r: "Mythique", p: "2%", c: "text-red-500"} ]
     },
     mythic: {
@@ -624,7 +624,7 @@ const buyBooster = async (type: string, price: number) => {
                      'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'
                    }`} />
                 )}
-                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/StandardB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-80 h-auto relative z-10 transition-all duration-700 ${selectedBoxType === 'legendary' ? 'hue-rotate-180 brightness-150' : ''} ${
+                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-80 h-auto relative z-10 transition-all duration-700 ${
                   openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' :
                   openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' :
                   openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' :
