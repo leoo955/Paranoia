@@ -17,6 +17,79 @@ async function getUserByDiscordId(discordId: string) {
   });
   return account?.user || null;
 }
+async function buildCardListMessage(discordId: string, page: number) {
+  const user = await getUserByDiscordId(discordId);
+  if (!user) return null;
+
+  const inventory = await prisma.userCard.findMany({
+    where: { userId: user.id },
+    include: { tradingCard: true }
+  });
+
+  if (inventory.length === 0) {
+    return { content: 'Votre inventaire est vide ! Ouvrez des boosters sur le site.' };
+  }
+
+  const cardCounts = new Map();
+  for (const item of inventory) {
+    const c = item.tradingCard;
+    if (!cardCounts.has(c.id)) {
+      cardCounts.set(c.id, { card: c, count: 1 });
+    } else {
+      cardCounts.get(c.id).count++;
+    }
+  }
+
+  const uniqueCards = Array.from(cardCounts.values());
+  const rarityOrder = ['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'];
+  uniqueCards.sort((a, b) => {
+    const rDiff = rarityOrder.indexOf(a.card.rarity) - rarityOrder.indexOf(b.card.rarity);
+    if (rDiff !== 0) return rDiff;
+    return a.card.title.localeCompare(b.card.title);
+  });
+
+  const totalPages = uniqueCards.length;
+  if (page < 0) page = 0;
+  if (page >= totalPages) page = totalPages - 1;
+
+  const currentCard = uniqueCards[page];
+
+  const colors: Record<string, number> = {
+    'MYTHIC': 0xdc2626,
+    'LEGENDARY': 0xfacc15,
+    'EPIC': 0xa855f7,
+    'RARE': 0x3b82f6,
+    'UNCOMMON': 0x22c55e,
+    'COMMON': 0x94a3b8
+  };
+
+  const embed = new EmbedBuilder()
+    .setTitle(currentCard.card.title)
+    .setColor(colors[currentCard.card.rarity] || 0x94a3b8)
+    .setDescription(`**Possédée en x${currentCard.count} exemplaire(s)**\n\n${currentCard.card.description || ''}`)
+    .addFields({ name: 'Rareté', value: currentCard.card.rarity, inline: true })
+    .setFooter({ text: `Carte ${page + 1} / ${totalPages}` });
+
+  if (currentCard.card.imageUrl) {
+    embed.setImage(currentCard.card.imageUrl);
+  }
+
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`card_prev_${discordId}_${page}`)
+      .setLabel('◀ Précédent')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page === 0),
+    new ButtonBuilder()
+      .setCustomId(`card_next_${discordId}_${page}`)
+      .setLabel('Suivant ▶')
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(page === totalPages - 1)
+  );
+
+  return { embeds: [embed], components: [row] };
+}
+
 const token = process.env.DISCORD_TOKEN;
 const clientId = process.env.DISCORD_CLIENT_ID;
 
@@ -55,16 +128,6 @@ const commands = [
         .setName('list')
         .setDescription('Afficher votre inventaire de cartes (pour flex)')
     )
-    .addSubcommand(subcommand =>
-      subcommand
-        .setName('show')
-        .setDescription('Afficher les détails d\'une carte que vous possédez')
-        .addStringOption(option => 
-          option.setName('nom')
-            .setDescription('La carte à afficher')
-            .setAutocomplete(true)
-            .setRequired(true)
-        )
     ),
   new SlashCommandBuilder()
     .setName('ticket-setup')
@@ -96,7 +159,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
       const focusedOption = interaction.options.getFocused(true);
       
       let discordIdToSearch = '';
-      if (focusedOption.name === 'carte_offerte' || focusedOption.name === 'nom') {
+      if (focusedOption.name === 'carte_offerte') {
         discordIdToSearch = interaction.user.id;
       } else if (focusedOption.name === 'carte_demandée') {
         const targetUser = interaction.options.get('utilisateur')?.value as string;
@@ -226,100 +289,11 @@ client.on('interactionCreate', async (interaction: Interaction) => {
       try {
         const subcommand = interaction.options.getSubcommand();
         if (subcommand === 'list') {
-          const user = await getUserByDiscordId(interaction.user.id);
-          if (!user) return await interaction.reply({ content: "Vous n'êtes pas enregistré sur Paranoia.", ephemeral: true });
-
-          const inventory = await prisma.userCard.findMany({
-            where: { userId: user.id },
-            include: { tradingCard: true }
-          });
-
-          if (inventory.length === 0) {
-            return await interaction.reply({ content: 'Votre inventaire est vide ! Ouvrez des boosters sur le site.', ephemeral: true });
+          const messageOptions = await buildCardListMessage(interaction.user.id, 0);
+          if (!messageOptions) {
+            return await interaction.reply({ content: "Vous n'êtes pas enregistré sur Paranoia.", ephemeral: true });
           }
-
-          const rarityGroups: Record<string, any[]> = {
-            'MYTHIC': [],
-            'LEGENDARY': [],
-            'EPIC': [],
-            'RARE': [],
-            'UNCOMMON': [],
-            'COMMON': []
-          };
-
-          const cardCounts = new Map();
-          for (const item of inventory) {
-            const c = item.tradingCard;
-            if (!cardCounts.has(c.id)) {
-              cardCounts.set(c.id, { card: c, count: 1 });
-            } else {
-              cardCounts.get(c.id).count++;
-            }
-          }
-
-          for (const { card, count } of cardCounts.values()) {
-            if (rarityGroups[card.rarity]) {
-              rarityGroups[card.rarity].push(`**${card.title}** (x${count})`);
-            } else {
-              if (!rarityGroups['AUTRE']) rarityGroups['AUTRE'] = [];
-              rarityGroups['AUTRE'].push(`**${card.title}** (x${count})`);
-            }
-          }
-
-          const embed = new EmbedBuilder()
-            .setTitle(`Collection de ${interaction.user.username} 🏆`)
-            .setColor('#facc15')
-            .setDescription(`Total : **${inventory.length}** cartes`);
-
-          for (const [rarity, cards] of Object.entries(rarityGroups)) {
-            if (cards.length > 0) {
-              let text = cards.join(', ');
-              if (text.length > 1020) text = text.slice(0, 1000) + '...';
-              embed.addFields({ name: `${rarity} (${cards.length} modèles)`, value: text });
-            }
-          }
-
-          await interaction.reply({ embeds: [embed] });
-        } else if (subcommand === 'show') {
-          const cardId = interaction.options.get('nom')?.value as string;
-          if (!cardId) {
-            return await interaction.reply({ content: "Veuillez sélectionner une carte valide.", ephemeral: true });
-          }
-
-          const card = await prisma.tradingCard.findUnique({
-            where: { id: cardId },
-            include: { player: true }
-          });
-
-          if (!card) {
-            return await interaction.reply({ content: "Carte introuvable.", ephemeral: true });
-          }
-
-          const colors: Record<string, number> = {
-            'MYTHIC': 0xdc2626, // Red
-            'LEGENDARY': 0xfacc15, // Yellow
-            'EPIC': 0xa855f7, // Purple
-            'RARE': 0x3b82f6, // Blue
-            'UNCOMMON': 0x22c55e, // Green
-            'COMMON': 0x94a3b8 // Gray
-          };
-
-          const embed = new EmbedBuilder()
-            .setTitle(card.title)
-            .setColor(colors[card.rarity] || 0x94a3b8)
-            .addFields(
-              { name: 'Rareté', value: card.rarity, inline: true }
-            );
-
-          if (card.description) {
-            embed.setDescription(card.description);
-          }
-
-          if (card.imageUrl) {
-            embed.setImage(card.imageUrl);
-          }
-
-          await interaction.reply({ embeds: [embed] });
+          await interaction.reply(messageOptions);
         }
       } catch (error) {
         console.error("Card command error:", error);
@@ -360,6 +334,25 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
   if (interaction.isButton()) {
     try {
+      if (interaction.customId.startsWith('card_prev_') || interaction.customId.startsWith('card_next_')) {
+        const parts = interaction.customId.split('_');
+        const direction = parts[1]; // prev or next
+        const discordId = parts[2];
+        const currentPage = parseInt(parts[3], 10);
+
+        if (interaction.user.id !== discordId) {
+          return await interaction.reply({ content: 'Vous ne pouvez pas naviguer dans l\'inventaire d\'un autre joueur !', ephemeral: true });
+        }
+
+        const newPage = direction === 'next' ? currentPage + 1 : currentPage - 1;
+        const messageOptions = await buildCardListMessage(discordId, newPage);
+        
+        if (messageOptions) {
+          await interaction.update(messageOptions);
+        }
+        return;
+      }
+
       if (interaction.customId.startsWith('trade_')) {
         const parts = interaction.customId.split('_');
         const action = parts[1]; // accept or decline
