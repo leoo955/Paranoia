@@ -127,7 +127,6 @@ const commands = [
       subcommand
         .setName('list')
         .setDescription('Afficher votre inventaire de cartes (pour flex)')
-    )
     ),
   new SlashCommandBuilder()
     .setName('ticket-setup')
