@@ -1403,6 +1403,42 @@ export default function AdminPage() {
                     <option value="Netherite" className="bg-[var(--color-bg-elevated)] text-white">Netherite</option>
                   </select>
                 </div>
+
+                {/* Encadrement pour la Variante */}
+                <div className="mt-6 border-2 border-indigo-500/50 rounded-xl p-4 bg-indigo-500/10 shadow-[0_0_15px_rgba(99,102,241,0.2)] relative">
+                  <div className="absolute -top-3 left-4 bg-[var(--color-bg-elevated)] px-2 text-indigo-400 font-bold text-sm flex items-center gap-2">
+                    ✨ Variante de Carte
+                  </div>
+                  <p className="text-xs text-[var(--color-text-secondary)] mb-3">Si cette carte est une variante spéciale (ex: signée, holographique...), ajoutez le badge ici.</p>
+                  <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge de Variante (Image)</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text"
+                      value={variantBadgeUrl}
+                      onChange={(e) => setVariantBadgeUrl(e.target.value)}
+                      className="flex-1 bg-black/40 border border-indigo-500/30 rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-400"
+                      placeholder="URL de l'image"
+                      disabled={creatingCard}
+                    />
+                    <label className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg px-4 py-2 cursor-pointer flex items-center justify-center transition-colors font-bold shadow-lg shadow-indigo-500/20">
+                      Upload
+                      <input type="file" accept="image/png, image/jpeg, image/gif" className="hidden" onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        try {
+                          const res = await fetch("/api/upload", { method: "POST", body: formData });
+                          if (res.ok) {
+                            const data = await res.json();
+                            setVariantBadgeUrl(data.url);
+                          }
+                        } catch (err) {}
+                      }} />
+                    </label>
+                  </div>
+                </div>
+
                   </div>
                 </details>
 
