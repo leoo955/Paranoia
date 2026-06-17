@@ -16,13 +16,9 @@ interface HomePageClientProps {
 export default function HomePageClient({ stats }: HomePageClientProps) {
   return (
     <div className="flex flex-col min-h-screen bg-[#0a0a0f] overflow-hidden selection:bg-purple-500/30">
-      
-      {/* --- HERO SECTION --- */}
       <section className="relative w-full min-h-screen flex items-center justify-center">
-        {/* Animated Background */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 z-0 mix-blend-overlay"></div>
         <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] md:w-[800px] md:h-[800px] bg-[radial-gradient(ellipse_at_center,_rgba(147,51,234,0.4)_0%,_transparent_70%)] rounded-full z-0 opacity-20" />
-        
         <div className="relative z-10 text-center px-4 mt-20 max-w-5xl mx-auto flex flex-col items-center">
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
@@ -40,7 +36,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
               priority
             />
           </motion.div>
-          
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -49,7 +44,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
           >
             Survivez. <span className="text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.8)]">Trahissez.</span> Dominez.
           </motion.h1>
-          
           <motion.p 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -58,7 +52,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
           >
             Une aventure Minecraft impitoyable sous liste blanche. Forgez des alliances, brisez-les, et laissez votre empreinte dans l'histoire du serveur.
           </motion.p>
-          
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -78,8 +71,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
             </Link>
           </motion.div>
         </div>
-        
-        {/* Scroll Indicator */}
         <motion.div 
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -90,7 +81,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
         </motion.div>
       </section>
 
-      {/* --- STATS SECTION --- */}
       <section className="w-full bg-[#111118] border-y border-white/5 py-12 relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 divide-y md:divide-y-0 md:divide-x divide-white/10 text-center">
@@ -118,10 +108,8 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
         </div>
       </section>
 
-      {/* --- BENTO GRID FEATURES --- */}
       <section id="features" className="w-full py-32 relative z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
           <div className="text-center mb-16">
             <motion.h2 
               initial={{ opacity: 0, y: 20 }}
@@ -137,8 +125,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6 auto-rows-[300px]">
-            
-            {/* LARGE BENTO ITEM: Trading Cards */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -148,7 +134,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
             >
               <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.15)_0%,_transparent_70%)] rounded-full translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-              
               <div className="relative z-10 h-full flex flex-col p-8 md:p-12">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs font-bold border border-purple-500/30 w-fit mb-4">
                   <Sparkles className="w-4 h-4" /> Trading Cards
@@ -166,13 +151,11 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
                 </div>
               </div>
 
-              {/* Decorative Image/Element */}
               <div className="absolute -bottom-10 -right-10 w-2/3 h-2/3 pointer-events-none perspective-[1000px]">
                 <div className="w-full h-full bg-[url('/MythiqueB.png')] bg-contain bg-no-repeat bg-bottom opacity-50 group-hover:opacity-100 group-hover:rotate-[-5deg] group-hover:scale-110 transition-all duration-700 transform-gpu drop-shadow-[0_0_50px_rgba(168,85,247,0.5)]"></div>
               </div>
             </motion.div>
 
-            {/* SMALL BENTO ITEM 1: Tier List */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -181,7 +164,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
               className="relative group rounded-3xl overflow-hidden border border-white/10 bg-[#111118] p-8 flex flex-col"
             >
               <div className="absolute inset-0 bg-gradient-to-bl from-yellow-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 text-xs font-bold border border-yellow-500/30 w-fit mb-4">
                 <Trophy className="w-4 h-4" /> Compétition
               </div>
@@ -189,17 +171,14 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
               <p className="text-gray-400 text-sm mb-6">
                 Le classement officiel du serveur. Votez et définissez qui sont les meilleurs joueurs en PvP.
               </p>
-              
               <div className="mt-auto relative z-10">
                 <Link href="/tier-list" className="inline-flex items-center gap-2 font-bold text-yellow-500 hover:text-yellow-400 transition-colors group/link">
                   Voir les classements <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                 </Link>
               </div>
-              
               <Swords className="absolute -bottom-4 -right-4 w-32 h-32 text-yellow-500/10 group-hover:text-yellow-500/20 group-hover:scale-110 transition-all duration-500 rotate-[-15deg]" />
             </motion.div>
 
-            {/* SMALL BENTO ITEM 2: Forum */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -208,7 +187,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
               className="relative group rounded-3xl overflow-hidden border border-white/10 bg-[#111118] p-8 flex flex-col"
             >
               <div className="absolute inset-0 bg-gradient-to-tl from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold border border-blue-500/30 w-fit mb-4">
                 <MessageSquare className="w-4 h-4" /> Diplomatie
               </div>
@@ -216,13 +194,11 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
               <p className="text-gray-400 text-sm mb-6">
                 Annonces officielles, déclarations de guerre, recherche de factions. Tout se passe ici.
               </p>
-              
               <div className="mt-auto relative z-10">
                 <Link href="/forum" className="inline-flex items-center gap-2 font-bold text-blue-500 hover:text-blue-400 transition-colors group/link">
                   Rejoindre le forum <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
                 </Link>
               </div>
-              
               <MessageSquare className="absolute -bottom-4 -right-4 w-32 h-32 text-blue-500/10 group-hover:text-blue-500/20 group-hover:scale-110 transition-all duration-500" />
             </motion.div>
 
@@ -230,13 +206,10 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
         </div>
       </section>
 
-      {/* --- CALL TO ACTION FOOTER --- */}
       <section className="relative w-full py-32 overflow-hidden mt-12 border-t border-white/10">
         <div className="absolute inset-0 bg-black z-0"></div>
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-30 mix-blend-overlay z-0"></div>
-        
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518130028744-97d34293f9ec?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-[radial-gradient(ellipse_at_center,_rgba(147,51,234,0.2)_0%,_transparent_70%)] rounded-t-full z-0"></div>
-        
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center flex flex-col items-center">
           <ShieldAlert className="w-16 h-16 text-purple-500 mx-auto mb-8 opacity-80" />
           <h2 className="text-4xl md:text-6xl font-black font-outfit text-white mb-6 uppercase tracking-wider drop-shadow-lg">

@@ -7,8 +7,6 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-  
-  // @ts-ignore
   if (!session?.user || (session.user.role !== "ADMIN" && session.user.role !== "MODERATOR")) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
@@ -37,7 +35,6 @@ export async function POST(req: Request) {
       });
     } else if (action === "set_booster") {
       if (!boxType) return new NextResponse("Missing boxType", { status: 400 });
-      
       const existingBox = user.boxes.find(b => b.boxType === boxType);
       if (existingBox) {
         await prisma.userBox.update({

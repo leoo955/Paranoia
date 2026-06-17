@@ -33,10 +33,8 @@ export default function SetupPage() {
         throw new Error("Erreur lors de l'enregistrement");
       }
 
-      // Mettre à jour le token JWT local avant de rediriger
       await update({ minecraftName: pseudo });
 
-      // Recharger la page pour forcer la mise à jour de la session côté client/middleware
       window.location.href = "/";
     } catch (err) {
       setError("Une erreur est survenue.");
@@ -50,7 +48,6 @@ export default function SetupPage() {
         <div className="w-16 h-16 bg-[var(--color-bg-elevated)] rounded-full flex items-center justify-center mx-auto mb-6">
           <Check className="w-8 h-8 text-[var(--color-accent-purple)]" />
         </div>
-        
         <h1 className="text-3xl font-outfit font-black text-white mb-2">Bienvenue</h1>
         <p className="text-[var(--color-text-secondary)] mb-8">
           Avant de continuer, veuillez lier votre pseudo Minecraft à votre compte.
@@ -61,8 +58,8 @@ export default function SetupPage() {
             <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">
               Pseudo Minecraft
             </label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               required
               value={pseudo}
               onChange={(e) => setPseudo(e.target.value)}
@@ -74,8 +71,8 @@ export default function SetupPage() {
 
           {error && <p className="text-red-500 text-sm text-left">{error}</p>}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isLoading}
             className="w-full btn-primary py-3 flex justify-center"
           >

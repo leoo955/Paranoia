@@ -34,7 +34,6 @@ export default function AdminPage() {
   };
   const dragRawPos = useRef<{x: number, y: number} | null>(null);
 
-  // Preset Badges for Dock
   const presetBadges = [
     { url: 'https://cdn-icons-png.flaticon.com/512/1055/1055673.png', name: 'Couronne' },
     { url: 'https://cdn-icons-png.flaticon.com/512/119/119068.png', name: 'Épée' },
@@ -70,8 +69,6 @@ export default function AdminPage() {
   const [showRarityBadge, setShowRarityBadge] = useState(true);
   const [showLevelText, setShowLevelText] = useState(true);
   const [showLevelIcon, setShowLevelIcon] = useState(true);
-  
-  // New Full Art & Color States
   const [isFullArt, setIsFullArt] = useState(false);
   const [isHolo, setIsHolo] = useState(false);
   const [hideCharacter, setHideCharacter] = useState(false);
@@ -108,12 +105,16 @@ export default function AdminPage() {
   const [editionBadgeUrl, setEditionBadgeUrl] = useState("");
   const [variantBadgeUrl, setVariantBadgeUrl] = useState("");
   const [parentCardId, setParentCardId] = useState("");
+  const [isVariant, setIsVariant] = useState(false);
+  const [cardVariantLinks, setCardVariantLinks] = useState<any[]>([]);
+  const [selectedVariantProfileId, setSelectedVariantProfileId] = useState("");
+  const [selectedTargetCardId, setSelectedTargetCardId] = useState("");
+  const [isSavingLink, setIsSavingLink] = useState(false);
   const [draggingItem, setDraggingItem] = useState<{type: string, id: string} | null>(null);
 
   const [showVGuide, setShowVGuide] = useState(false);
   const [showHGuide, setShowHGuide] = useState(false);
 
-  
   const [templates, setTemplates] = useState<any[]>([]);
   const [editions, setEditions] = useState<any[]>([]);
   const [variants, setVariants] = useState<any[]>([]);
@@ -157,16 +158,20 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/cards/manage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          action: "GIVE_BOX", 
-          userId: godPlayerId, // godPlayerId is now the User ID
+        body: JSON.stringify({
+          action: "GIVE_BOX",
+          userId: godPlayerId,
           boxType: godBoxType,
           amount: godBoxAmount,
-          cardId: "box" // dummy value to pass validation
+          cardId: "box"
         })
       });
-      if (res.ok) toast(`Box ${godBoxType} (x${godBoxAmount}, { icon: '⚠️' }) donnée avec succès !`);
-      else toast(await res.text(), { icon: '⚠️' });
+      if (res.ok) {
+        toast.success(`Box ${godBoxType} (x${godBoxAmount}) donnée avec succès !`);
+      } else {
+        const errorText = await res.text();
+        toast(errorText, { icon: '⚠️' });
+      }
     } catch (e) {
       toast.error("Erreur lors de l'attribution de la box");
     }
@@ -215,7 +220,6 @@ export default function AdminPage() {
           boxType: economyBoxType,
         }),
       });
-      
       if (res.ok) {
         toast.success("Action effectuée avec succès !");
         setSelectedUserEconomy(null);
@@ -275,8 +279,6 @@ export default function AdminPage() {
     }
   };
 
-  
-  
   const fetchVariants = async () => {
     try {
       const res = await fetch("/api/variants");
@@ -337,28 +339,21 @@ export default function AdminPage() {
   useEffect(() => {
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (!draggingItem) return;
-      
       const deltaX = (e.movementX / 300) * 100;
       const deltaY = (e.movementY / 420) * 100;
-      
       let isXCenter = false;
       let isYCenter = false;
 
       const calcSnap = (val: number, isShift: boolean, isX: boolean) => {
         if (isShift) return val;
         let snapped = val;
-        
-        // Snap to center (50)
         if (Math.abs(val - 50) < 2.5) {
            snapped = 50;
            if (isX) isXCenter = true;
            else isYCenter = true;
         }
-        
-        // Snap to edges (0, 100)
         if (Math.abs(val - 0) < 3) snapped = 0;
         if (Math.abs(val - 100) < 3) snapped = 100;
-        
         return snapped;
       };
 
@@ -434,12 +429,9 @@ export default function AdminPage() {
          }));
       }
 
-      // Update guide visibility (we use a setTimeout or direct state if React batches it. 
-      // In a raw DOM event, React 18 auto-batches setState!)
       setShowVGuide(isXCenter);
       setShowHGuide(isYCenter);
     };
-    
     const handleGlobalMouseUp = () => {
       setDraggingItem(null);
       dragRawPos.current = null;
@@ -480,18 +472,17 @@ export default function AdminPage() {
 
   const waitForVideo = async (cardElement: HTMLElement) => {
     const videoEl = cardElement.querySelector("video");
-    if (videoEl && videoEl.readyState < 2) { // HAVE_CURRENT_DATA
+    if (videoEl && videoEl.readyState < 2) {
       await new Promise(resolve => {
         videoEl.addEventListener('loadeddata', resolve, { once: true });
-        setTimeout(resolve, 3000); // 3s timeout
+        setTimeout(resolve, 3000);
       });
-      await new Promise(r => setTimeout(r, 200)); // small paint delay
+      await new Promise(r => setTimeout(r, 200));
     }
   };
 
   const handleCaptureDiscordImage = async () => {
     if (!editingCardId) return;
-    
     setIsCapturing(true);
     try {
       const cardElement = document.getElementById("live-preview-card");
@@ -523,7 +514,6 @@ export default function AdminPage() {
       if (!uploadRes.ok) throw new Error("Upload failed");
       const { url } = await uploadRes.json();
 
-      // Update card with rendered image
       const updateRes = await fetch('/api/cards', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -531,8 +521,6 @@ export default function AdminPage() {
       });
 
       if (!updateRes.ok) throw new Error("Failed to save image url to card");
-      
-      // Update local state
       setCards(cards.map(c => c.id === editingCardId ? { ...c, renderedImageUrl: url } : c));
       toast.success("Image Discord générée et sauvegardée avec succès !");
     } catch (err) {
@@ -587,7 +575,6 @@ export default function AdminPage() {
       const player = players.find(p => p.id === cardPlayerId);
       const url = "/api/cards";
       const method = editingCardId ? "PUT" : "POST";
-      
       const payload: any = {
         title: cardTitle || player?.minecraftName,
         playerName: player?.minecraftName,
@@ -691,8 +678,58 @@ export default function AdminPage() {
     }
   };
 
+  const fetchVariantLinks = async (motherCardId: string) => {
+    try {
+      const res = await fetch(`/api/admin/cards/variants/links?motherCardId=${motherCardId}`);
+      if (res.ok) setCardVariantLinks(await res.json());
+    } catch (e) { console.error(e); }
+  };
+
+  const handleSaveVariantLink = async () => {
+    if (!editingCardId || !selectedVariantProfileId || !selectedTargetCardId) {
+      toast.error("Veuillez remplir tous les champs");
+      return;
+    }
+    setIsSavingLink(true);
+    try {
+      const res = await fetch("/api/admin/cards/variants/links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          motherCardId: editingCardId,
+          variantProfileId: selectedVariantProfileId,
+          targetCardId: selectedTargetCardId
+        })
+      });
+      if (res.ok) {
+        toast.success("Lien de variante enregistré !");
+        fetchVariantLinks(editingCardId);
+        setSelectedVariantProfileId("");
+        setSelectedTargetCardId("");
+      }
+    } catch (e) {
+      toast.error("Erreur lors de la sauvegarde");
+    } finally {
+      setIsSavingLink(false);
+    }
+  };
+
+  const handleDeleteVariantLink = async (id: string) => {
+    confirmToast("Supprimer ce lien de variante ?", async () => {
+      try {
+        const res = await fetch(`/api/admin/cards/variants/links?id=${id}`, { method: "DELETE" });
+        if (res.ok) {
+          toast.success("Lien supprimé");
+          if (editingCardId) fetchVariantLinks(editingCardId);
+        }
+      } catch (e) { console.error(e); }
+    });
+  };
+
   const startEditCard = (card: any) => {
     setEditingCardId(card.id);
+    setIsVariant(card.isVariant || false);
+    if (card.id) fetchVariantLinks(card.id);
     setCardPlayerId(card.playerId);
     setCardRarity(card.rarity);
     setCardLevel(card.level);
@@ -702,7 +739,6 @@ export default function AdminPage() {
     setCardEdition(card.edition || "Standard");
     setCardCustomBg(card.customBackground || "");
     setCardImageUrl(card.imageUrl || "");
-    
     try {
       const attrs = typeof card.attributes === 'string' ? JSON.parse(card.attributes) : (card.attributes || {});
       setCardBorderColor(attrs.borderColor || "");
@@ -715,7 +751,6 @@ export default function AdminPage() {
       setFactionColor(attrs.factionColor || "");
       setRarityBadgeColor(attrs.rarityBadgeColor || "");
       setCardFrameUrl(attrs.frameUrl || "");
-      
       setIsFullArt(attrs.isFullArt || false);
       setIsHolo(attrs.isHolo || false);
       setHideCharacter(attrs.hideCharacter || false);
@@ -779,7 +814,6 @@ export default function AdminPage() {
     setEditingCardId(null);
     setCardTitle(card.title ? `${card.title} (Copie)` : "");
   };
-  
   const cancelEdit = () => {
     setEditingCardId(null);
     setCardPlayerId("");
@@ -924,7 +958,6 @@ export default function AdminPage() {
     });
   };
 
-  
   const handleDeleteTemplate = (id: string) => {
     confirmToast("Êtes-vous sûr de vouloir supprimer ce template ?", async () => {
       try {
@@ -1010,7 +1043,7 @@ export default function AdminPage() {
     setCardCustomBg(t.customBackground || "");
     if (t.level) setCardLevel(t.level);
     try { setCardCustomBadges(typeof t.customBadges === 'string' ? JSON.parse(t.customBadges) : t.customBadges || []); } catch {}
-    try { 
+    try {
       const pos = typeof t.characterPosition === 'string' ? JSON.parse(t.characterPosition) : t.characterPosition;
       setCharPosX(pos?.x ?? 50); setCharPosY(pos?.y ?? 50); setCharScale(pos?.scale ?? 100);
     } catch {}
@@ -1045,9 +1078,9 @@ export default function AdminPage() {
       setShowLevelText(attrs.showLevelText !== false);
       setShowLevelIcon(attrs.showLevelIcon !== false);
 
-      setTitlePos(attrs.titlePos || { x: 50, y: 75, scale: 100 }); 
-      setDescPos(attrs.descPos || { x: 50, y: 92, scale: 100 }); 
-      setRarityBadgePos(attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 }); 
+      setTitlePos(attrs.titlePos || { x: 50, y: 75, scale: 100 });
+      setDescPos(attrs.descPos || { x: 50, y: 92, scale: 100 });
+      setRarityBadgePos(attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 });
       setLevelTextPos(attrs.levelTextPos || { x: 50, y: 82, scale: 100 });
       setLevelBadgePos(attrs.levelBadgePos || { x: 10, y: 8, scale: 100 });
       setEditionBadgePos(attrs.editionBadgePos || { x: 85, y: 73, scale: 100 });
@@ -1076,7 +1109,6 @@ export default function AdminPage() {
     }
   };
 
-  
   const handleCreateVariant = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newVariantName) return;
@@ -1150,7 +1182,6 @@ export default function AdminPage() {
   const handleAddPlayer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPlayerName.trim()) return;
-    
     setLoading(true);
     setError("");
 
@@ -1207,13 +1238,9 @@ export default function AdminPage() {
 
       for (let i = 0; i < targetCards.length; i++) {
         const card = targetCards[i];
-        // 1. Set the card in the editor
         startEditCard(card);
-        
-        // 2. Wait for React to re-render the CardDisplay with the new states
         await new Promise(r => setTimeout(r, 1000));
 
-        // 3. Capture
         try {
           const cardElement = document.getElementById("live-preview-card");
           if (cardElement) {
@@ -1249,14 +1276,11 @@ export default function AdminPage() {
         setBatchProgress(i + 1);
       }
 
-      // Refresh cards
       const res = await fetch('/api/cards');
       if (res.ok) {
         const data = await res.json();
         setCards(data);
       }
-      
-      // Clear editor
       cancelEdit();
       setIsBatchGenerating(false);
       toast.success("Génération terminée !");
@@ -1271,19 +1295,25 @@ export default function AdminPage() {
       </div>
 
       <div className="flex flex-wrap gap-4 mb-8 border-b border-[var(--color-border-color)] pb-4">
-        <button 
+        <button
           onClick={() => setActiveTab("players")}
           className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'players' ? 'bg-[var(--color-accent-purple)] text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
         >
           <Users className="w-5 h-5" /> Base de Joueurs
         </button>
-        <button 
+        <button
           onClick={() => setActiveTab("cards")}
           className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'cards' ? 'bg-[var(--color-accent-purple)] text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
         >
           <Sparkles className="w-5 h-5" /> Cartes
         </button>
-        <button 
+        <button
+          onClick={() => setActiveTab("variants_tab")}
+          className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'variants_tab' ? 'bg-indigo-500 text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
+        >
+          <Layers className="w-5 h-5" /> Registre Variantes
+        </button>
+        <button
           onClick={() => setActiveTab("moderation")}
           className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${activeTab === 'moderation' ? 'bg-red-500 text-white' : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-elevated)] hover:text-white'}`}
         >
@@ -1299,12 +1329,12 @@ export default function AdminPage() {
               <form onSubmit={handleAddPlayer} className="space-y-4 max-w-md">
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Pseudo Minecraft (Exact)</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={newPlayerName}
                     onChange={(e) => setNewPlayerName(e.target.value)}
-                    className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]" 
-                    placeholder="Ex: Xx_Slayer_xX" 
+                    className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
+                    placeholder="Ex: Xx_Slayer_xX"
                     disabled={loading}
                   />
                 </div>
@@ -1337,8 +1367,99 @@ export default function AdminPage() {
           </div>
         )}
 
-        
-        
+        {activeTab === "variants_tab" && (
+          <div className="space-y-8">
+            <div className="bg-black/20 p-8 rounded-3xl border border-white/5">
+              <h2 className="text-2xl font-bold font-outfit text-white mb-2">Registre des Types de Variantes</h2>
+              <p className="text-[var(--color-text-secondary)] mb-8">
+                Définissez ici les types de variantes disponibles (ex: Boosté, Femboy, Élite).
+                Ces types pourront ensuite être liés à des cartes spécifiques.
+              </p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <form onSubmit={handleCreateVariant} className="space-y-4 bg-black/20 p-6 rounded-2xl border border-white/5">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Plus className="w-5 h-5 text-indigo-400" /> Nouveau Type
+                  </h3>
+                  <div>
+                    <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Nom du type (ex: "Boosté")</label>
+                    <input
+                      type="text"
+                      value={newVariantName}
+                      onChange={(e) => setNewVariantName(e.target.value)}
+                      className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-500"
+                      placeholder="Nom affiché au survol..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-[var(--color-text-secondary)] mb-1">URL de l'icône (Lien direct)</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newVariantIcon}
+                        onChange={(e) => setNewVariantIcon(e.target.value)}
+                        className="flex-1 bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-indigo-500"
+                        placeholder="https://..."
+                      />
+                      <label className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg px-4 py-2 cursor-pointer flex items-center justify-center transition-colors">
+                        <UploadCloud size={18} />
+                        <input type="file" className="hidden" onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if(!file) return;
+                          const fd = new FormData();
+                          fd.append("file", file);
+                          try {
+                            const res = await fetch("/api/upload", {method: "POST", body: fd});
+                            if(res.ok) {
+                              const data = await res.json();
+                              setNewVariantIcon(data.url);
+                            }
+                          } catch(err) {
+                            console.error(err);
+                          }
+                        }} />
+                      </label>
+                    </div>
+                  </div>
+                  {newVariantIcon && (
+                    <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 mt-4">
+                      <div className="w-12 h-12 bg-black/40 rounded-lg flex items-center justify-center overflow-hidden">
+                        <img src={newVariantIcon} className="w-10 h-10 object-contain" alt="" />
+                      </div>
+                      <div>
+                        <p className="text-white font-bold">{newVariantName || "Sans nom"}</p>
+                        <p className="text-xs text-[var(--color-text-secondary)] italic">Aperçu de l'icône</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <button type="submit" className="btn-primary w-full py-3 mt-4">
+                    Enregistrer le Type
+                  </button>
+                </form>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-white mb-4">Types Enregistrés ({variants.length})</h3>
+                  <div className="grid grid-cols-1 gap-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    {variants.map(v => (
+                      <div key={v.id} className="flex items-center justify-between bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] p-4 rounded-xl group hover:border-indigo-500/50 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-black/40 rounded flex items-center justify-center">
+                            <img src={v.iconUrl} className="w-8 h-8 object-contain" alt="" />
+                          </div>
+                          <span className="font-bold text-white">{v.name}</span>
+                        </div>
+                        <button onClick={() => handleDeleteVariant(v.id)} className="p-2 text-[var(--color-text-secondary)] hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+                    ))}
+                    {variants.length === 0 && <p className="text-[var(--color-text-secondary)] italic">Aucun type de variante enregistré.</p>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {activeTab === "cards" && (
           <div className="space-y-8">
@@ -1383,8 +1504,14 @@ export default function AdminPage() {
                   </summary>
                   <div className="p-4 space-y-4">
                 <div>
+                  <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-indigo-400 font-bold bg-indigo-500/10 p-3 rounded-lg border border-indigo-500/20">
+                    <input type="checkbox" checked={isVariant} onChange={(e) => setIsVariant(e.target.checked)} className="rounded border-indigo-600 bg-gray-700 w-5 h-5" />
+                    C'est une variante (Masquer les autres variantes sur cette carte)
+                  </label>
+                </div>
+                <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Pseudo affiché (Optionnel)</label>
-                  <input 
+                  <input
                     type="text"
                     value={cardTitle}
                     onChange={(e) => setCardTitle(e.target.value)}
@@ -1395,7 +1522,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Joueur Lié</label>
-                  <select 
+                  <select
                     value={cardPlayerId}
                     onChange={(e) => setCardPlayerId(e.target.value)}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
@@ -1409,7 +1536,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Édition</label>
-                  <select 
+                  <select
                     value={cardEdition}
                     onChange={(e) => setCardEdition(e.target.value)}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
@@ -1420,12 +1547,11 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Rareté</label>
-                  <select 
+                  <select
                     value={cardRarity}
                     onChange={(e) => {
                       const newRarity = e.target.value;
                       setCardRarity(newRarity);
-                      
                       // Auto-assign probabilities based on rarity
                       if (newRarity === 'COMMON') setCardProba(45);
                       else if (newRarity === 'UNCOMMON') setCardProba(35);
@@ -1447,7 +1573,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Niveau</label>
-                  <select 
+                  <select
                     value={cardLevel}
                     onChange={(e) => setCardLevel(e.target.value)}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
@@ -1463,7 +1589,7 @@ export default function AdminPage() {
 
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Carte d'origine (Optionnel)</label>
-                  <select 
+                  <select
                     value={parentCardId}
                     onChange={(e) => setParentCardId(e.target.value)}
                     className="w-full bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]"
@@ -1503,7 +1629,7 @@ export default function AdminPage() {
 
                     {(!variants.find(v => v.iconUrl === variantBadgeUrl) && variantBadgeUrl !== "" || variants.length === 0) && (
                       <div className="flex gap-2 mt-2">
-                        <input 
+                        <input
                           type="text"
                           value={variantBadgeUrl}
                           onChange={(e) => setVariantBadgeUrl(e.target.value)}
@@ -1557,6 +1683,80 @@ export default function AdminPage() {
                   </div>
                 </details>
 
+                {!isVariant && editingCardId && (
+                  <div className="bg-indigo-500/5 rounded-xl border border-indigo-500/20 p-6 shadow-[0_0_20px_rgba(99,102,241,0.05)]">
+                    <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                      <Layers className="w-5 h-5 text-indigo-400" /> Lier des Variantes (Carte Mère)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div>
+                        <label className="block text-xs text-gray-400 mb-1 uppercase font-bold">Type de Variante</label>
+                        <select
+                          value={selectedVariantProfileId}
+                          onChange={(e) => setSelectedVariantProfileId(e.target.value)}
+                          className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-indigo-500"
+                        >
+                          <option value="">-- Choisir type --</option>
+                          {variants.map(v => (
+                            <option key={v.id} value={v.id}>{v.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="md:col-span-1">
+                        <label className="block text-xs text-gray-400 mb-1 uppercase font-bold">Carte Cible</label>
+                        <select
+                          value={selectedTargetCardId}
+                          onChange={(e) => setSelectedTargetCardId(e.target.value)}
+                          className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white outline-none focus:border-indigo-500"
+                        >
+                          <option value="">-- Choisir carte --</option>
+                          {cards.filter(c => c.id !== editingCardId).map(c => (
+                            <option key={c.id} value={c.id}>{c.title || c.playerName || "Sans nom"}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex items-end">
+                        <button
+                          type="button"
+                          onClick={handleSaveVariantLink}
+                          disabled={isSavingLink}
+                          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-2 h-[42px]"
+                        >
+                          {isSavingLink ? "..." : <Plus size={18} />} Lier
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                      {cardVariantLinks.map(link => (
+                        <div key={link.id} className="flex items-center justify-between bg-black/40 p-3 rounded-lg border border-white/5 group hover:border-indigo-500/30 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-black/40 rounded flex items-center justify-center overflow-hidden border border-white/10">
+                              <img src={link.variantProfile.iconUrl} className="w-8 h-8 object-contain" alt="" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-black text-white">{link.variantProfile.name}</p>
+                              <p className="text-xs text-indigo-400 font-medium">➔ {link.targetCard.title || link.targetCard.playerName}</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteVariantLink(link.id)}
+                            className="p-2 text-gray-500 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      ))}
+                      {cardVariantLinks.length === 0 && (
+                        <div className="text-center py-6 border border-dashed border-white/10 rounded-xl bg-white/5">
+                          <p className="text-xs text-gray-500 italic">Aucune variante liée à cette carte mère.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <details className="group bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-xl overflow-hidden">
                   <summary className="cursor-pointer font-bold font-outfit text-white p-4 bg-black/20 hover:bg-black/40 transition-colors flex justify-between items-center select-none">
                     Apparence & Design
@@ -1566,7 +1766,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Fond Custom (Image)</label>
                   <div className="flex gap-2">
-                    <input 
+                    <input
                       type="text"
                       value={cardCustomBg}
                       onChange={(e) => setCardCustomBg(e.target.value)}
@@ -1599,7 +1799,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Skin Custom (Image du perso)</label>
                   <div className="flex gap-2">
-                    <input 
+                    <input
                       type="text"
                       value={cardImageUrl}
                       onChange={(e) => setCardImageUrl(e.target.value)}
@@ -1616,7 +1816,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Cadre Custom (Overlay Image)</label>
                   <div className="flex gap-2">
-                    <input 
+                    <input
                       type="text"
                       value={cardFrameUrl}
                       onChange={(e) => setCardFrameUrl(e.target.value)}
@@ -1632,7 +1832,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Couleur du Fond Custom (Code Hex)</label>
-                  <input 
+                  <input
                     type="text"
                     value={cardBgColor}
                     onChange={(e) => setCardBgColor(e.target.value)}
@@ -1643,7 +1843,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Couleur de la Lueur/Glow (Code Hex)</label>
-                  <input 
+                  <input
                     type="text"
                     value={cardGlowColor}
                     onChange={(e) => setCardGlowColor(e.target.value)}
@@ -1654,7 +1854,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Couleur du Bloc en Bas (Code Hex ou bg-color)</label>
-                  <input 
+                  <input
                     type="text"
                     value={factionColor}
                     onChange={(e) => setFactionColor(e.target.value)}
@@ -1665,7 +1865,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Couleur du Cadre Custom (Code Hex)</label>
-                  <input 
+                  <input
                     type="text"
                     value={cardBorderColor}
                     onChange={(e) => setCardBorderColor(e.target.value)}
@@ -1677,7 +1877,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge de Niveau Custom (Image)</label>
                   <div className="flex gap-2">
-                    <input 
+                    <input
                       type="text"
                       value={levelBadgeUrl}
                       onChange={(e) => setLevelBadgeUrl(e.target.value)}
@@ -1694,7 +1894,7 @@ export default function AdminPage() {
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Badge d'Édition (Image)</label>
                   <div className="flex gap-2 mb-4">
-                    <input 
+                    <input
                       type="text"
                       value={editionBadgeUrl}
                       onChange={(e) => setEditionBadgeUrl(e.target.value)}
@@ -1722,7 +1922,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Probabilité d'obtention (%)</label>
-                  <input 
+                  <input
                     type="number"
                     step="0.1"
                     min="0"
@@ -1735,7 +1935,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Description</label>
-                  <input 
+                  <input
                     type="text"
                     value={cardDesc}
                     onChange={(e) => setCardDesc(e.target.value)}
@@ -1743,7 +1943,6 @@ export default function AdminPage() {
                     disabled={creatingCard}
                   />
                 </div>
-                
                   </div>
                 </details>
 
@@ -1755,7 +1954,6 @@ export default function AdminPage() {
                   <div className="p-4 space-y-4">
                 <div>
                   <h4 className="text-sm font-bold text-white mb-4">Mode Full Art & Visibilité</h4>
-                  
                   <label className="flex items-center gap-2 mb-4 cursor-pointer text-sm text-[var(--color-accent-purple)] font-bold">
                     <input type="checkbox" checked={isFullArt} onChange={(e) => {
                       const checked = e.target.checked;
@@ -1808,7 +2006,6 @@ export default function AdminPage() {
                     </label>
                   </div>
 
-                  
                   <div className="mb-4">
                     <label className="block text-sm font-bold text-[var(--color-text-secondary)] mb-2">Effet Spécial (Holo/Shiny)</label>
                     <select
@@ -1942,14 +2139,14 @@ export default function AdminPage() {
 
               <div className="flex-1 flex flex-col items-center justify-center bg-[var(--color-bg-primary)] p-4 rounded-xl border border-dashed border-[var(--color-border-color)]">
                 <div id="live-preview-card" className="w-full max-w-[350px]">
-                <CardDisplay 
+                <CardDisplay
                   isEditing={true}
                   onUpdateElement={handleUpdateElement}
                   childVariantBadges={cards.filter(c => {
-                    try { return JSON.parse(c.attributes || '{}').parentCardId === editingCardId; } 
+                    try { return JSON.parse(c.attributes || '{}').parentCardId === editingCardId; }
                     catch { return false; }
                   }).map(c => {
-                    try { return JSON.parse(c.attributes || '{}').variantBadgeUrl; } 
+                    try { return JSON.parse(c.attributes || '{}').variantBadgeUrl; }
                     catch { return null; }
                   }).filter(Boolean)}
                   card={{
@@ -1965,10 +2162,10 @@ export default function AdminPage() {
                       showVGuide,
                       showHGuide,
                     characterPosition: { x: charPosX, y: charPosY, scale: charScale },
-                    attributes: JSON.stringify({ 
+                    attributes: JSON.stringify({
                       borderColor: cardBorderColor,
                       cardBgColor,
-                      cardGlowColor, 
+                      cardGlowColor,
                       mainColor,
                       rarityBadgeColor,
                       frameUrl: cardFrameUrl,
@@ -2005,14 +2202,14 @@ export default function AdminPage() {
                     player: {
                       minecraftName: players.find(p => p.id === cardPlayerId)?.minecraftName || ""
                     }
-                  }} 
-                  size="lg" 
+                  }}
+                  size="lg"
                 />
                 </div>
                 {editingCardId && (
-                  <button 
-                    type="button" 
-                    onClick={handleCaptureDiscordImage} 
+                  <button
+                    type="button"
+                    onClick={handleCaptureDiscordImage}
                     disabled={isCapturing}
                     className="mt-6 w-full max-w-[350px] btn-primary py-3 flex items-center justify-center gap-2"
                   >
@@ -2034,10 +2231,8 @@ export default function AdminPage() {
                   <h3 className="text-lg font-bold text-white mb-4">Créer une Édition</h3>
                   <form onSubmit={handleCreateEdition} className="flex flex-col gap-2">
                     <input type="text" value={newEditionName} onChange={e => setNewEditionName(e.target.value)} placeholder="Nom de l'édition..." className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)]" />
-                    
                     <div className="flex gap-2 items-center">
                       <input type="text" value={newEditionIconUrl} onChange={e => setNewEditionIconUrl(e.target.value)} placeholder="URL du badge (optionnel)..." className="flex-1 bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none focus:border-[var(--color-accent-purple)] text-sm" />
-                      
                       <label className="bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] hover:border-[var(--color-accent-purple)] px-3 py-2 rounded-lg cursor-pointer transition-colors flex items-center justify-center">
                         <Upload size={18} className="text-[var(--color-accent-purple)]" />
                         <input type="file" accept="image/png, image/jpeg, image/gif" className="hidden" onChange={handleEditionIconUpload} />
@@ -2069,7 +2264,7 @@ export default function AdminPage() {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold font-outfit text-white">Cartes Créées ({cards.length})</h2>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={() => handleGenerateImages(false)}
                     disabled={isBatchGenerating}
                     className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm"
@@ -2086,7 +2281,7 @@ export default function AdminPage() {
                       </>
                     )}
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleGenerateImages(true)}
                     disabled={isBatchGenerating}
                     className="bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 text-sm"
@@ -2126,19 +2321,19 @@ export default function AdminPage() {
                     <div className="mt-2 flex justify-between items-center text-xs text-[var(--color-text-secondary)]">
                       <span>{card.proba}% de chance</span>
                       <div className="flex gap-2">
-                        <button 
+                        <button
                           onClick={() => startEditCard(card)}
                           className="text-indigo-400 hover:text-indigo-300 underline"
                         >
                           Éditer
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDuplicateCard(card)}
                           className="text-green-400 hover:text-green-300 underline"
                         >
                           Dupliquer
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDeleteCard(card.id)}
                           className="text-red-400 hover:text-red-300 underline"
                         >
@@ -2160,13 +2355,12 @@ export default function AdminPage() {
         {activeTab === "moderation" && (
           <div className="space-y-6">
 
-            {/* Card Manager / God Mode inside Moderation */}
+            {}
             <div className="bg-[var(--color-bg-elevated)] border border-red-500/50 rounded-xl p-6 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 to-purple-600"></div>
               <h2 className="text-2xl font-bold font-outfit text-white mb-6 flex items-center gap-2">
                 <ShieldAlert className="text-red-500" /> Card Manager
               </h2>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Sélectionner une Carte</label>
@@ -2197,14 +2391,13 @@ export default function AdminPage() {
                 <button onClick={() => handleGodAction("WIPE_ALL")} disabled={!godCardId} className="bg-red-700 hover:bg-red-600 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all hover:scale-105 shadow-[0_0_15px_rgba(220,38,38,0.5)]">
                   <ShieldAlert className="w-6 h-6" /> WIPE ALL
                 </button>
-              
                 <button onClick={() => handleGodAction("WIPE_PLAYER")} disabled={!godPlayerId} className="bg-red-900 hover:bg-red-800 disabled:opacity-50 text-white font-bold py-3 px-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all hover:scale-105 border border-red-500/30">
                   <ShieldAlert className="w-6 h-6" /> Wipe Inventaire
                 </button>
 </div>
             </div>
 
-            {/* Box Management */}
+            {}
             <div className="bg-[var(--color-bg-elevated)] border border-purple-500/30 rounded-xl p-6">
               <h2 className="text-2xl font-bold font-outfit text-white mb-6">Distribution de Box</h2>
               <div className="flex gap-4 items-end">
@@ -2231,7 +2424,6 @@ export default function AdminPage() {
 
             <h2 className="text-2xl font-bold font-outfit text-white mb-6">Gestion des Utilisateurs</h2>
             <p className="text-[var(--color-text-secondary)] mb-4">Gérez les rôles des utilisateurs connectés (MEMBER, MODERATOR, ADMIN).</p>
-            
             {loadingUsers ? (
               <div className="text-white text-center py-8">Chargement des utilisateurs...</div>
             ) : (
@@ -2274,7 +2466,7 @@ export default function AdminPage() {
                           </span>
                         </td>
                         <td className="p-4 flex gap-2 items-center">
-                          <select 
+                          <select
                             value={user.role}
                             onChange={(e) => handleRoleChange(user.id, e.target.value)}
                             className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded px-3 py-1 text-sm outline-none focus:border-[var(--color-accent-purple)]"
@@ -2283,7 +2475,7 @@ export default function AdminPage() {
                             <option value="MODERATOR">MODERATOR</option>
                             <option value="ADMIN">ADMIN</option>
                           </select>
-                          <button 
+                          <button
                             onClick={() => setSelectedUserEconomy(user)}
                             className="bg-indigo-600/20 text-indigo-400 hover:bg-indigo-600 hover:text-white px-3 py-1 rounded text-sm transition-colors"
                           >
@@ -2309,7 +2501,6 @@ export default function AdminPage() {
                   <h3 className="text-xl font-bold text-white mb-4">
                     Gérer l'économie : {selectedUserEconomy.name}
                   </h3>
-                  
                   <div className="flex gap-4 mb-4">
                     <div className="bg-black/30 p-3 rounded-lg flex-1 border border-white/5">
                       <p className="text-xs text-[var(--color-text-secondary)]">PARA Coins</p>
@@ -2329,7 +2520,7 @@ export default function AdminPage() {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Action</label>
-                      <select 
+                      <select
                         value={economyActionType}
                         onChange={(e) => setEconomyActionType(e.target.value as any)}
                         className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none"
@@ -2342,7 +2533,7 @@ export default function AdminPage() {
                     {economyActionType === "set_booster" && (
                       <div>
                         <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Type de Booster</label>
-                        <select 
+                        <select
                           value={economyBoxType}
                           onChange={(e) => setEconomyBoxType(e.target.value)}
                           className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none"
@@ -2357,24 +2548,24 @@ export default function AdminPage() {
 
                     <div>
                       <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Quantité</label>
-                      <input 
-                        type="number" 
-                        min="1" 
-                        value={economyActionAmount} 
-                        onChange={(e) => setEconomyActionAmount(parseInt(e.target.value))} 
-                        className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none" 
+                      <input
+                        type="number"
+                        min="1"
+                        value={economyActionAmount}
+                        onChange={(e) => setEconomyActionAmount(parseInt(e.target.value))}
+                        className="w-full bg-[var(--color-bg-primary)] border border-[var(--color-border-color)] rounded-lg px-4 py-2 text-white outline-none"
                       />
                     </div>
                   </div>
 
                   <div className="flex gap-3 mt-6">
-                    <button 
+                    <button
                       onClick={() => setSelectedUserEconomy(null)}
                       className="flex-1 bg-transparent border border-[var(--color-border-color)] hover:bg-white/5 text-white font-bold py-2 rounded-lg"
                     >
                       Annuler
                     </button>
-                    <button 
+                    <button
                       onClick={handleEconomyAction}
                       disabled={isUpdatingEconomy}
                       className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg disabled:opacity-50"

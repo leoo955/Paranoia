@@ -17,7 +17,6 @@ export async function POST(req: Request) {
       return new NextResponse("Missing uuid", { status: 400 });
     }
 
-    // @ts-ignore
     const user = await prisma.user.findFirst({
       where: { minecraftUuid: minecraftUuid, isMcVerified: true },
     });

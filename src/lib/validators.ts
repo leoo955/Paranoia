@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const sanitizeText = (text: string) => {
-  return text.replace(/<[^>]*>?/gm, ''); // simple html stripping
+  return text.replace(/<[^>]*>?/gm, '');
 };
 
 export const createTopicSchema = z.object({
@@ -35,6 +35,6 @@ export const createTradingCardSchema = z.object({
 
 export const saveTierListSchema = z.object({
   title: z.string().min(1).max(100),
-  data: z.string(), // json stringified
+  data: z.string(),
   isPublic: z.boolean(),
 });

@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="fr" className="dark">
       <body className={`${inter.variable} ${outfit.variable} flex flex-col min-h-screen bg-[var(--color-bg-primary)]`}>
         <Providers>
-          <Toaster 
+          <Toaster
             position="bottom-right"
             toastOptions={{
               className: '',

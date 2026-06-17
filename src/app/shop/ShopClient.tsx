@@ -88,7 +88,49 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
 
   return (
     <div className="w-full relative z-10">
-      
+      {}
+      <div className="relative w-full mb-16 rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
+        {}
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center transition-transform duration-10000 group-hover:scale-110"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-indigo-900/20 mix-blend-overlay"></div>
+
+        <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 bg-yellow-500 text-black font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-widest mb-4 shadow-[0_0_20px_rgba(234,179,8,0.5)]">
+              <Sparkles className="w-4 h-4" /> Édition Limitée
+            </div>
+            <h2 className="text-4xl md:text-6xl font-outfit font-black text-white mb-4 drop-shadow-lg">
+              ÉTÉ <span className="text-yellow-400">2026</span>
+            </h2>
+            <p className="text-white/80 text-lg max-w-xl mb-8 font-medium leading-relaxed">
+              Découvrez la collection panoramique exclusive. Chaque carte joueur s'intègre dans un panorama unique du serveur Paranoïa.
+            </p>
+            <button className="bg-white text-black font-black px-8 py-4 rounded-2xl flex items-center gap-3 transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]">
+              VOIR LA COLLECTION <Zap className="w-5 h-5 fill-black" />
+            </button>
+          </div>
+
+          <div className="flex-shrink-0 flex gap-4 animate-float">
+            <div className="w-32 h-44 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 rotate-[-12deg] translate-y-4 shadow-2xl flex items-center justify-center overflow-hidden">
+               <img src="/Paranoia_logo.png" className="w-20 opacity-40 grayscale" alt="" />
+            </div>
+            <div className="w-40 h-56 bg-gradient-to-br from-indigo-500/40 to-purple-600/40 backdrop-blur-xl rounded-2xl border border-white/30 shadow-[0_0_50px_rgba(168,85,247,0.4)] z-10 flex items-center justify-center overflow-hidden">
+               <img src="/Paranoia_logo.png" className="w-28 drop-shadow-2xl" alt="" />
+            </div>
+            <div className="w-32 h-44 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 rotate-[12deg] translate-y-4 shadow-2xl flex items-center justify-center overflow-hidden">
+               <img src="/Paranoia_logo.png" className="w-20 opacity-40 grayscale" alt="" />
+            </div>
+          </div>
+        </div>
+        {/* Animated players zones mock */}
+        <div className="absolute bottom-4 right-8 flex gap-2">
+          {[1,2,3,4,5].map(i => (
+            <div key={i} className="w-2 h-2 rounded-full bg-white/20 animate-pulse" style={{ animationDelay: `${i * 0.5}s` }}></div>
+          ))}
+        </div>
+      </div>
+
       {/* HUD Balance */}
       {isLoggedIn && (
         <div className="flex justify-center md:justify-end mb-12">
@@ -116,33 +158,30 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
       {/* Pricing Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-6xl mx-auto">
         {packages.map((pkg, i) => (
-          <div 
-            key={pkg.id} 
+          <div
+            key={pkg.id}
             className={`relative group bg-gradient-to-br ${pkg.color} bg-opacity-10 backdrop-blur-xl border ${pkg.border} rounded-[2rem] p-8 flex flex-col items-center text-center transition-all duration-500 hover:scale-[1.02] hover:-translate-y-4`}
           >
             {/* Background Glow */}
             <div className={`absolute inset-0 ${pkg.glow} blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none rounded-[2rem]`}></div>
-            
             {pkg.popular && (
               <div className="absolute -top-5 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white text-sm font-black px-6 py-1.5 rounded-full uppercase tracking-widest shadow-[0_0_20px_rgba(168,85,247,0.6)] animate-pulse-glow border border-white/20 z-10 flex items-center gap-2">
                 <Zap className="w-4 h-4 fill-white" />
                 Plus Populaire
               </div>
             )}
-            
             <div className="text-[var(--color-text-secondary)] font-bold tracking-widest uppercase text-sm mb-6 relative z-10">
               {pkg.title}
             </div>
 
             <div className={`w-32 h-32 mb-4 relative flex items-center justify-center`}>
               <div className={`absolute inset-0 ${pkg.glow} rounded-full blur-2xl opacity-50 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700`}></div>
-              <img 
-                src="/Paracoin.png" 
-                alt="PARA Coins" 
+              <img
+                src="/Paracoin.png"
+                alt="PARA Coins"
                 className={`relative z-10 w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)] transition-transform duration-700 group-hover:scale-110 group-hover:rotate-12`}
               />
             </div>
-            
             {pkg.bonusAmount > 0 && (
               <div className="bg-gradient-to-r from-red-600 to-red-500 border border-red-400/50 text-white font-black text-sm px-4 py-1 rounded shadow-[0_0_15px_rgba(239,68,68,0.5)] mb-6 transform -rotate-2 group-hover:scale-110 transition-transform duration-300">
                 {pkg.baseAmount} + {pkg.bonusAmount} EN PLUS
@@ -151,29 +190,25 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
             {pkg.bonusAmount === 0 && (
               <div className="h-8 mb-6"></div> // spacer
             )}
-            
             <h3 className="text-5xl font-outfit font-black text-white mb-2 flex items-baseline gap-2 relative z-10 drop-shadow-lg">
               {pkg.amount}
               <span className={`text-lg font-bold ${pkg.iconColor} uppercase tracking-widest`}>Coins</span>
             </h3>
-            
             <p className="text-[var(--color-text-secondary)] mb-10 flex-1 relative z-10 font-medium px-4">
               Idéal pour agrandir rapidement votre collection de Trading Cards.
             </p>
-            
             <button
               onClick={() => handleBuy(pkg.id, pkg.amount)}
               disabled={loadingPkg !== null}
               className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all duration-300 relative overflow-hidden group/btn z-10 ${
-                loadingPkg === pkg.id 
-                  ? 'bg-white/10 text-white/50 cursor-not-allowed border border-white/10' 
+                loadingPkg === pkg.id
+                  ? 'bg-white/10 text-white/50 cursor-not-allowed border border-white/10'
                   : `${pkg.buttonBg} text-white`
               }`}
             >
               {loadingPkg !== pkg.id && (
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ease-out"></div>
               )}
-              
               <span className="relative z-10 flex items-center gap-2 text-lg">
                 {loadingPkg === pkg.id ? (
                   <>
@@ -200,7 +235,7 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
         <div>
           <h4 className="text-xl font-outfit text-white font-bold mb-3">Paiement 100% Sécurisé</h4>
           <p className="text-blue-200/70 leading-relaxed font-medium">
-            Les PARA Coins sont une monnaie virtuelle exclusive au serveur PARANOIA, conçue pour l'ouverture de Boosters de Trading Cards. 
+            Les PARA Coins sont une monnaie virtuelle exclusive au serveur PARANOIA, conçue pour l'ouverture de Boosters de Trading Cards.
             Aucun remboursement n'est possible après l'achat. Ce module est actuellement en phase de test (simulateur).
           </p>
         </div>

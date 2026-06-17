@@ -8,7 +8,6 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const gameMode = searchParams.get("gameMode") || "GÉNERAL";
 
-    // Find the most recent tier list for this game mode
     const tierList = await prisma.tierList.findFirst({
       where: { gameMode },
       orderBy: { updatedAt: 'desc' }
@@ -41,7 +40,6 @@ export async function POST(req: Request) {
 
     const stringifiedData = JSON.stringify(data);
 
-    // See if a tierlist for this mode exists
     const existing = await prisma.tierList.findFirst({
       where: { gameMode }
     });

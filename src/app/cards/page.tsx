@@ -14,9 +14,7 @@ export const metadata = {
 
 export default async function CardsPage() {
   const session = await getServerSession(authOptions);
-  // @ts-ignore
   const userId = session?.user?.id;
-
 
   let inventory: any[] = [];
   let userBoxes: any[] = [];
@@ -32,7 +30,12 @@ export default async function CardsPage() {
       where: { userId },
       include: {
         tradingCard: {
-          include: { player: true }
+          include: {
+            player: true,
+            motherLinks: {
+              include: { variantProfile: true }
+            }
+          }
         }
       },
       orderBy: { obtainedAt: 'desc' }
@@ -43,33 +46,35 @@ export default async function CardsPage() {
   }
 
   const allCards = await prisma.tradingCard.findMany({
-    include: { player: true },
+    include: {
+      player: true,
+      motherLinks: {
+        include: { variantProfile: true }
+      }
+    },
     orderBy: { rarity: 'desc' }
   });
 
   const allUsers = await prisma.user.findMany({
     select: { minecraftName: true, id: true }
   });
-  
   const serverPlayers = allUsers
     .map(u => u.minecraftName)
     .filter(Boolean) as string[];
 
-  // Find current user's minecraftName
   const currentUserMCName = allUsers.find(u => u.id === userId)?.minecraftName || "";
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Background Ambience */}
+      {}
       <div className="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-30 pointer-events-none mix-blend-screen animate-pulse-slow" />
       <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[150%] max-w-7xl h-[800px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/50 via-purple-900/20 to-transparent pointer-events-none" />
       <div className="fixed bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none z-0" />
-      
-      {/* Floating particles */}
+      {}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         {[...Array(20)].map((_, i) => (
-          <div 
-            key={i} 
+          <div
+            key={`particle-${i}`}
             className="absolute rounded-full bg-indigo-400/20 blur-sm animate-float"
             style={{
               width: Math.random() * 10 + 5 + 'px',
@@ -81,11 +86,26 @@ export default async function CardsPage() {
             }}
           />
         ))}
+
+        {}
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={`bg-card-${i}`}
+            className="absolute opacity-5 blur-[1px] animate-float pointer-events-none hidden lg:block"
+            style={{
+              left: `${(i * 20) % 100}%`,
+              top: `${(i * 25) % 100}%`,
+              animationDuration: `${15 + i * 2}s`,
+              animationDelay: `${i * -3}s`,
+              transform: `rotate(${i * 15}deg) scale(0.8)`,
+            }}
+          >
+            <div className="w-48 h-64 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl border border-white/10" />
+          </div>
+        ))}
       </div>
-      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10">
-        
-        {/* Page Header */}
+        {}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-2">
           <div className="relative">
             <div className="absolute -inset-4 bg-indigo-500/20 blur-2xl rounded-full opacity-50"></div>
@@ -98,11 +118,11 @@ export default async function CardsPage() {
           </div>
         </div>
 
-        <PackOpenerClient 
-          initialInventory={inventory} 
-          initialBoxes={userBoxes} 
-          initialCoins={paraCoins} 
-          isLoggedIn={!!userId} 
+        <PackOpenerClient
+          initialInventory={inventory}
+          initialBoxes={userBoxes}
+          initialCoins={paraCoins}
+          isLoggedIn={!!userId}
           allCards={allCards}
           serverPlayers={serverPlayers}
           currentUserMCName={currentUserMCName}

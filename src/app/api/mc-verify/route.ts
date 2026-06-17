@@ -3,7 +3,6 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    // Basic security: require a secret token in headers to prevent fake verification
     const authHeader = req.headers.get("authorization");
     const API_SECRET = process.env.MC_API_SECRET;
 
@@ -18,10 +17,7 @@ export async function POST(req: Request) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
-    // Find user with this code
-    // @ts-ignore
     const user = await prisma.user.findUnique({
-      // @ts-ignore
       where: { mcVerificationCode: code },
     });
 
@@ -29,16 +25,13 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid code", { status: 404 });
     }
 
-    // Verify user and remove code
-    // @ts-ignore
     await prisma.user.update({
-      // @ts-ignore
       where: { id: user.id },
       data: {
         isMcVerified: true,
         minecraftName: minecraftName,
         minecraftUuid: minecraftUuid,
-        mcVerificationCode: null, // Consume the code
+        mcVerificationCode: null,
       },
     });
 

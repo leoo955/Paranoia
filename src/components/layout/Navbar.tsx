@@ -32,7 +32,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Force Next.js to refresh data from server when navigating to avoid stale cache
   useEffect(() => {
     router.refresh();
   }, [pathname, router]);
@@ -48,18 +47,18 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
+          {}
           <Link href="/" className="flex-shrink-0 flex items-center group">
-            <Image 
-              src="/Paranoia_no_effect.png" 
-              alt="PARANOIA SMP" 
-              width={160} 
-              height={50} 
+            <Image
+              src="/Paranoia_no_effect.png"
+              alt="PARANOIA SMP"
+              width={160}
+              height={50}
               className="object-contain drop-shadow-[0_0_10px_rgba(179,102,255,0.5)] transition-transform group-hover:scale-105"
             />
           </Link>
 
-          {/* Desktop Navigation */}
+          {}
           <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
             {navLinks.map((link) => {
               const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
@@ -82,13 +81,13 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Login Button (Desktop) */}
+          {}
           <div className="hidden md:flex items-center space-x-4">
             {status === "loading" ? (
               <div className="w-24 h-10 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
             ) : session ? (
               <div className="flex items-center space-x-4">
-                {/* @ts-expect-error */}
+                {}
                 {session.user?.role === "ADMIN" && (
                   <Link href="/admin" className="flex items-center gap-2 text-[var(--color-accent-purple)] hover:text-white transition-colors text-sm font-bold">
                     <ShieldAlert className="w-4 h-4" /> Admin
@@ -110,7 +109,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -122,7 +121,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
+      {}
       {isMobileMenuOpen && (
         <div className="md:hidden panel-matte border-t-0 animate-slide-up origin-top absolute top-20 left-0 right-0 p-4 space-y-2">
           {navLinks.map((link) => {
@@ -150,7 +149,7 @@ export default function Navbar() {
               <div className="w-full h-12 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
             ) : session ? (
               <div className="space-y-3">
-                {/* @ts-expect-error */}
+                {}
                 {session.user?.role === "ADMIN" && (
                   <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center space-x-2 py-3 bg-[var(--color-bg-elevated)] rounded-lg text-[var(--color-accent-purple)] font-bold">
                     <ShieldAlert className="w-5 h-5" />

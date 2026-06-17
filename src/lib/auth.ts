@@ -22,12 +22,9 @@ export const authOptions: NextAuthOptions = {
         token.minecraftName = (user as any).minecraftName;
         token.isMcVerified = (user as any).isMcVerified;
       }
-      
-      // Upgrade to ADMIN if Discord ID matches
       if (account && account.provider === 'discord' && account.providerAccountId === process.env.ADMIN_DISCORD_ID) {
         token.role = 'ADMIN';
       }
-      // Handle session updates (when user sets their pseudo or verifies IG)
       if (trigger === "update" && token.id) {
         const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
         if (dbUser) {
@@ -39,13 +36,9 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        // @ts-expect-error
         session.user.id = token.id;
-        // @ts-expect-error
         session.user.role = token.role;
-        // @ts-expect-error
         session.user.minecraftName = token.minecraftName;
-        // @ts-expect-error
         session.user.isMcVerified = token.isMcVerified;
       }
       return session;

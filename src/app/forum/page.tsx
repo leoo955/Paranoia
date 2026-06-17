@@ -18,7 +18,6 @@ export default async function ForumPage({
   const params = await searchParams;
   const category = params.category;
   const q = params.q;
-  
   const where = {
     ...(category && category !== "all" ? { category: { equals: category } } : {}),
     ...(q ? { title: { contains: q } } : {}),

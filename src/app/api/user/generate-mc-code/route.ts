@@ -10,17 +10,13 @@ export async function POST(req: Request) {
       return new NextResponse("Non autorisé", { status: 401 });
     }
 
-    // Generate a random 6-character code
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let code = "";
     for (let i = 0; i < 6; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
 
-    // Save it to the user
-    // @ts-ignore
     await prisma.user.update({
-      // @ts-ignore
       where: { id: session.user.id },
       data: { mcVerificationCode: code },
     });

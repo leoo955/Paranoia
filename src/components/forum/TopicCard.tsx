@@ -47,7 +47,6 @@ export default function TopicCard({ topic }: TopicCardProps) {
             <span>par <span className="text-[var(--color-text-secondary)]">{topic.author.name || "Anonyme"}</span></span>
           </div>
         </div>
-        
           <div className="flex items-center gap-6 text-sm text-[var(--color-text-muted)] md:justify-end">
           <div className="flex items-center gap-1.5" title="Vues">
             <Eye className="w-4 h-4" />

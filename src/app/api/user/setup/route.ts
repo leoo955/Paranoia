@@ -17,10 +17,7 @@ export async function POST(req: Request) {
       return new NextResponse("Pseudo invalide", { status: 400 });
     }
 
-    // Update user in DB
-    // @ts-ignore
     await prisma.user.update({
-      // @ts-ignore
       where: { id: session.user.id },
       data: { minecraftName },
     });

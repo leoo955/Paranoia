@@ -5,7 +5,7 @@ async function main() {
   const account = await prisma.account.findFirst({
     where: { providerAccountId: "1417148856646242387" }
   });
-  
+
   if (account) {
     await prisma.user.update({
       where: { id: account.userId },

@@ -94,9 +94,7 @@ export default function TierListPage() {
     if (!itemName) return;
 
     setTiers(prev => {
-      // Remove item from any existing tier
       const newTiers = prev.map(t => ({ ...t, items: t.items.filter(i => i !== itemName) }));
-      // Add to target tier
       const target = newTiers.find(t => t.id === targetTierId);
       if (target) {
         target.items.push(itemName);
@@ -114,7 +112,7 @@ export default function TierListPage() {
   };
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault(); // allow drop
+    e.preventDefault();
   };
 
   const handleRemoveFromTier = (itemName: string) => {
@@ -130,7 +128,7 @@ export default function TierListPage() {
         </div>
         <div className="flex gap-2">
           {(session?.user as any)?.role === "ADMIN" && (
-            <button 
+            <button
               onClick={handleSave}
               disabled={isSaving}
               className="flex items-center gap-2 btn-secondary py-2 px-4 text-sm hidden md:flex text-green-400 border-green-500/30 hover:bg-green-500/10"
@@ -147,15 +145,15 @@ export default function TierListPage() {
         </div>
       </div>
 
-      {/* Barre des Modes de Jeu */}
+      {}
       <div className="panel-matte p-4 rounded-xl mb-6 flex flex-wrap gap-2 justify-center">
         {GAME_MODES.map((mode) => (
-          <button 
+          <button
             key={mode}
             onClick={() => setActiveMode(mode)}
             className={`px-4 py-2 rounded-lg font-outfit font-bold text-sm transition-all duration-200 border ${
-              activeMode === mode 
-                ? "bg-[var(--color-accent-purple)] text-white border-transparent" 
+              activeMode === mode
+                ? "bg-[var(--color-accent-purple)] text-white border-transparent"
                 : "bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] border-[var(--color-border-color)] hover:text-white hover:border-[var(--color-text-muted)]"
             }`}
           >
@@ -168,23 +166,22 @@ export default function TierListPage() {
         <div className="flex flex-col">
           {tiers.map((tier) => (
             <div key={tier.id} className="flex min-h-[100px] border-b border-[var(--color-border-color)] last:border-b-0">
-              {/* Tier Label */}
+              {}
               <div className={`w-24 md:w-32 flex-shrink-0 flex items-center justify-center font-outfit font-black text-2xl text-white shadow-inner relative group ${tier.color}`}>
                 {tier.name}
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
                   <Settings className="w-5 h-5" />
                 </div>
               </div>
-              
-              {/* Tier Content Area */}
-              <div 
+              {}
+              <div
                 className="flex-1 bg-[rgba(0,0,0,0.3)] p-3 flex flex-wrap gap-2 items-start content-start"
                 onDrop={(e) => handleDropToTier(e, tier.id)}
                 onDragOver={handleDragOver}
               >
                 {tier.items.map((item, itemIdx) => (
-                  <div 
-                    key={itemIdx} 
+                  <div
+                    key={itemIdx}
                     draggable
                     onDragStart={(e) => handleDragStart(e, item)}
                     className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] px-3 py-2 rounded shadow-sm text-sm font-medium text-white flex flex-col items-center gap-1 cursor-grab hover:border-[var(--color-accent-purple)] transition-colors relative group"
@@ -202,7 +199,7 @@ export default function TierListPage() {
         </div>
       </div>
 
-      {/* Unranked Pool */}
+      {}
       <div className="mt-8 panel-matte p-6 rounded-2xl">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-outfit font-bold text-white text-lg">Éléments non classés</h3>
@@ -210,14 +207,14 @@ export default function TierListPage() {
             <Plus className="w-4 h-4" /> Ajouter
           </button>
         </div>
-        <div 
+        <div
           className="min-h-[100px] bg-[rgba(0,0,0,0.3)] rounded-lg border border-dashed border-[var(--color-border-color)] p-3 flex flex-wrap gap-2"
           onDrop={handleDropToUnranked}
           onDragOver={handleDragOver}
         >
           {unranked.map(item => (
-            <div 
-               key={item} 
+            <div
+               key={item}
                draggable
                onDragStart={(e) => handleDragStart(e, item)}
                className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] px-3 py-2 rounded shadow-sm text-sm font-medium text-white flex flex-col items-center gap-1 cursor-grab hover:border-[var(--color-accent-purple)] transition-colors relative group"

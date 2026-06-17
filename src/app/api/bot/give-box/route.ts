@@ -6,7 +6,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { discordId, boxType, amount, secret } = body;
 
-    // Verify secret
     if (!secret || secret !== process.env.BOT_API_SECRET) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -15,7 +14,6 @@ export async function POST(req: Request) {
       return new NextResponse("Missing parameters", { status: 400 });
     }
 
-    // Find user by discordId
     const user = await prisma.user.findUnique({
       where: { discordId }
     });
@@ -24,7 +22,6 @@ export async function POST(req: Request) {
       return new NextResponse("User not found", { status: 404 });
     }
 
-    // Upsert UserBox
     const userBox = await prisma.userBox.upsert({
       where: {
         userId_boxType: {

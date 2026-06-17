@@ -4,7 +4,6 @@ import * as dotenv from 'dotenv';
 import path from 'path';
 import http from 'http';
 
-// Load env from the Next.js project root
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const prisma = new PrismaClient();
@@ -23,20 +22,32 @@ async function buildCardListMessage(discordId: string, page: number, targetDisco
   const user = await getUserByDiscordId(queryId);
   if (!user) return null;
 
-  const inventory = await prisma.userCard.findMany({
+  const rawInventory = await prisma.userCard.findMany({
     where: { userId: user.id },
     include: { tradingCard: { include: { player: true } } }
   });
 
-  if (inventory.length === 0) {
+  if (rawInventory.length === 0) {
     return { content: targetDiscordId ? 'Son inventaire est vide !' : 'Votre inventaire est vide ! Ouvrez des boosters sur le site.' };
   }
 
+  const grouped: Record<string, { card: any, count: number, ids: string[] }> = {};
+  rawInventory.forEach(item => {
+    const tId = item.tradingCard.id;
+    if (!grouped[tId]) {
+      grouped[tId] = { card: item.tradingCard, count: 0, ids: [] };
+    }
+    grouped[tId].count++;
+    grouped[tId].ids.push(item.id);
+  });
+
+  const inventory = Object.values(grouped);
+
   const rarityOrder = ['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'];
   inventory.sort((a, b) => {
-    const rDiff = rarityOrder.indexOf(a.tradingCard.rarity) - rarityOrder.indexOf(b.tradingCard.rarity);
+    const rDiff = rarityOrder.indexOf(a.card.rarity) - rarityOrder.indexOf(b.card.rarity);
     if (rDiff !== 0) return rDiff;
-    return a.tradingCard.title.localeCompare(b.tradingCard.title);
+    return a.card.title.localeCompare(b.card.title);
   });
 
   const totalPages = inventory.length;
@@ -44,7 +55,7 @@ async function buildCardListMessage(discordId: string, page: number, targetDisco
   if (page >= totalPages) page = totalPages - 1;
 
   const currentItem = inventory[page];
-  const shortUuid = currentItem.id.slice(-6);
+  const shortUuid = currentItem.ids[0].slice(-6);
 
   const colors: Record<string, number> = {
     'MYTHIC': 0xdc2626,
@@ -55,24 +66,26 @@ async function buildCardListMessage(discordId: string, page: number, targetDisco
     'COMMON': 0x94a3b8
   };
 
+  const quantityText = currentItem.count > 1 ? `\nQuantité: **x${currentItem.count}**` : '';
+  const uuidText = currentItem.count > 1 ? `UUIDs: \`${currentItem.count} instances\`` : `UUID: \`#${shortUuid}\``;
+
   const embed = new EmbedBuilder()
-    .setTitle(targetDiscordId ? `Catalogue de ${user.minecraftName || 'Joueur'}` : 'Votre Inventaire')
-    .setColor(colors[currentItem.tradingCard.rarity] || 0x94a3b8)
-    .setDescription(`**${currentItem.tradingCard.title}**\nRareté: ${currentItem.tradingCard.rarity}\nUUID: \`#${shortUuid}\``)
-    .setFooter({ text: `Page ${page + 1}/${totalPages}` });
+    .setTitle(targetDiscordId ? `Inventaire de ${user.minecraftName || 'Joueur'}` : 'Votre Inventaire')
+    .setColor(colors[currentItem.card.rarity] || 0x94a3b8)
+    .setDescription(`**${currentItem.card.title}**\nÉdition: \`${currentItem.card.edition}\`\nRareté: ${currentItem.card.rarity}${quantityText}\n${uuidText}`)
+    .setFooter({ text: `Page ${page + 1}/${totalPages} | ${rawInventory.length} cartes au total` });
 
   const files: any[] = [];
-  
-  if (currentItem.tradingCard.renderedImageUrl) {
+  if (currentItem.card.renderedImageUrl) {
     const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const imageUrl = currentItem.tradingCard.renderedImageUrl.startsWith('http') 
-      ? currentItem.tradingCard.renderedImageUrl 
-      : `${appUrl}${currentItem.tradingCard.renderedImageUrl}`;
+    const imageUrl = currentItem.card.renderedImageUrl.startsWith('http')
+      ? currentItem.card.renderedImageUrl
+      : `${appUrl}${currentItem.card.renderedImageUrl}`;
     const timestamp = Date.now();
     embed.setImage(`${imageUrl}?v=${timestamp}`);
   } else {
     const timestamp = Date.now();
-    const bgImage = currentItem.tradingCard.imageUrl || `https://render.crafty.gg/3d/bust/${currentItem.tradingCard.player?.minecraftName || 'Steve'}?v=${timestamp}`;
+    const bgImage = currentItem.card.imageUrl || `https://render.crafty.gg/3d/bust/${currentItem.card.player?.minecraftName || 'Steve'}?v=${timestamp}`;
     embed.setImage(bgImage);
   }
 
@@ -108,23 +121,27 @@ const commands = [
   new SlashCommandBuilder()
     .setName('trade')
     .setDescription('Échanger une carte avec un autre joueur')
-    .addUserOption(option => 
+    .addUserOption(option =>
       option.setName('utilisateur')
         .setDescription('Le joueur avec qui vous voulez échanger')
         .setRequired(true))
-    .addStringOption(option => 
+    .addStringOption(option =>
       option.setName('carte_offerte')
         .setDescription('La carte que vous offrez (tapez pour chercher)')
         .setAutocomplete(true)
         .setRequired(true))
-    .addStringOption(option => 
+    .addStringOption(option =>
       option.setName('carte_demandée')
         .setDescription('La carte que vous demandez (tapez pour chercher)')
         .setAutocomplete(true)
         .setRequired(true)),
   new SlashCommandBuilder()
     .setName('inv')
-    .setDescription('Afficher votre collection de cartes'),
+    .setDescription('Afficher une collection de cartes (la vôtre ou celle d\'un joueur)')
+    .addUserOption(option =>
+      option.setName('joueur')
+        .setDescription('Le joueur dont vous voulez voir l\'inventaire (optionnel)')
+        .setRequired(false)),
   new SlashCommandBuilder()
     .setName('flex')
     .setDescription('Afficher la meilleure carte de votre collection'),
@@ -132,9 +149,12 @@ const commands = [
     .setName('pc')
     .setDescription('Afficher votre nombre de Paracoins'),
   new SlashCommandBuilder()
+    .setName('daily')
+    .setDescription('Récupérer votre récompense quotidienne en ParaCoins'),
+  new SlashCommandBuilder()
     .setName('catalogue')
     .setDescription('Afficher le catalogue de cartes d\'un joueur')
-    .addUserOption(option => 
+    .addUserOption(option =>
       option.setName('joueur')
         .setDescription('Le joueur dont vous voulez voir le catalogue')
         .setRequired(true)),
@@ -146,7 +166,6 @@ const commands = [
 
 client.once('ready', async () => {
   console.log(`Bot logged in as ${client.user?.tag}`);
-  
   if (!client.user) return;
 
   const rest = new REST({ version: '10' }).setToken(token);
@@ -166,7 +185,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
   if (interaction.isAutocomplete()) {
     try {
       const focusedOption = interaction.options.getFocused(true);
-      
       let discordIdToSearch = '';
       if (focusedOption.name === 'carte_offerte') {
         discordIdToSearch = interaction.user.id;
@@ -178,22 +196,18 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
       if (!discordIdToSearch) return await interaction.respond([]);
 
-      // Fetch user from DB
       const user = await getUserByDiscordId(discordIdToSearch);
 
       if (!user) {
         return await interaction.respond([]);
       }
 
-      // Fetch inventory
       const inventory = await prisma.userCard.findMany({
         where: { userId: user.id },
         include: { tradingCard: { include: { player: true } } }
       });
 
-      // Filter based on input
       const search = focusedOption.value.toLowerCase();
-      
       const choices = inventory
         .filter(item => {
           const name = `${item.tradingCard.title} (${item.tradingCard.rarity})`;
@@ -204,7 +218,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
           const shortUuid = item.id.slice(-6);
           return {
             name: `[#${shortUuid}] ${item.tradingCard.title} (${item.tradingCard.rarity})`,
-            value: item.id // The UserCard ID
+            value: item.id
           };
         });
 
@@ -235,7 +249,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         if (!proposer) return await interaction.reply({ content: 'Vous n\'êtes pas enregistré sur Paranoia.', ephemeral: true });
         if (!receiver) return await interaction.reply({ content: 'Ce joueur n\'est pas enregistré sur Paranoia.', ephemeral: true });
 
-        // Check if proposer actually has the offered card instance
         const proposerCard = await prisma.userCard.findFirst({
           where: { id: offeredCardId, userId: proposer.id },
           include: { tradingCard: true }
@@ -245,7 +258,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
           return await interaction.reply({ content: 'Vous ne possédez pas ou plus la carte que vous proposez !', ephemeral: true });
         }
 
-        // Check if receiver actually has the requested card instance
         const receiverCard = await prisma.userCard.findFirst({
           where: { id: requestedCardId, userId: receiver.id },
           include: { tradingCard: true }
@@ -290,13 +302,52 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
     if (interaction.commandName === 'inv') {
       try {
-        const messageOptions = await buildCardListMessage(interaction.user.id, 0);
+        const targetUser = interaction.options.getUser('joueur');
+        const queryId = targetUser ? targetUser.id : interaction.user.id;
+        
+        const messageOptions = await buildCardListMessage(interaction.user.id, 0, queryId !== interaction.user.id ? queryId : undefined);
         if (!messageOptions) {
-          return await interaction.reply({ content: "Vous n'êtes pas enregistré sur Paranoia.", ephemeral: true });
+          return await interaction.reply({ content: targetUser ? "Ce joueur n'est pas enregistré sur Paranoia." : "Vous n'êtes pas enregistré sur Paranoia.", ephemeral: true });
         }
         await interaction.reply(messageOptions);
       } catch (error) {
         console.error("inv command error:", error);
+        await interaction.reply({ content: "Une erreur est survenue.", ephemeral: true });
+      }
+    }
+
+    if (interaction.commandName === 'daily') {
+      try {
+        const user = await getUserByDiscordId(interaction.user.id);
+        if (!user) return await interaction.reply({ content: "Vous n'êtes pas enregistré sur Paranoia.", ephemeral: true });
+
+        const now = new Date();
+        const lastDaily = user.lastDaily;
+
+        if (lastDaily && (now.getTime() - lastDaily.getTime()) < 24 * 60 * 60 * 1000) {
+          const nextAvailable = new Date(lastDaily.getTime() + 24 * 60 * 60 * 1000);
+          const diff = nextAvailable.getTime() - now.getTime();
+          const hours = Math.floor(diff / (1000 * 60 * 60));
+          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          return await interaction.reply({ content: `Vous avez déjà récupéré votre récompense quotidienne ! Revenez dans **${hours}h et ${mins}m**.`, ephemeral: true });
+        }
+
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            paraCoins: { increment: 100 },
+            lastDaily: now
+          }
+        });
+
+        const embed = new EmbedBuilder()
+          .setTitle('🎁 Récompense Quotidienne')
+          .setColor('#22c55e')
+          .setDescription(`Vous avez reçu **100 ParaCoins** !\nVotre nouveau solde est de **${user.paraCoins + 100} PC**.`);
+
+        await interaction.reply({ embeds: [embed] });
+      } catch (error) {
+        console.error("daily command error:", error);
         await interaction.reply({ content: "Une erreur est survenue.", ephemeral: true });
       }
     }
@@ -351,7 +402,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         inventory.sort((a, b) => {
           const rDiff = rarityOrder.indexOf(a.tradingCard.rarity) - rarityOrder.indexOf(b.tradingCard.rarity);
           if (rDiff !== 0) return rDiff;
-          return a.tradingCard.proba - b.tradingCard.proba; // Lowest proba is best
+          return a.tradingCard.proba - b.tradingCard.proba;
         });
 
         const bestItem = inventory[0];
@@ -369,12 +420,12 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         const embed = new EmbedBuilder()
           .setTitle(`👑 Flex Time !`)
           .setColor(colors[bestItem.tradingCard.rarity] || 0x94a3b8)
-          .setDescription(`<@${interaction.user.id}> flex avec sa meilleure carte :\n**${bestItem.tradingCard.title}** (${bestItem.tradingCard.rarity})\nUUID: \`#${shortUuid}\``);
+          .setDescription(`<@${interaction.user.id}> flex avec sa meilleure carte :\n**${bestItem.tradingCard.title}** (${bestItem.tradingCard.rarity})\nÉdition: \`${bestItem.tradingCard.edition}\`\nUUID: \`#${shortUuid}\``);
 
         if (bestItem.tradingCard.renderedImageUrl) {
           const appUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-          const imageUrl = bestItem.tradingCard.renderedImageUrl.startsWith('http') 
-            ? bestItem.tradingCard.renderedImageUrl 
+          const imageUrl = bestItem.tradingCard.renderedImageUrl.startsWith('http')
+            ? bestItem.tradingCard.renderedImageUrl
             : `${appUrl}${bestItem.tradingCard.renderedImageUrl}`;
           embed.setImage(`${imageUrl}?v=${Date.now()}`);
         } else {
@@ -424,7 +475,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
     try {
       if (interaction.customId.startsWith('card_prev_') || interaction.customId.startsWith('card_next_')) {
         const parts = interaction.customId.split('_');
-        const direction = parts[1]; // prev or next
+        const direction = parts[1];
         const discordId = parts[2];
         const currentPage = parseInt(parts[3], 10);
 
@@ -434,7 +485,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
         const newPage = direction === 'next' ? currentPage + 1 : currentPage - 1;
         const messageOptions = await buildCardListMessage(discordId, newPage);
-        
         if (messageOptions) {
           await interaction.update(messageOptions);
         }
@@ -443,11 +493,10 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
       if (interaction.customId.startsWith('trade_')) {
         const parts = interaction.customId.split('_');
-        const action = parts[1]; // accept or decline
+        const action = parts[1];
         const proposerCardId = parts[2];
         const receiverCardId = parts[3];
 
-        // Fetch cards to find owners
         const rCard = await prisma.userCard.findUnique({ where: { id: receiverCardId }, include: { tradingCard: true } });
         const pCard = await prisma.userCard.findUnique({ where: { id: proposerCardId }, include: { tradingCard: true } });
 
@@ -458,7 +507,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         const receiverId = rCard.userId;
         const proposerId = pCard.userId;
 
-        // Check if the person clicking is the intended receiver
         const currentUser = await getUserByDiscordId(interaction.user.id);
         if (!currentUser || currentUser.id !== receiverId) {
           return await interaction.reply({ content: 'Ce bouton ne vous est pas destiné !', ephemeral: true });
@@ -469,14 +517,11 @@ client.on('interactionCreate', async (interaction: Interaction) => {
             .setTitle('Échange annulé')
             .setColor('#dc2626')
             .setDescription(`<@${interaction.user.id}> a refusé l'échange.`);
-            
           return await interaction.update({ embeds: [embed], components: [], content: '' });
         }
 
         if (action === 'accept') {
-          // Cards already verified above
 
-          // Swap
           await prisma.$transaction([
             prisma.userCard.update({
               where: { id: pCard.id },
@@ -504,8 +549,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
         if (!guild) return await interaction.reply({ content: 'Ce bouton ne peut être utilisé que sur un serveur.', ephemeral: true });
 
         const ticketName = `checkout-${interaction.user.username.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
-        
-        // Vérifier si le joueur a déjà un ticket de ce nom
         const existingChannel = guild.channels.cache.find(c => c.name === ticketName);
         if (existingChannel) {
           return await interaction.reply({ content: `Vous avez déjà un ticket ouvert : <#${existingChannel.id}>`, ephemeral: true });
@@ -516,7 +559,7 @@ client.on('interactionCreate', async (interaction: Interaction) => {
           type: ChannelType.GuildText,
           permissionOverwrites: [
             {
-              id: guild.id, // @everyone
+              id: guild.id,
               deny: [PermissionsBitField.Flags.ViewChannel],
             },
             {
@@ -569,7 +612,6 @@ client.on('interactionCreate', async (interaction: Interaction) => {
 
 client.login(token);
 
-// Simple HTTP server for keepalive (UptimeRobot, Render Web Service, etc.)
 const port = process.env.PORT || 3001;
 const server = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });

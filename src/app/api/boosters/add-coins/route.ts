@@ -6,7 +6,6 @@ import { authOptions } from "@/lib/auth";
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    // @ts-ignore
     const userId = session?.user?.id;
 
     if (!userId) {

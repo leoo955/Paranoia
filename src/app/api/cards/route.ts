@@ -11,14 +11,13 @@ export async function POST(req: Request) {
     if (!session || !user || user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const { title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes } = await req.json();
+    const { title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes, isVariant } = await req.json();
     if (!playerId || !rarity || !level) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
 
     const parsedProba = parseFloat(proba);
     const validProba = isNaN(parsedProba) ? 100 : parsedProba;
-    
     const parsedBadges = Array.isArray(customBadges) ? JSON.stringify(customBadges) : "[]";
     const parsedCharPos = typeof characterPosition === 'object' && characterPosition !== null ? JSON.stringify(characterPosition) : '{"x":50,"y":50,"scale":100}';
     const parsedAttributes = typeof attributes === 'object' && attributes !== null ? JSON.stringify(attributes) : "{}";
@@ -40,6 +39,7 @@ export async function POST(req: Request) {
         attributes: parsedAttributes,
         authorId: user.id as string,
         isPublished: true,
+        isVariant: !!isVariant,
       },
     });
 
@@ -77,13 +77,12 @@ export async function PUT(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id, title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes } = await req.json();
+    const { id, title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes, isVariant } = await req.json();
 
     if (!id) {
       return new NextResponse("Missing id", { status: 400 });
     }
 
-    // Special case for just updating the renderedImageUrl
     if (renderedImageUrl !== undefined && !playerId && !rarity) {
       const card = await prisma.tradingCard.update({
         where: { id },
@@ -120,6 +119,7 @@ export async function PUT(req: Request) {
         characterPosition: parsedCharPos,
         attributes: parsedAttributes,
         isPublished: true,
+        isVariant: !!isVariant,
       },
     });
 

@@ -18,10 +18,8 @@ export async function POST(req: Request) {
       return new NextResponse("Missing action parameter", { status: 400 });
     }
 
-    
     if (action === "GIVE_BOX") {
       if (!userId || !boxType || !amount) return new NextResponse("Missing parameters for giving box", { status: 400 });
-      
       const user = await prisma.user.findUnique({ where: { id: userId } });
       if (!user) return new NextResponse("User not found", { status: 404 });
 
@@ -38,7 +36,6 @@ export async function POST(req: Request) {
       if (!minecraftName) return new NextResponse("Missing minecraftName", { status: 400 });
       const user = await prisma.user.findFirst({ where: { minecraftName } });
       if (!user) return new NextResponse("Ce joueur n'est pas inscrit sur le site web", { status: 404 });
-      
       await prisma.userCard.create({
         data: {
           userId: user.id,
@@ -54,12 +51,10 @@ export async function POST(req: Request) {
       const user = await prisma.user.findFirst({ where: { minecraftName } });
       if (!user) return new NextResponse("Ce joueur n'est pas inscrit sur le site web", { status: 404 });
 
-      // Remove one instance of this card from the user
       const userCard = await prisma.userCard.findFirst({
         where: { userId: user.id, tradingCardId: cardId }
       });
       if (!userCard) return new NextResponse("L'utilisateur ne possède pas cette carte", { status: 404 });
-      
       await prisma.userCard.delete({
         where: { id: userCard.id }
       });
@@ -68,7 +63,6 @@ export async function POST(req: Request) {
 
     if (action === "GIVE_ALL") {
       if (!cardId) return new NextResponse("Missing cardId", { status: 400 });
-      // Give the card to ALL users
       const users = await prisma.user.findMany();
       const userCardsData = users.map(u => ({
         userId: u.id,
@@ -81,7 +75,6 @@ export async function POST(req: Request) {
     }
 
     if (action === "WIPE_ALL") {
-      // Delete ALL instances of this card from all users
       if (!cardId) return new NextResponse("Missing cardId", { status: 400 });
       const deleted = await prisma.userCard.deleteMany({
         where: { tradingCardId: cardId }
@@ -90,11 +83,9 @@ export async function POST(req: Request) {
     }
 
     if (action === "WIPE_PLAYER") {
-      // Wipes ALL cards for a specific user
       if (!userId) return new NextResponse("Missing userId", { status: 400 });
       const user = await prisma.user.findUnique({ where: { id: userId } });
       if (!user) return new NextResponse("Utilisateur introuvable", { status: 404 });
-      
       const deleted = await prisma.userCard.deleteMany({
         where: { userId: user.id }
       });

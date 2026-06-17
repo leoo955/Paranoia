@@ -13,7 +13,6 @@ const PRICES: Record<string, number> = {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    // @ts-ignore
     const userId = session?.user?.id;
 
     if (!userId) {
@@ -38,15 +37,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Fonds insuffisants" }, { status: 400 });
     }
 
-    // Use a transaction to deduct coins and add a box
     await prisma.$transaction(async (tx) => {
-      // Deduct coins
       await tx.user.update({
         where: { id: userId },
         data: { paraCoins: { decrement: price } }
       });
 
-      // Add box/booster
       const existingBox = await tx.userBox.findFirst({
         where: { userId, boxType }
       });

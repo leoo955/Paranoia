@@ -18,7 +18,6 @@ export default function CandidaturePage() {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // API call would go here
       toast.success("Candidature envoyée avec succès ! (Simulation)");
     }
   };
@@ -35,9 +34,9 @@ export default function CandidaturePage() {
       </div>
 
       <div className="panel-matte p-8 md:p-12 rounded-2xl relative overflow-hidden">
-        {/* Progress Bar */}
+        {}
         <div className="absolute top-0 left-0 right-0 h-1 bg-[var(--color-bg-elevated)]">
-          <div 
+          <div
             className="h-full bg-[var(--color-accent-red)] transition-all duration-500 ease-in-out glow-red"
             style={{ width: `${(step / 3) * 100}%` }}
           />
@@ -50,11 +49,10 @@ export default function CandidaturePage() {
                 <span className="w-8 h-8 rounded-full bg-[rgba(179,102,255,0.2)] text-[var(--color-accent-red)] flex items-center justify-center text-sm">1</span>
                 Informations Joueur
               </h2>
-              
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Pseudo Minecraft</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   value={formData.minecraftName}
                   onChange={e => setFormData({...formData, minecraftName: e.target.value})}
@@ -65,8 +63,8 @@ export default function CandidaturePage() {
 
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Âge</label>
-                <input 
-                  type="number" 
+                <input
+                  type="number"
                   required min="13" max="99"
                   value={formData.age}
                   onChange={e => setFormData({...formData, age: e.target.value})}
@@ -89,10 +87,9 @@ export default function CandidaturePage() {
                 <span className="w-8 h-8 rounded-full bg-[rgba(179,102,255,0.2)] text-[var(--color-accent-red)] flex items-center justify-center text-sm">2</span>
                 Profil de Survie
               </h2>
-              
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Vos motivations (Pourquoi nous ?)</label>
-                <textarea 
+                <textarea
                   required minLength={50}
                   value={formData.motivation}
                   onChange={e => setFormData({...formData, motivation: e.target.value})}
@@ -103,7 +100,7 @@ export default function CandidaturePage() {
 
               <div>
                 <label className="block text-sm font-medium text-[var(--color-text-secondary)] mb-2">Vos spécialités / Expérience</label>
-                <textarea 
+                <textarea
                   required minLength={20}
                   value={formData.experience}
                   onChange={e => setFormData({...formData, experience: e.target.value})}
@@ -129,7 +126,6 @@ export default function CandidaturePage() {
                 <span className="w-8 h-8 rounded-full bg-[rgba(179,102,255,0.2)] text-[var(--color-accent-red)] flex items-center justify-center text-sm">3</span>
                 Confirmation
               </h2>
-              
               <div className="bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-lg p-6 space-y-4">
                 <div>
                   <div className="text-sm text-[var(--color-text-muted)]">Pseudo</div>

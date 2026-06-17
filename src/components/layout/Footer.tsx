@@ -13,7 +13,6 @@ export default function Footer() {
               Serveur Minecraft SMP Privé. L'élite de la survie.
             </p>
           </div>
-          
           <div className="flex flex-wrap justify-center gap-6 text-sm">
             <Link href="/" className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent-red)] transition-colors">Accueil</Link>
             <Link href="/forum" className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent-red)] transition-colors">Forum</Link>
@@ -22,7 +21,6 @@ export default function Footer() {
             <Link href="/candidature" className="text-[var(--color-text-secondary)] hover:text-[var(--color-accent-red)] transition-colors">Nous rejoindre</Link>
           </div>
         </div>
-        
         <div className="mt-8 pt-8 border-t border-[var(--color-border-color)] text-center md:flex md:justify-between md:text-left">
           <p className="text-sm text-[var(--color-text-muted)]">
             &copy; {new Date().getFullYear()} PARANOIA SMP. Tous droits réservés.

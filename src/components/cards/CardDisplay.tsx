@@ -21,7 +21,7 @@ export const getLevelStyle = (level: string): React.CSSProperties => {
     case "Diamond":
       return { backgroundImage: "conic-gradient(from 120deg at 50% 50%, #0891b2, #06b6d4, #67e8f9, #0891b2, #164e63, #0891b2)" };
     case "Netherite":
-      return { 
+      return {
         backgroundColor: "#0a0510",
         backgroundImage: "radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.5) 0%, transparent 50%), radial-gradient(circle at 50% 100%, rgba(88, 28, 135, 0.8) 0%, transparent 60%), url('https://www.transparenttextures.com/patterns/dark-matter.png')",
         backgroundBlendMode: "screen, screen, overlay"
@@ -62,7 +62,7 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (card?.isEditing) return; // Disable 3D rotation in editing mode
+    if (card?.isEditing) return;
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -85,8 +85,8 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
   };
 
   const style: React.CSSProperties = {
-    transform: isHovered 
-      ? `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale3d(1.05, 1.05, 1.05)` 
+    transform: isHovered
+      ? `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale3d(1.05, 1.05, 1.05)`
       : "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)",
     transition: isHovered ? "transform 0.1s ease-out" : "transform 0.5s ease-out",
     transformStyle: "preserve-3d",
@@ -99,23 +99,23 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
   const hasVideoBg = card?.customBackground && (card.customBackground.includes('.mp4') || card.customBackground.includes('.webm'));
   const attrs = typeof card?.attributes === 'string' ? JSON.parse(card.attributes) : (card?.attributes || {});
 
-  const combinedStyle = { 
-    ...style, 
+  const combinedStyle = {
+    ...style,
     ...customStyle,
     ...((attrs.cardGlowColor || attrs.mainColor) ? { '--custom-glow-color': attrs.cardGlowColor || attrs.mainColor } as React.CSSProperties : {}),
-    ...((attrs.cardBgColor || attrs.mainColor) 
-      ? { backgroundColor: attrs.cardBgColor || attrs.mainColor, backgroundImage: 'none' } 
-      : (!hasVideoBg && card?.customBackground 
-          ? { 
-              backgroundImage: `url('${card.customBackground}')`, 
-              backgroundSize: attrs.bgScale ? `${attrs.bgScale}%` : 'cover', 
-              backgroundPosition: `${attrs.bgPosX ?? 50}% ${attrs.bgPosY ?? 50}%` 
-            } 
+    ...((attrs.cardBgColor || attrs.mainColor)
+      ? { backgroundColor: attrs.cardBgColor || attrs.mainColor, backgroundImage: 'none' }
+      : (!hasVideoBg && card?.customBackground
+          ? {
+              backgroundImage: `url('${card.customBackground}')`,
+              backgroundSize: attrs.bgScale ? `${attrs.bgScale}%` : 'cover',
+              backgroundPosition: `${attrs.bgPosX ?? 50}% ${attrs.bgPosY ?? 50}%`
+            }
           : (!hasVideoBg && card ? getLevelStyle(card.level) : { backgroundColor: "transparent" })))
   };
 
   return (
-    <div 
+    <div
       ref={cardRef}
       className={`relative rounded-xl cursor-pointer ${className}`}
       onMouseMove={handleMouseMove}
@@ -125,12 +125,12 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
     >
       {hasVideoBg && (
         <div className="absolute inset-0 z-0 overflow-hidden rounded-xl">
-          <video 
-            src={card.customBackground} 
-            autoPlay 
-            loop 
-            muted 
-            playsInline 
+          <video
+            src={card.customBackground}
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover pointer-events-none"
             style={{
               objectPosition: `${attrs.bgPosX ?? 50}% ${attrs.bgPosY ?? 50}%`,
@@ -140,16 +140,15 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
           />
         </div>
       )}
-      {/* Base Level Texture Overlay (gives depth to the gradient) */}
+      {}
       <div className="absolute inset-0 z-0 mix-blend-multiply opacity-50 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none rounded-xl" />
 
       <div className="relative z-10 w-full h-full" style={{ transformStyle: "preserve-3d" }}>
         {children}
       </div>
-      
-      {/* Holographic Foil Effect (Shattered Glass / Rainbow) */}
+      {}
       {attrs.isHolo && (
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none z-[15] rounded-xl overflow-hidden mix-blend-color-dodge opacity-60"
           style={{
             backgroundImage: `linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.7) 30%, rgba(255, 0, 200, 0.5) 40%, rgba(0, 200, 255, 0.5) 50%, rgba(255, 255, 255, 0.7) 60%, transparent 80%), url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
@@ -160,20 +159,18 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
           }}
         />
       )}
-      
-      {/* Glare Effect */}
+      {}
       {isHovered && (
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay rounded-xl overflow-hidden"
           style={{
             background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%)`
           }}
         />
       )}
-      
-      {/* Elegant Light Sweep / Glare */}
+      {}
       {isHovered && !card.isEditing && (
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-xl mix-blend-overlay"
           style={{
             opacity: 0.6,
@@ -185,8 +182,8 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
   );
 };
 
-export default function CardDisplay({ 
-  card, 
+export default function CardDisplay({
+  card,
   size = "md",
   isEditing = false,
   isOwned = false,
@@ -194,37 +191,31 @@ export default function CardDisplay({
   specialEffect = null,
   childVariantBadges = [],
   onUpdateElement
-}: { 
-  card: any, 
+}: {
+  card: any,
   size?: "sm" | "md" | "lg",
   isEditing?: boolean,
   isOwned?: boolean,
   disableTilt?: boolean,
   specialEffect?: string | null,
   childVariantBadges?: string[],
+  ownedVariantIds?: string[],
   onUpdateElement?: (type: string, id: string, data: any) => void
 }) {
-  // Define sizing classes based on 'size' prop
   const wrapperClass = size === "lg" ? "w-80" : size === "md" ? "w-full max-w-[18rem]" : "w-56";
-  
-  // Icon sizes - Shrinking non-netherite to be more reasonable
-  const iconClass = size === "lg" 
-    ? "absolute -top-8 -left-8 w-28 h-28 drop-shadow-[0_0_20px_rgba(0,0,0,0.6)]" 
-    : size === "md" 
-    ? "absolute -top-5 -left-5 w-16 h-16 drop-shadow-[0_0_15px_rgba(0,0,0,0.6)]" 
+  const iconClass = size === "lg"
+    ? "absolute -top-8 -left-8 w-28 h-28 drop-shadow-[0_0_20px_rgba(0,0,0,0.6)]"
+    : size === "md"
+    ? "absolute -top-5 -left-5 w-16 h-16 drop-shadow-[0_0_15px_rgba(0,0,0,0.6)]"
     : "absolute -top-4 -left-4 w-12 h-12 drop-shadow-[0_0_10px_rgba(0,0,0,0.6)]";
-    
-  // Netherite image has intrinsic padding, so it needs to be scaled up heavily to match visual size of others
   const badgeScale = card.level === 'Netherite' ? 'scale-150 -translate-y-2 -translate-x-2' : 'scale-100';
-  
   const translateZ = size === "lg" ? "30px" : "20px";
 
-  const levelColorClass = card.level === 'Netherite' ? 'text-[#a278b5]' : 
-                          card.level === 'Diamond' ? 'text-[#2de2e6]' : 
-                          card.level === 'Gold' ? 'text-[#facc15]' : 
+  const levelColorClass = card.level === 'Netherite' ? 'text-[#a278b5]' :
+                          card.level === 'Diamond' ? 'text-[#2de2e6]' :
+                          card.level === 'Gold' ? 'text-[#facc15]' :
                           card.level === 'Iron' ? 'text-gray-300' : 'text-gray-500';
 
-  // Parse Custom Badges
   let customBadges: any[] = [];
   try {
     customBadges = typeof card.customBadges === 'string' ? JSON.parse(card.customBadges) : (card.customBadges || []);
@@ -232,7 +223,8 @@ export default function CardDisplay({
     customBadges = [];
   }
 
-  // Parse Character Position
+  const variantLinks = card.motherLinks || [];
+
   let charPos = { x: 50, y: 50, scale: 100 };
   try {
     charPos = typeof card.characterPosition === 'string' ? JSON.parse(card.characterPosition) : (card.characterPosition || charPos);
@@ -245,12 +237,11 @@ export default function CardDisplay({
 
   const isPremiumLayout = attrs.isFullArt || ["LEGENDARY", "LÉGENDAIRE", "LEGENDAIRE", "MYTHIC", "MYTHIQUE"].includes(card.rarity.toUpperCase());
 
-  // Full Art no longer overrides default positions rigidly, positions are managed by Admin state
   const titlePos = attrs.titlePos || { x: 50, y: 75, scale: 100 };
   const descPos = attrs.descPos || { x: 50, y: 92, scale: 100 };
   const rarityBadgePos = attrs.rarityBadgePos || { x: 15, y: 65, scale: 100 };
   const levelTextPos = attrs.levelTextPos || { x: 50, y: 82, scale: 100 };
-  const textPos = attrs.textPos; // Fallback for old cards
+  const textPos = attrs.textPos;
   const levelBadgePos = attrs.levelBadgePos || { x: 10, y: 8, scale: 100 };
   const editionBadgePos = attrs.editionBadgePos || { x: 85, y: 73, scale: 100 };
   const variantBadgePos = attrs.variantBadgePos || { x: 15, y: 15, scale: 100 };
@@ -272,20 +263,15 @@ export default function CardDisplay({
   const combinedStyle = {
     ...((attrs.cardGlowColor || attrs.mainColor) ? { '--custom-glow-color': attrs.cardGlowColor || attrs.mainColor } as React.CSSProperties : {}),
     ...(attrs.borderColor ? { borderColor: attrs.borderColor } : {}),
-    borderWidth: attrs.isFullArt ? '6px' : '2px', // Fun border logic
+    borderWidth: attrs.isFullArt ? '6px' : '2px',
   };
-  // --- Aesthetic TCG Layout Data (No Gameplay) ---
   const levelIconUrl = getLevelIcon(card.level);
-  
-  // Faction / Level Color for the nameplate
   let factionColor = 'bg-gray-800';
   if (card.level === 'Diamond') factionColor = 'bg-cyan-600';
   if (card.level === 'Gold') factionColor = 'bg-yellow-600';
   if (card.level === 'Iron') factionColor = 'bg-gray-400';
   if (card.level === 'Netherite') factionColor = 'bg-purple-900';
-  if (attrs.factionColor) factionColor = attrs.factionColor; // Custom override
-  
-  // Rarity styling
+  if (attrs.factionColor) factionColor = attrs.factionColor;
   let rarityBgColor = 'bg-gray-500';
   let rarityTextColor = 'text-white';
   if (card.rarity === 'MYTHIC') { rarityBgColor = 'bg-red-600'; rarityTextColor = 'text-yellow-300'; }
@@ -297,23 +283,37 @@ export default function CardDisplay({
   const role = card.edition || attrs.role || 'SURVIVANT';
   const faction = attrs.faction || 'PARANOIA SMP';
 
-
   return (
     <div className={`relative ${wrapperClass} aspect-[2.5/3.5] mx-auto rounded-xl ${isEditing ? '' : 'perspective-1000'} @container`}>
-      <InteractiveCard 
-        card={{...card, isEditing}} 
-        className={`${wrapperClass} aspect-[2.5/3.5] border-2 rounded-xl overflow-hidden ${getLevelBorder(card.level)} ${(attrs.cardGlowColor || attrs.mainColor) ? 'animate-pulse-glow-custom' : getRarityGlow(card.rarity)}`}
+      <InteractiveCard
+        card={{...card, isEditing}}
+        className={`${wrapperClass} aspect-[2.5/3.5] border-2 rounded-xl overflow-hidden ${getLevelBorder(card.level)} ${(attrs.cardGlowColor || attrs.mainColor) ? 'animate-pulse-glow-custom' : getRarityGlow(card.rarity)} relative`}
         style={combinedStyle}
       >
-        
-        {/* Full Art Character Image */}
+        {}
+        {card.specialEffect === "Holographique" && (
+          <div className="absolute inset-0 z-[60] mix-blend-color-dodge pointer-events-none opacity-50 bg-gradient-to-tr from-transparent via-white to-transparent animate-shimmer" style={{ backgroundSize: '200% 200%' }} />
+        )}
+        {card.specialEffect === "Paillettes" && (
+          <div className="absolute inset-0 z-[60] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-80 mix-blend-screen" />
+        )}
+        {card.specialEffect === "Doré" && (
+          <div className="absolute inset-0 z-[60] pointer-events-none border-4 border-yellow-400 shadow-[inset_0_0_20px_rgba(250,204,21,0.8)] mix-blend-overlay" />
+        )}
+        {card.specialEffect === "Glitch" && (
+          <div className="absolute inset-0 z-[60] pointer-events-none mix-blend-difference bg-gradient-to-b from-transparent via-red-500/10 to-transparent animate-pulse" />
+        )}
+        {card.specialEffect === "Néon" && (
+          <div className="absolute inset-0 z-[60] pointer-events-none border-4 border-cyan-400 shadow-[inset_0_0_30px_rgba(34,211,238,1)] mix-blend-screen" />
+        )}
+        {}
         <div className="absolute inset-0 z-10 w-full h-full flex items-end justify-center overflow-hidden rounded-xl">
           {!attrs.hideCharacter && (
             (card.imageUrl || card.player?.minecraftName || card.title) ? (
-              <img 
-                src={card.imageUrl || `https://vzge.me/bust/512/${card.player?.minecraftName || card.title}.png`} 
-                alt={card.title} 
-                className={`w-[120%] h-[85%] object-cover object-top drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`} 
+              <img
+                src={card.imageUrl || `https://vzge.me/bust/512/${card.player?.minecraftName || card.title}.png`}
+                alt={card.title}
+                className={`w-[120%] h-[85%] object-cover object-top drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`}
                 onMouseDown={(e) => handleMouseDown(e, 'character')}
                 onWheel={(e) => handleWheel(e, 'character')}
               />
@@ -323,10 +323,10 @@ export default function CardDisplay({
           )}
         </div>
 
-        {/* Top-Right: Rarity Box */}
-        {!attrs.hideRarityBox && <div 
+        {}
+        {!attrs.hideRarityBox && <div
           className={`absolute z-30 flex items-center ${rarityBgColor} border-white shadow-lg overflow-hidden`}
-          style={{ 
+          style={{
             top: '0', right: '0',
             borderBottomWidth: '0.4cqi',
             borderLeftWidth: '0.4cqi',
@@ -339,10 +339,10 @@ export default function CardDisplay({
           </span>
         </div>}
 
-        {/* Edition Badge */}
+        {}
         {attrs.editionBadgeUrl && (
-          <img 
-            src={attrs.editionBadgeUrl} 
+          <img
+            src={attrs.editionBadgeUrl}
             alt="Edition Badge"
             className={`absolute z-[70] object-contain drop-shadow-md ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
             style={{
@@ -357,11 +357,11 @@ export default function CardDisplay({
           />
         )}
 
-        {/* Fixed Variant Badges Container */}
+        {}
         <div className="absolute top-[2cqi] left-[2cqi] flex flex-row gap-[1cqi] z-[70] pointer-events-none items-center">
           {attrs.variantBadgeUrl && !attrs.variantBadgeUrls && (
-            <img 
-              src={attrs.variantBadgeUrl} 
+            <img
+              src={attrs.variantBadgeUrl}
               alt="Variant Badge"
               className="object-contain drop-shadow-md"
               style={{ width: '15cqi', height: '15cqi' }}
@@ -369,9 +369,9 @@ export default function CardDisplay({
             />
           )}
           {attrs.variantBadgeUrls && attrs.variantBadgeUrls.map((badgeUrl: string, idx: number) => (
-            <img 
+            <img
               key={`manual-${idx}`}
-              src={badgeUrl} 
+              src={badgeUrl}
               alt={`Variant Badge ${idx}`}
               className="object-contain drop-shadow-md"
               style={{ width: '15cqi', height: '15cqi' }}
@@ -379,9 +379,9 @@ export default function CardDisplay({
             />
           ))}
           {childVariantBadges.map((badgeUrl, idx) => (
-            <img 
+            <img
               key={`child-${idx}`}
-              src={badgeUrl} 
+              src={badgeUrl}
               alt={`Child Variant Badge ${idx}`}
               className="object-contain drop-shadow-md"
               style={{ width: '15cqi', height: '15cqi' }}
@@ -390,11 +390,28 @@ export default function CardDisplay({
           ))}
         </div>
 
-        {/* Side Text (Card ID or SMP branding) */}
-        {/* Removed per user request */}        {/* Bottom Layout: Description + Nameplate */}
+        {}
+        {!card.isVariant && variantLinks.length > 0 && (
+          <div className="absolute bottom-[11cqi] left-0 right-0 z-40 flex justify-center gap-[1.5cqi] pointer-events-none px-[2cqi]">
+            {variantLinks.map((link: any) => {
+              const owned = ownedVariantIds?.includes(link.targetCardId);
+              return (
+                <div
+                  key={link.id}
+                  className={`w-[8cqi] h-[8cqi] rounded-full border border-white/30 bg-black/60 backdrop-blur-md flex items-center justify-center overflow-hidden transition-all shadow-lg ${owned ? 'shadow-indigo-500/50 scale-110 border-indigo-400' : 'grayscale opacity-40'}`}
+                  style={{ transform: 'translateZ(45px)' }}
+                >
+                  <img src={link.variantProfile.iconUrl} className="w-[70%] h-[70%] object-contain" alt="" />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {}
+        {}        {}
         <div className="absolute bottom-0 inset-x-0 z-30 flex flex-col" style={{ transform: `translateZ(${parseInt(translateZ) * 1.2}px)` }}>
-          
-          {/* Description / Effect Box */}
+          {}
           {(!attrs.hideDescription && card.description) && (
             <div className={`w-full bg-black/90 border-white/20 shadow-inner relative ${attrs.hideNameplate ? 'rounded-b-xl' : ''}`} style={{ margin: attrs.hideNameplate ? '0' : '0 0 1cqi 0', padding: '2cqi 2cqi 2cqi 2cqi', borderTopWidth: '0.2cqi', borderBottomWidth: '0.2cqi' }}>
               <p className="text-white/90 font-medium leading-tight text-center italic" style={{ fontSize: '3.2cqi' }}>
@@ -403,17 +420,15 @@ export default function CardDisplay({
             </div>
           )}
 
-          {/* Nameplate */}
+          {}
           {!attrs.hideNameplate && <div className={`w-full ${factionColor?.startsWith('#') || factionColor?.startsWith('rgb') ? '' : factionColor} border-white/50 relative shadow-[0_-5px_15px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center rounded-b-xl`} style={{ backgroundColor: factionColor?.startsWith('#') || factionColor?.startsWith('rgb') ? factionColor : undefined, borderTopWidth: '0.6cqi', padding: '2cqi 2cqi 1.5cqi 2cqi' }}>
-            {/* Rarity/Role tag */}
+            {}
             {!attrs.hideRole && <div className="absolute bg-white text-black font-black uppercase rounded-sm shadow-md" style={{ top: '-3cqi', right: '2cqi', padding: '0.5cqi 1.5cqi', fontSize: '3cqi' }}>
               {role}
             </div>}
-            
             {!attrs.hideTitle && <h3 className="text-white font-black uppercase tracking-widest text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ fontSize: '7.5cqi', WebkitTextStroke: '0.1cqi black', lineHeight: 1 }}>
               {card.title}
             </h3>}
-            
             {!attrs.hideBottomText && <div className="flex justify-center mt-[0.5cqi]">
               <span className="text-white/70 font-bold tracking-[0.2em] uppercase" style={{ fontSize: '3cqi' }}>
                 {card.level} TIER • {faction}
@@ -422,19 +437,19 @@ export default function CardDisplay({
           </div>}
         </div>
 
-        {/* Custom Badges */}
+        {}
         {customBadges && customBadges.map((badge: any, i: number) => (
-          <img 
+          <img
             key={badge.id || i}
             src={badge.url}
             alt="Badge"
             className={`absolute z-[60] object-contain drop-shadow-lg ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
-            style={{ 
-              left: `${badge.x}%`, 
-              top: `${badge.y}%`, 
-              width: `${badge.size}px`, 
-              height: `${badge.size}px`, 
-              transform: `translate(-50%, -50%) translateZ(60px)` 
+            style={{
+              left: `${badge.x}%`,
+              top: `${badge.y}%`,
+              width: `${badge.size}px`,
+              height: `${badge.size}px`,
+              transform: `translate(-50%, -50%) translateZ(60px)`
             }}
             onMouseDown={(e) => handleMouseDown(e, 'customBadge', badge.id || String(i))}
             onWheel={(e) => handleWheel(e, 'customBadge', badge.id || String(i))}
@@ -442,7 +457,7 @@ export default function CardDisplay({
           />
         ))}
 
-        {/* Smart Guides (Photoshop style) */}
+        {}
         {isEditing && attrs.showVGuide && (
           <div className="absolute top-0 bottom-0 left-1/2 w-[2px] bg-[var(--color-accent-purple)] shadow-[0_0_8px_var(--color-accent-purple)] z-[100] pointer-events-none" style={{ transform: 'translateX(-50%) translateZ(100px)' }} />
         )}
@@ -450,19 +465,27 @@ export default function CardDisplay({
           <div className="absolute left-0 right-0 top-1/2 h-[2px] bg-[var(--color-accent-purple)] shadow-[0_0_8px_var(--color-accent-purple)] z-[100] pointer-events-none" style={{ transform: 'translateY(-50%) translateZ(100px)' }} />
         )}
 
-        {/* Custom Frame Overlay (behind characters and text) */}
+        {}
+        {attrs.variantSuite && (
+          <div className="absolute bottom-4 right-4 z-[80] flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full shadow-lg group/variant transition-all hover:scale-110" style={{ transform: 'translateZ(90px)' }}>
+            <Sparkles className="w-3 h-3 text-indigo-400 animate-pulse" />
+            <span className="text-[10px] font-black text-white uppercase tracking-tighter">Variantes</span>
+          </div>
+        )}
+
+        {}
         {attrs.frameUrl && (
           <img src={attrs.frameUrl} alt="Card Frame" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
         )}
 
-        {/* Special Effects Overlay (From base card) */}
+        {}
         {attrs.effect && attrs.effect !== "none" && (
           <div className="absolute inset-0 pointer-events-none rounded-xl z-50 overflow-hidden" style={{ transform: 'translateZ(40px)' }}>
             <div className={`absolute inset-0 w-full h-full ${attrs.effect === 'holo' ? 'effect-holo' : attrs.effect === 'shiny' ? 'effect-shiny' : attrs.effect === 'glitch' ? 'effect-glitch' : attrs.effect === 'paillettes' ? 'effect-paillettes' : ''}`} />
           </div>
         )}
 
-        {/* UserCard Instance Special Effect */}
+        {}
         {specialEffect && (
           <div className="absolute inset-0 pointer-events-none rounded-xl z-[70] overflow-hidden" style={{ transform: 'translateZ(50px)' }}>
             {specialEffect === "Holographique" && <div className="absolute inset-0 w-full h-full effect-holo opacity-80 mix-blend-color-dodge" />}

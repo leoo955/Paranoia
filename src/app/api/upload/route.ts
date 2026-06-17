@@ -18,7 +18,6 @@ export async function POST(req: Request) {
       return new NextResponse("No file received.", { status: 400 });
     }
 
-    // On Vercel, the file system is read-only, so we upload the image to Catbox.moe (free image hosting)
     const catboxFormData = new FormData();
     catboxFormData.append('reqtype', 'fileupload');
     catboxFormData.append('fileToUpload', file);
@@ -32,7 +31,7 @@ export async function POST(req: Request) {
       throw new Error(`Catbox upload failed: ${uploadRes.statusText}`);
     }
 
-    const url = await uploadRes.text(); // Catbox returns the URL directly in plain text
+    const url = await uploadRes.text();
 
     return NextResponse.json({ url: url.trim() });
   } catch (error) {

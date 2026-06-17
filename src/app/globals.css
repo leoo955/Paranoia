@@ -24,7 +24,6 @@
   body {
     @apply bg-[var(--color-bg-primary)] text-[var(--color-text-primary)] font-inter antialiased min-h-screen selection:bg-[var(--color-accent-red)] selection:text-white;
   }
-  
   h1, h2, h3, h4, h5, h6 {
     @apply font-outfit tracking-tight;
   }
@@ -48,15 +47,12 @@
   .panel-matte {
     @apply bg-[var(--color-panel-bg)] border border-[var(--color-panel-border)] shadow-sm;
   }
-  
   .glow-red {
     text-shadow: 0 0 10px rgba(179, 102, 255, 0.5), 0 0 20px rgba(179, 102, 255, 0.3);
   }
-  
   .glow-purple {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
   }
-  
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[var(--color-accent-red)] to-[var(--color-accent-purple)];
   }
@@ -82,7 +78,6 @@
   }
 
   .animate-pulse-glow {
-    
   }
 
   .animate-slide-up {
@@ -145,7 +140,6 @@
     animation: huge-reveal 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     font-size: clamp(3rem, 10vw, 8rem);
   }
-  
   @keyframes flash-burst {
     0% { opacity: 0; transform: scale(0.8); }
     85% { opacity: 0; transform: scale(0.8); }
@@ -187,7 +181,6 @@
     50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.7); border-color: rgba(59, 130, 246, 0.9); }
   }
 
-  
   @keyframes pulse-glow-custom {
     0%, 100% { box-shadow: 0 0 15px var(--custom-glow-color, rgba(255,255,255,0.4)); border-color: var(--custom-glow-color, rgba(255,255,255,0.4)); }
     50% { box-shadow: 0 0 35px var(--custom-glow-color, rgba(255,255,255,0.8)); border-color: var(--custom-glow-color, rgba(255,255,255,1)); }
@@ -227,7 +220,6 @@
     animation: pulse-glow-epic 2s infinite ease-in-out;
   }
 
-  
   @keyframes pulse-glow-mythic {
     0%, 100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6), inset 0 0 15px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.7); }
     50% { box-shadow: 0 0 50px rgba(239, 68, 68, 1), inset 0 0 30px rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 1); }
@@ -245,19 +237,18 @@
     animation: shimmer-foil 4s infinite linear;
   }
 
-  /* Special Effects */
   @keyframes holo-shimmer {
     0% { filter: hue-rotate(0deg); }
     100% { filter: hue-rotate(360deg); }
   }
   .effect-holo {
-    background: linear-gradient(115deg, 
-      rgba(255,0,0,0.15), 
-      rgba(255,255,0,0.15), 
-      rgba(0,255,0,0.15), 
-      rgba(0,255,255,0.15), 
-      rgba(0,0,255,0.15), 
-      rgba(255,0,255,0.15), 
+    background: linear-gradient(115deg,
+      rgba(255,0,0,0.15),
+      rgba(255,255,0,0.15),
+      rgba(0,255,0,0.15),
+      rgba(0,255,255,0.15),
+      rgba(0,0,255,0.15),
+      rgba(255,0,255,0.15),
       rgba(255,0,0,0.15)
     );
     background-size: 300% 300%;
@@ -305,7 +296,7 @@
     100% { background-position: 200px 200px, -200px -200px; }
   }
   .effect-paillettes {
-    background-image: 
+    background-image:
       radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
       radial-gradient(1px 1px at 40px 70px, #ffffff, rgba(0,0,0,0)),
       radial-gradient(2px 2px at 50px 160px, rgba(255,255,255,0.8), rgba(0,0,0,0)),

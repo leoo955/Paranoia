@@ -5,9 +5,6 @@ import { NextRequest } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// We fetch fonts or just use default Satori fonts.
-// To keep it simple, we'll use default Satori sans-serif.
-
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -37,7 +34,6 @@ export async function GET(req: NextRequest) {
 
     const color = rarityColors[card.rarity] || '#94a3b8';
 
-    // Image URL fallback (crafty render) with cache buster
     const timestamp = Date.now();
     const bgImage = card.imageUrl || `https://vzge.me/bust/512/${card.player?.minecraftName || 'Steve'}.png?v=${timestamp}`;
 
@@ -56,7 +52,7 @@ export async function GET(req: NextRequest) {
             position: 'relative',
           }}
         >
-          {/* Card Frame */}
+          {}
           <div
             style={{
               display: 'flex',
@@ -71,7 +67,7 @@ export async function GET(req: NextRequest) {
               boxShadow: `0 0 40px ${color}80`,
             }}
           >
-            {/* Background/Illustration */}
+            {}
             <img
               src={bgImage}
               style={{
@@ -83,8 +79,7 @@ export async function GET(req: NextRequest) {
                 left: 0,
               }}
             />
-            
-            {/* Bottom Gradient overlay */}
+            {}
             <div
               style={{
                 position: 'absolute',
@@ -97,7 +92,7 @@ export async function GET(req: NextRequest) {
               }}
             />
 
-            {/* Content overlay */}
+            {}
             <div
               style={{
                 display: 'flex',

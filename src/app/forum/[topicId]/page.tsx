@@ -39,7 +39,6 @@ export default async function TopicPage({ params }: { params: Promise<{ topicId:
         <ArrowLeft className="w-4 h-4" />
         <span>Retour au forum</span>
       </Link>
-      
       <div className="panel-matte p-8 rounded-2xl mb-8 border-l-4 border-l-[var(--color-accent-purple)]">
         <div className="flex items-center gap-3 mb-4">
           <span className="px-3 py-1 bg-[var(--color-bg-elevated)] border border-[var(--color-border-color)] rounded-full text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">
@@ -48,13 +47,11 @@ export default async function TopicPage({ params }: { params: Promise<{ topicId:
           <span className="text-[var(--color-text-muted)] text-sm">{formatRelativeTime(topic.createdAt)}</span>
         </div>
         <h1 className="text-3xl font-outfit font-black text-white mb-6">{topic.title}</h1>
-        
         <div className="prose prose-invert max-w-none text-[var(--color-text-primary)]">
           {topic.content.split('\n').map((line, i) => (
             <p key={i} className="mb-4">{line}</p>
           ))}
         </div>
-        
         <div className="mt-8 pt-6 border-t border-[var(--color-border-color)] flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[var(--color-accent-purple)] flex items-center justify-center font-bold text-white">
             {topic.author.name?.charAt(0).toUpperCase() || "?"}
@@ -68,7 +65,6 @@ export default async function TopicPage({ params }: { params: Promise<{ topicId:
           </div>
         </div>
       </div>
-      
       <h3 className="text-xl font-outfit font-bold text-white mb-6">{topic.comments.length} Réponses</h3>
       <div className="space-y-4">
         {topic.comments.map(comment => (
@@ -85,7 +81,6 @@ export default async function TopicPage({ params }: { params: Promise<{ topicId:
             <p className="text-[var(--color-text-primary)] whitespace-pre-wrap">{comment.content}</p>
           </div>
         ))}
-        
         <div className="panel-matte p-6 rounded-xl mt-8">
            <h4 className="font-outfit font-bold text-white mb-4">Répondre (Connectez-vous via Discord)</h4>
         </div>
