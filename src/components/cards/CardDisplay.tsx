@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { Sparkles } from "lucide-react";
 
 export const getRarityGlow = (rarity: string) => {
   const r = rarity.toUpperCase();
@@ -140,56 +141,73 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
           />
         </div>
       )}
-      {}
-      <div className="absolute inset-0 z-0 mix-blend-multiply opacity-50 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] pointer-events-none rounded-xl" />
+      {/* Subtle Texture Overlay */}
+      <div className="absolute inset-0 z-0 mix-blend-overlay opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none rounded-xl" />
 
       <div className="relative z-10 w-full h-full" style={{ transformStyle: "preserve-3d" }}>
         {children}
       </div>
-      {}
+      
+      {/* Reactive Holo Layer */}
       {attrs.isHolo && (
         <div
-          className="absolute inset-0 pointer-events-none z-[15] rounded-xl overflow-hidden mix-blend-color-dodge opacity-60"
+          className="absolute inset-0 pointer-events-none z-[5] rounded-xl overflow-hidden mix-blend-color-dodge opacity-[0.20]"
           style={{
-            backgroundImage: `linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.7) 30%, rgba(255, 0, 200, 0.5) 40%, rgba(0, 200, 255, 0.5) 50%, rgba(255, 255, 255, 0.7) 60%, transparent 80%), url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-            backgroundSize: '200% 200%, 150px 150px',
-            backgroundPosition: `${glarePosition.x * 2}% ${glarePosition.y * 2}%`,
-            opacity: isHovered ? 0.9 : 0.4,
-            transition: 'opacity 0.3s ease',
+            backgroundImage: `
+              linear-gradient(
+                115deg, 
+                transparent 10%, 
+                rgba(255, 255, 255, 0.7) 15%, 
+                rgba(255, 0, 0, 0.15) 20%, 
+                rgba(255, 255, 0, 0.15) 25%, 
+                rgba(0, 255, 0, 0.15) 30%, 
+                rgba(255, 255, 0, 0.15) 35%, 
+                rgba(0, 0, 255, 0.15) 40%, 
+                rgba(255, 0, 255, 0.15) 45%, 
+                rgba(255, 255, 255, 0.7) 50%, 
+                transparent 60%
+              )
+            `,
+            backgroundSize: '200% 200%',
+            backgroundPosition: `${glarePosition.x}% ${glarePosition.y}%`,
+            mixBlendMode: 'color-dodge',
+            filter: 'brightness(1.1) contrast(1.1)',
+            transform: 'translateZ(5px)'
           }}
         />
       )}
-      {}
-      {isHovered && (
-        <div
-          className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay rounded-xl overflow-hidden"
-          style={{
-            background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%)`
-          }}
-        />
-      )}
-      {}
-      {isHovered && !card.isEditing && (
-        <div
-          className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-xl mix-blend-overlay"
-          style={{
-            opacity: 0.6,
-            backgroundImage: `radial-gradient(farthest-corner at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 40%, transparent 100%)`
-          }}
-        />
-      )}
-    </div>
-  );
-};
+        {}
+        {isHovered && (
+          <div
+            className="absolute inset-0 pointer-events-none z-20 mix-blend-overlay rounded-xl overflow-hidden"
+            style={{
+              background: `radial-gradient(circle at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 60%)`
+            }}
+          />
+        )}
+        {}
+        {isHovered && !card.isEditing && (
+          <div
+            className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-xl mix-blend-overlay"
+            style={{
+              opacity: 0.6,
+              backgroundImage: `radial-gradient(farthest-corner at ${glarePosition.x}% ${glarePosition.y}%, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.2) 40%, transparent 100%)`
+            }}
+          />
+        )}
+      </div>
+    );
+  };
 
 export default function CardDisplay({
   card,
   size = "md",
   isEditing = false,
-  isOwned = false,
+  isOwned = true,
   disableTilt = false,
   specialEffect = null,
   childVariantBadges = [],
+  ownedVariantIds = [],
   onUpdateElement
 }: {
   card: any,
@@ -437,8 +455,7 @@ export default function CardDisplay({
           </div>}
         </div>
 
-        {}
-        {customBadges && customBadges.map((badge: any, i: number) => (
+        {customBadges && customBadges.map((badge: any, i: number) => badge.url && (
           <img
             key={badge.id || i}
             src={badge.url}
@@ -457,7 +474,7 @@ export default function CardDisplay({
           />
         ))}
 
-        {}
+        {/* Editor Guides */}
         {isEditing && attrs.showVGuide && (
           <div className="absolute top-0 bottom-0 left-1/2 w-[2px] bg-[var(--color-accent-purple)] shadow-[0_0_8px_var(--color-accent-purple)] z-[100] pointer-events-none" style={{ transform: 'translateX(-50%) translateZ(100px)' }} />
         )}
@@ -465,7 +482,7 @@ export default function CardDisplay({
           <div className="absolute left-0 right-0 top-1/2 h-[2px] bg-[var(--color-accent-purple)] shadow-[0_0_8px_var(--color-accent-purple)] z-[100] pointer-events-none" style={{ transform: 'translateY(-50%) translateZ(100px)' }} />
         )}
 
-        {}
+        {/* Variant Suite Icon */}
         {attrs.variantSuite && (
           <div className="absolute bottom-4 right-4 z-[80] flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/20 px-3 py-1 rounded-full shadow-lg group/variant transition-all hover:scale-110" style={{ transform: 'translateZ(90px)' }}>
             <Sparkles className="w-3 h-3 text-indigo-400 animate-pulse" />
@@ -473,27 +490,11 @@ export default function CardDisplay({
           </div>
         )}
 
-        {}
+        {/* Card Frame overlay */}
         {attrs.frameUrl && (
           <img src={attrs.frameUrl} alt="Card Frame" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
         )}
-
-        {}
-        {attrs.effect && attrs.effect !== "none" && (
-          <div className="absolute inset-0 pointer-events-none rounded-xl z-50 overflow-hidden" style={{ transform: 'translateZ(40px)' }}>
-            <div className={`absolute inset-0 w-full h-full ${attrs.effect === 'holo' ? 'effect-holo' : attrs.effect === 'shiny' ? 'effect-shiny' : attrs.effect === 'glitch' ? 'effect-glitch' : attrs.effect === 'paillettes' ? 'effect-paillettes' : ''}`} />
-          </div>
-        )}
-
-        {}
-        {specialEffect && (
-          <div className="absolute inset-0 pointer-events-none rounded-xl z-[70] overflow-hidden" style={{ transform: 'translateZ(50px)' }}>
-            {specialEffect === "Holographique" && <div className="absolute inset-0 w-full h-full effect-holo opacity-80 mix-blend-color-dodge" />}
-            {specialEffect === "Doré" && <div className="absolute inset-0 w-full h-full bg-gradient-to-tr from-yellow-500/20 via-yellow-200/40 to-yellow-600/20 mix-blend-overlay shadow-[inset_0_0_20px_rgba(234,179,8,0.5)]" />}
-            {specialEffect === "Ombré" && <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-black/80 via-black/20 to-transparent mix-blend-multiply" />}
-          </div>
-        )}
-</InteractiveCard>
+      </InteractiveCard>
     </div>
   );
 }

@@ -19,6 +19,15 @@ export default async function ShopPage() {
     balance = userDB?.paraCoins || 0;
   }
 
+  let activeEditions: any[] = [];
+  try {
+    activeEditions = await prisma.edition.findMany({
+      where: { showInShop: true }
+    });
+  } catch (error) {
+    console.error("Failed to fetch active editions:", error);
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-slide-up relative">
       {}
@@ -33,7 +42,7 @@ export default async function ShopPage() {
         </p>
       </div>
 
-      <ShopClient initialBalance={balance} isLoggedIn={!!userId} />
+      <ShopClient initialBalance={balance} isLoggedIn={!!userId} editions={activeEditions} />
     </div>
   );
 }

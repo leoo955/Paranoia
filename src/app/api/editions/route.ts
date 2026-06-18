@@ -21,16 +21,52 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { name, iconUrl } = await req.json();
+    const { name, iconUrl, bannerUrl, description, showInShop, isPurchasable } = await req.json();
     if (!name) return new NextResponse("Name is required", { status: 400 });
 
     const edition = await prisma.edition.create({
-      data: { name, iconUrl },
+      data: { 
+        name, 
+        iconUrl,
+        bannerUrl,
+        description,
+        showInShop: !!showInShop,
+        isPurchasable: !!isPurchasable
+      },
     });
 
     return NextResponse.json(edition);
   } catch (error) {
     console.error("Error creating edition:", error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "ADMIN") {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const { id, name, iconUrl, bannerUrl, description, showInShop, isPurchasable } = await req.json();
+    if (!id) return new NextResponse("ID is required", { status: 400 });
+
+    const edition = await prisma.edition.update({
+      where: { id },
+      data: { 
+        name, 
+        iconUrl,
+        bannerUrl,
+        description,
+        showInShop: !!showInShop,
+        isPurchasable: !!isPurchasable
+      },
+    });
+
+    return NextResponse.json(edition);
+  } catch (error) {
+    console.error("Error updating edition:", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

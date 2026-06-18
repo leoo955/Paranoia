@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Account {
@@ -185,10 +184,15 @@ model Player {
 }
 
 model Edition {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  iconUrl   String?
-  createdAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  name            String   @unique
+  iconUrl         String?
+  bannerUrl       String?
+  mobileBannerUrl String?
+  description     String?  @db.Text
+  showInShop      Boolean  @default(false)
+  isPurchasable   Boolean  @default(false)
+  createdAt       DateTime @default(now())
 }
 
 model VariantProfile {
@@ -209,6 +213,12 @@ model CardVariantLink {
   targetCard       TradingCard    @relation("TargetCard", fields: [targetCardId], references: [id], onDelete: Cascade)
 
   @@unique([motherCardId, variantProfileId])
+}
+
+model SystemSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
 }
 
 model UserBox {

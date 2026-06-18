@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, ShoppingCart, Sparkles, AlertCircle, Zap, ShieldCheck } from "lucide-react";
+import { Loader2, ShoppingCart, Sparkles, AlertCircle, Zap, ShieldCheck, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
 
-export default function ShopClient({ initialBalance, isLoggedIn }: { initialBalance: number, isLoggedIn: boolean }) {
+export default function ShopClient({ initialBalance, isLoggedIn, editions = [] }: { initialBalance: number, isLoggedIn: boolean, editions?: any[] }) {
   const [balance, setBalance] = useState(initialBalance);
   const [loadingPkg, setLoadingPkg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -88,48 +88,39 @@ export default function ShopClient({ initialBalance, isLoggedIn }: { initialBala
 
   return (
     <div className="w-full relative z-10">
-      {}
-      <div className="relative w-full mb-16 rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group">
-        {}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center transition-transform duration-10000 group-hover:scale-110"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent"></div>
-        <div className="absolute inset-0 bg-indigo-900/20 mix-blend-overlay"></div>
+      
+      {editions.length > 0 && (
+        <div className="mb-20 space-y-12">
+          {editions.map((ed, idx) => (
+            <div key={ed.id} className="relative w-full rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl group min-h-[400px]">
+              <div className="absolute inset-0 bg-cover bg-center transition-transform duration-[15s] group-hover:scale-110" style={{ backgroundImage: `url(${ed.bannerUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2000'})` }}></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+              <div className="absolute inset-0 bg-indigo-900/30 mix-blend-overlay"></div>
 
-        <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
-          <div className="flex-1 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 bg-yellow-500 text-black font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-widest mb-4 shadow-[0_0_20px_rgba(234,179,8,0.5)]">
-              <Sparkles className="w-4 h-4" /> Édition Limitée
+              <div className="relative z-10 p-8 md:p-16 h-full flex flex-col justify-end">
+                <div className="max-w-2xl">
+                  <div className="inline-flex items-center gap-2 bg-indigo-500 text-white font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-widest mb-4 shadow-[0_0_20px_rgba(99,102,241,0.5)] border border-white/20">
+                    <Sparkles className="w-4 h-4" /> Édition Spéciale
+                  </div>
+                  <h2 className="text-4xl md:text-6xl font-outfit font-black text-white mb-4 drop-shadow-lg uppercase tracking-tighter flex items-center gap-4">
+                    {ed.iconUrl && <img src={ed.iconUrl} alt={ed.name} className="w-12 h-12 md:w-16 md:h-16 object-contain" />}
+                    {ed.name}
+                  </h2>
+                  
+                  <div className="flex flex-wrap gap-4">
+                    <button 
+                      onClick={() => router.push(`/shop/edition/${ed.id}`)}
+                      className="bg-white text-black font-black px-8 py-4 rounded-2xl flex items-center gap-3 transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] uppercase tracking-wider"
+                    >
+                      Explorer l'Édition <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <h2 className="text-4xl md:text-6xl font-outfit font-black text-white mb-4 drop-shadow-lg">
-              ÉTÉ <span className="text-yellow-400">2026</span>
-            </h2>
-            <p className="text-white/80 text-lg max-w-xl mb-8 font-medium leading-relaxed">
-              Découvrez la collection panoramique exclusive. Chaque carte joueur s'intègre dans un panorama unique du serveur Paranoïa.
-            </p>
-            <button className="bg-white text-black font-black px-8 py-4 rounded-2xl flex items-center gap-3 transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]">
-              VOIR LA COLLECTION <Zap className="w-5 h-5 fill-black" />
-            </button>
-          </div>
-
-          <div className="flex-shrink-0 flex gap-4 animate-float">
-            <div className="w-32 h-44 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 rotate-[-12deg] translate-y-4 shadow-2xl flex items-center justify-center overflow-hidden">
-               <img src="/Paranoia_logo.png" className="w-20 opacity-40 grayscale" alt="" />
-            </div>
-            <div className="w-40 h-56 bg-gradient-to-br from-indigo-500/40 to-purple-600/40 backdrop-blur-xl rounded-2xl border border-white/30 shadow-[0_0_50px_rgba(168,85,247,0.4)] z-10 flex items-center justify-center overflow-hidden">
-               <img src="/Paranoia_logo.png" className="w-28 drop-shadow-2xl" alt="" />
-            </div>
-            <div className="w-32 h-44 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 rotate-[12deg] translate-y-4 shadow-2xl flex items-center justify-center overflow-hidden">
-               <img src="/Paranoia_logo.png" className="w-20 opacity-40 grayscale" alt="" />
-            </div>
-          </div>
-        </div>
-        {/* Animated players zones mock */}
-        <div className="absolute bottom-4 right-8 flex gap-2">
-          {[1,2,3,4,5].map(i => (
-            <div key={i} className="w-2 h-2 rounded-full bg-white/20 animate-pulse" style={{ animationDelay: `${i * 0.5}s` }}></div>
           ))}
         </div>
-      </div>
+      )}
 
       {/* HUD Balance */}
       {isLoggedIn && (

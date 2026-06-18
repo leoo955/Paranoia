@@ -52,9 +52,21 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const edition = searchParams.get("edition");
+
+    const where: any = {};
+    if (edition) {
+      where.edition = edition;
+    }
+
     const cards = await prisma.tradingCard.findMany({
+      where,
       include: {
         player: true,
+        motherLinks: {
+          include: { variantProfile: true }
+        }
       },
       orderBy: {
         createdAt: "desc",
