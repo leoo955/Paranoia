@@ -837,7 +837,7 @@ export default function AdminCardsPage() {
                 </div>
 
                 {/* 4. Variant Linking */}
-                {!isVariant && editingCardId && (
+                {editingCardId && (
                     <div className="bg-indigo-950/10 border border-indigo-500/20 p-8 rounded-[2.5rem] space-y-8 animate-in fade-in slide-in-from-bottom-4">
                         <h3 className="text-xl font-black text-white uppercase tracking-tighter flex items-center gap-3">
                             <Layers className="w-5 h-5 text-indigo-400" /> Lier des Variantes (Carte Mère)

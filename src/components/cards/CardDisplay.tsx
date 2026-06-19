@@ -401,7 +401,7 @@ export default function CardDisplay({
         </div>
 
         {}
-        {!card.isVariant && variantLinks.length > 0 && (
+        {variantLinks.length > 0 && (
           <div className="absolute bottom-[11cqi] left-0 right-0 z-40 flex justify-center gap-[1.5cqi] pointer-events-none px-[2cqi]">
             {variantLinks.map((link: any) => {
               const owned = ownedVariantIds?.has(link.targetCardId);
@@ -486,6 +486,23 @@ export default function CardDisplay({
         {/* Card Frame overlay */}
         {attrs.frameUrl && (
           <img src={attrs.frameUrl} alt="Card Frame" loading={isEditing ? "eager" : "lazy"} decoding="async" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
+        )}
+
+        {/* Special Effects Overlays */}
+        {specialEffect === 'Holographique' && (
+          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl mix-blend-color-dodge opacity-50 bg-[linear-gradient(105deg,transparent_20%,#ff0080_25%,#ff8c00_30%,#40e0d0_35%,transparent_40%)]" style={{ backgroundSize: '200% 200%', backgroundPosition: '100% 100%' }} />
+        )}
+        {specialEffect === 'Doré' && (
+          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl mix-blend-overlay bg-gradient-to-tr from-yellow-600/80 via-yellow-200/80 to-yellow-700/80 opacity-80 shadow-[inset_0_0_30px_rgba(234,179,8,0.5)]" />
+        )}
+        {specialEffect === 'Néon' && (
+          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl shadow-[inset_0_0_30px_rgba(0,255,255,0.8),0_0_20px_rgba(0,255,255,0.5)] border-2 border-cyan-400/50" />
+        )}
+        {specialEffect === 'Glitch' && (
+          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl mix-blend-exclusion bg-red-500/20 opacity-50 animate-pulse" style={{ animationDuration: '0.1s' }} />
+        )}
+        {specialEffect === 'Paillettes' && (
+          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl mix-blend-color-dodge opacity-70" style={{ backgroundImage: 'radial-gradient(circle, #fff 10%, transparent 20%)', backgroundSize: '10px 10px' }} />
         )}
       </InteractiveCard>
     </div>
