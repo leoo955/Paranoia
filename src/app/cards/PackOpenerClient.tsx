@@ -212,16 +212,21 @@ export default function PackOpenerClient({
   const handleBoosterClick = () => {
     if (boosterStep !== "waiting_click") return;
     
-    setBoosterStep("exploding");
+    setBoosterStep("charging");
     
-    // Jouer l'effet d'explosion pendant 600ms puis révéler
+    // Phase 1: Charging anticipation (1.2s)
+    setTimeout(() => {
+      setBoosterStep("exploding");
+    }, 1200);
+    
+    // Phase 2: Explosion + white flash + reveal cards (after 2.5s total)
     setTimeout(() => {
       setDrawnCards(fetchedCardsRef.current);
       setShowReveal(true);
       setIsOpening(false);
       setBoosterStep("idle");
       router.refresh();
-    }, 600);
+    }, 2500);
   };
 
   const groupedInventory = useMemo(() => {
@@ -437,49 +442,112 @@ export default function PackOpenerClient({
             </div>
           )}
           {isOpening && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 bg-black/90 overflow-hidden">
+            <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/90 overflow-hidden">
+              {/* Ambient particles */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {Array.from({ length: 30 }).map((_, i) => (
+                  <div key={i} className="absolute rounded-full bg-white/20" style={{
+                    width: `${Math.random() * 4 + 1}px`,
+                    height: `${Math.random() * 4 + 1}px`,
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
+                    animationDelay: `${Math.random() * 3}s`
+                  }} />
+                ))}
+              </div>
+
               <AnimatePresence>
                 {boosterStep !== "idle" && (
                   <motion.div 
-                    className="relative flex items-center justify-center"
-                    initial={{ y: -500, opacity: 0 }}
+                    className="relative flex flex-col items-center justify-center"
+                    initial={{ y: -600, opacity: 0, scale: 0.5 }}
                     animate={
                       boosterStep === "waiting_click" 
-                      ? { y: [0, -20, 0], opacity: 1, transition: { y: { repeat: Infinity, duration: 3, ease: "easeInOut" }, opacity: { duration: 0.5 } } }
-                      : { 
-                          scale: [1, 0.8, 1.3, 0], 
-                          rotate: [0, -10, 20, -20, 90],
-                          filter: ["brightness(1) blur(0px)", "brightness(0.5) blur(2px)", "brightness(3) drop-shadow(0 0 100px white) blur(0px)", "brightness(10) blur(20px)"],
-                          transition: { duration: 1.8, ease: "easeInOut", times: [0, 0.4, 0.8, 1] }
+                      ? { 
+                          y: 0, opacity: 1, scale: 1,
+                          transition: { type: "spring", stiffness: 80, damping: 15, mass: 1.5 }
+                        }
+                      : boosterStep === "charging"
+                      ? {
+                          y: 0, opacity: 1,
+                          scale: [1, 0.92, 0.92, 0.92],
+                          rotate: [0, -2, 2, -2, 2, 0],
+                          transition: { 
+                            scale: { duration: 0.3, ease: "easeOut" },
+                            rotate: { duration: 1.2, ease: "linear", repeat: Infinity }
+                          }
+                        }
+                      : {
+                          scale: [0.92, 1.4, 0],
+                          opacity: [1, 1, 0],
+                          filter: ["brightness(1)", "brightness(4)", "brightness(10)"],
+                          transition: { duration: 1.3, ease: [0.22, 1, 0.36, 1], times: [0, 0.3, 1] }
                         }
                     }
-                    exit={{ opacity: 0 }}
+                    exit={{ opacity: 0, scale: 0, transition: { duration: 0.3 } }}
                     onClick={handleBoosterClick}
                     style={{ cursor: boosterStep === "waiting_click" ? "pointer" : "default" }}
                   >
-                    <div className="relative w-80 h-[480px] z-10 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                    {/* Glow aura behind booster */}
+                    <motion.div 
+                      className="absolute w-[500px] h-[500px] rounded-full pointer-events-none z-0"
+                      style={{ background: `radial-gradient(circle, ${activeBox.glow.includes('blue') ? 'rgba(59,130,246,0.3)' : activeBox.glow.includes('purple') ? 'rgba(168,85,247,0.3)' : activeBox.glow.includes('yellow') ? 'rgba(250,204,21,0.3)' : 'rgba(239,68,68,0.3)'} 0%, transparent 70%)` }}
+                      animate={
+                        boosterStep === "charging" 
+                        ? { scale: [1, 1.5, 1.2], opacity: [0.3, 0.8, 0.6], transition: { duration: 1.2, repeat: Infinity } }
+                        : boosterStep === "exploding"
+                        ? { scale: [1.2, 4], opacity: [0.8, 0], transition: { duration: 1.3 } }
+                        : { scale: [0.8, 1.1, 0.8], opacity: [0.2, 0.4, 0.2], transition: { duration: 3, repeat: Infinity, ease: "easeInOut" } }
+                      }
+                    />
+
+                    {/* Light rays during charging */}
+                    {boosterStep === "charging" && (
+                      <>
+                        {Array.from({ length: 8 }).map((_, i) => (
+                          <motion.div
+                            key={`ray-${i}`}
+                            className="absolute w-[2px] h-[200px] bg-gradient-to-t from-transparent via-white/60 to-transparent pointer-events-none z-0"
+                            style={{ transformOrigin: "bottom center" }}
+                            initial={{ opacity: 0, scaleY: 0, rotate: i * 45 }}
+                            animate={{ opacity: [0, 0.8, 0], scaleY: [0, 1.5, 0.5], rotate: i * 45 + 15 }}
+                            transition={{ duration: 1.2, delay: i * 0.05, repeat: Infinity, ease: "easeOut" }}
+                          />
+                        ))}
+                      </>
+                    )}
+
+                    {/* The booster image */}
+                    <div className="relative w-72 h-[430px] md:w-80 md:h-[480px] z-10 drop-shadow-[0_0_50px_rgba(255,255,255,0.15)]">
                       <Image src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" priority fill className="object-contain" sizes="320px" />
                     </div>
-                    {boosterStep === 'waiting_click' && (
+
+                    {/* Click to open text */}
+                    {boosterStep === "waiting_click" && (
                       <motion.div 
-                        className="absolute -bottom-20 left-1/2 -translate-x-1/2 text-white font-black uppercase tracking-widest text-xl whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] pointer-events-none"
-                        animate={{ opacity: [0.3, 1, 0.3], y: [0, -5, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        className="mt-8 text-white/80 font-black uppercase tracking-[0.3em] text-lg whitespace-nowrap drop-shadow-[0_2px_20px_rgba(0,0,0,0.9)] pointer-events-none flex items-center gap-3"
+                        animate={{ opacity: [0.4, 1, 0.4] }}
+                        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
                       >
+                        <span className="w-8 h-[1px] bg-white/30" />
                         Cliquez pour ouvrir
+                        <span className="w-8 h-[1px] bg-white/30" />
                       </motion.div>
-                    )}
-                    {boosterStep === 'exploding' && (
-                      <motion.div 
-                        className="absolute inset-0 z-[-1] rounded-full bg-white mix-blend-overlay"
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: [0, 2, 8, 30], opacity: [0, 1, 1, 0] }}
-                        transition={{ duration: 1.8, ease: "easeIn" }}
-                      />
                     )}
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* White flash on explosion */}
+              {boosterStep === "exploding" && (
+                <motion.div
+                  className="fixed inset-0 z-[60] bg-white pointer-events-none"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 0, 0.9, 0] }}
+                  transition={{ duration: 1.3, times: [0, 0.2, 0.4, 1], ease: "easeOut" }}
+                />
+              )}
             </div>
           )}
           {showReveal && drawnCards.length > 0 && (
