@@ -568,11 +568,55 @@ export default function PackOpenerClient({
                 <h2 className="text-3xl font-outfit font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-purple-300 flex items-center gap-3"><BookOpen className="w-8 h-8 text-rose-400" /> Catalogue Complet</h2>
                 <span className="text-rose-200/50 font-medium tracking-wider uppercase text-sm ml-11">Découvrez toutes les cartes</span>
               </div>
+              <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div className="relative w-full sm:w-72 group">
+                  <div className="absolute inset-0 bg-rose-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex items-center">
+                    <Search className="absolute left-4 w-5 h-5 text-rose-300/50 group-focus-within:text-rose-400 transition-colors" />
+                    <input type="text" placeholder="Rechercher une carte..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-12 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl text-white placeholder-rose-200/30 outline-none focus:border-rose-500/50 transition-all shadow-inner" />
+                  </div>
+                </div>
+                <div className="relative w-full sm:w-56 group">
+                  <div className="absolute inset-0 bg-purple-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex items-center">
+                    <Filter className="absolute left-4 w-5 h-5 text-purple-300/50 group-focus-within:text-purple-400 transition-colors" />
+                    <select value={rarityFilter} onChange={(e) => setRarityFilter(e.target.value)} className="w-full pl-12 pr-10 py-3 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-purple-500/50 transition-all appearance-none shadow-inner cursor-pointer">
+                      <option value="ALL">Toutes Raretés</option>
+                      <option value="COMMON">Commune</option>
+                      <option value="UNCOMMON">Peu Commune</option>
+                      <option value="RARE">Rare</option>
+                      <option value="EPIC">Épique</option>
+                      <option value="LEGENDARY">Légendaire</option>
+                      <option value="MYTHIC">Mythique</option>
+                    </select>
+                    <div className="absolute right-4 pointer-events-none text-purple-300/50">▼</div>
+                  </div>
+                </div>
+                <div className="relative w-full sm:w-56 group">
+                  <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex items-center">
+                    <Layers className="absolute left-4 w-5 h-5 text-blue-300/50 group-focus-within:text-blue-400 transition-colors" />
+                    <select value={filterEdition} onChange={(e) => setFilterEdition(e.target.value)} className="w-full pl-12 pr-10 py-3 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-blue-500/50 transition-all appearance-none shadow-inner cursor-pointer">
+                      <option value="ALL">Toutes Éditions</option>
+                      {Array.from(new Set(allCards.map(c => c.edition))).filter(Boolean).map(ed => <option key={ed} value={ed}>{ed}</option>)}
+                    </select>
+                    <div className="absolute right-4 pointer-events-none text-blue-300/50">▼</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-16">
             {['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'].map(rarity => {
-              const cardsOfRarity = allCards.filter(c => c.rarity === rarity);
+              const cardsOfRarity = allCards.filter(c => {
+                if (c.rarity !== rarity) return false;
+                const titleMatch = c.title ? c.title.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+                const playerMatch = c.player ? c.player.minecraftName.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+                const matchesSearch = titleMatch || playerMatch;
+                const matchesRarity = rarityFilter === "ALL" || c.rarity === rarityFilter;
+                const matchesEdition = filterEdition === "ALL" || c.edition === filterEdition;
+                return matchesSearch && matchesRarity && matchesEdition;
+              });
               if (cardsOfRarity.length === 0) return null;
               const ownedCount = cardsOfRarity.filter(c => ownedVariantIds.has(c.id)).length;
               return (
@@ -595,6 +639,24 @@ export default function PackOpenerClient({
               );
             })}
             {allCards.length === 0 && <div className="text-center py-20 text-[var(--color-text-secondary)]">Aucune carte n'a encore été publiée.</div>}
+            {allCards.length > 0 && !['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'].some(rarity => {
+              return allCards.filter(c => {
+                if (c.rarity !== rarity) return false;
+                const titleMatch = c.title ? c.title.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+                const playerMatch = c.player ? c.player.minecraftName.toLowerCase().includes(searchQuery.toLowerCase()) : false;
+                const matchesSearch = titleMatch || playerMatch;
+                const matchesRarity = rarityFilter === "ALL" || c.rarity === rarityFilter;
+                const matchesEdition = filterEdition === "ALL" || c.edition === filterEdition;
+                return matchesSearch && matchesRarity && matchesEdition;
+              }).length > 0;
+            }) && (
+              <div className="text-center py-24 bg-[var(--color-bg-elevated)] rounded-2xl border border-dashed border-[var(--color-border-color)] flex flex-col items-center">
+                <div className="w-20 h-20 bg-black/30 rounded-full flex items-center justify-center mb-4 border border-white/5"><Search className="w-10 h-10 text-[var(--color-text-muted)]" /></div>
+                <h3 className="text-2xl font-bold text-white mb-2">Aucune carte trouvée</h3>
+                <p className="text-[var(--color-text-secondary)] max-w-md">Aucune carte de ce catalogue ne correspond à vos filtres.</p>
+                <button onClick={() => {setSearchQuery(""); setRarityFilter("ALL"); setFilterEdition("ALL");}} className="mt-6 text-[var(--color-accent-purple)] hover:text-white underline transition-colors">Réinitialiser les filtres</button>
+              </div>
+            )}
           </div>
         </div>
       )}
