@@ -109,6 +109,9 @@ export default function PackOpenerClient({
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
   const [activeModalTab, setActiveModalTab] = useState<"details" | "variants">("details");
   const [boosterStep, setBoosterStep] = useState<"idle" | "waiting_click" | "exploding">("idle");
+  const [clicksRequired, setClicksRequired] = useState(1);
+  const [clicksRemaining, setClicksRemaining] = useState(1);
+  const [isHit, setIsHit] = useState(false);
   const fetchedCardsRef = useRef<any[]>([]);
   
   useEffect(() => {
@@ -209,6 +212,14 @@ export default function PackOpenerClient({
 
       setBoxes(prev => prev.map(b => b.boxType === selectedBoxType ? { ...b, amount: b.amount - 1 } : b));
 
+      let clicks = 1;
+      if (bestCardRarity === 'EPIC') clicks = 3;
+      else if (bestCardRarity === 'LEGENDARY') clicks = 5;
+      else if (bestCardRarity === 'MYTHIC') clicks = 7;
+
+      setClicksRequired(clicks);
+      setClicksRemaining(clicks);
+
       const cardsWithEffects = data.userCards.map((uc: any) => ({ ...uc.tradingCard, specialEffect: uc.specialEffect }));
       fetchedCardsRef.current = cardsWithEffects;
       setInventory(prev => [...data.userCards, ...prev]);
@@ -222,6 +233,14 @@ export default function PackOpenerClient({
 
   const handleBoosterClick = () => {
     if (boosterStep !== "waiting_click") return;
+    
+    if (clicksRemaining > 1) {
+      setClicksRemaining(prev => prev - 1);
+      setIsHit(true);
+      setTimeout(() => setIsHit(false), 150);
+      return;
+    }
+
     setBoosterStep("exploding");
     
     // Jouer l'effet d'explosion pendant 600ms puis révéler
@@ -432,8 +451,9 @@ export default function PackOpenerClient({
           )}
           {isOpening && (
             <div className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 ${openingGlow === 'MYTHIC' ? 'bg-red-900/20' : openingGlow === 'LEGENDARY' ? 'bg-yellow-900/20' : openingGlow === 'EPIC' ? 'bg-purple-900/20' : 'bg-black/90'}`}>
+              {isHit && <div className="absolute inset-0 bg-white/20 z-[150] pointer-events-none mix-blend-overlay"></div>}
               <div 
-                className={`relative flex items-center justify-center transition-all duration-300 ${boosterStep === 'waiting_click' ? 'cursor-pointer hover:scale-110 hover:-rotate-3 active:scale-95 animate-pulse' : ''} ${boosterStep === 'exploding' ? 'animate-[huge-reveal_0.6s_ease-out_forwards]' : 'animate-booster-drop'}`}
+                className={`relative flex items-center justify-center transition-all duration-300 ${boosterStep === 'waiting_click' ? 'cursor-pointer hover:scale-105 active:scale-95' : ''} ${boosterStep === 'exploding' ? 'animate-[huge-reveal_0.6s_ease-out_forwards]' : 'animate-booster-drop'} ${isHit ? 'scale-90 -rotate-3 brightness-150' : ''}`}
                 onClick={handleBoosterClick}
               >
               {showReveal && (openingGlow === 'MYTHIC' || openingGlow === 'LEGENDARY') && (
@@ -441,13 +461,24 @@ export default function PackOpenerClient({
                   <h2 className={`font-black uppercase tracking-widest animate-huge-reveal ${openingGlow === 'MYTHIC' ? 'text-red-500 drop-shadow-[0_0_80px_rgba(239,68,68,1)] text-stroke-mythic' : 'text-yellow-400 drop-shadow-[0_0_80px_rgba(250,204,21,1)] text-stroke-legendary'}`} style={{ WebkitTextStroke: '3px white', filter: 'drop-shadow(0px 10px 20px rgba(0,0,0,0.8))' }}>{openingGlow === 'MYTHIC' ? 'MYTHIQUE !' : 'LÉGENDAIRE !'}</h2>
                 </div>
               )}
-              {openingGlow && <div className={`absolute inset-0 z-0 blur-lg ${openingGlow === 'MYTHIC' ? 'bg-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : openingGlow === 'LEGENDARY' ? 'bg-yellow-400/30 shadow-[0_0_50px_rgba(250,204,21,0.5)]' : 'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'}`} />}
-                <div className={`relative w-80 h-[480px] z-10 transition-all duration-700 ${openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' : openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' : openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' : 'drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]'}`}>
+              {openingGlow && <div className={`absolute inset-0 z-0 blur-lg ${openingGlow === 'MYTHIC' ? 'bg-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : openingGlow === 'LEGENDARY' ? 'bg-yellow-400/30 shadow-[0_0_50px_rgba(250,204,21,0.5)]' : 'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'} ${isHit ? 'opacity-100 scale-150' : 'opacity-70'}`} style={{ transition: 'all 0.15s ease-out' }} />}
+                <div className={`relative w-80 h-[480px] z-10 transition-all duration-150 ${openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' : openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' : openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' : 'drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]'} ${isHit ? 'blur-[2px]' : ''}`}>
                   <Image src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" priority fill className="object-contain" sizes="320px" />
                 </div>
                 {boosterStep === 'waiting_click' && (
-                  <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 text-white font-black uppercase tracking-widest text-xl animate-bounce whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-                    👆 Cliquez pour ouvrir !
+                  <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 text-white font-black uppercase tracking-widest text-xl whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] pointer-events-none">
+                    {clicksRequired > 1 ? (
+                      <div className={`transition-all duration-150 flex flex-col items-center ${isHit ? 'text-red-400 scale-125' : ''}`}>
+                        <span>{clicksRemaining === 1 ? "🔥 COUP FINAL ! 🔥" : `👆 FRAPPEZ ENCORE !`}</span>
+                        <div className="flex gap-1 mt-2">
+                          {Array.from({ length: clicksRequired }).map((_, i) => (
+                            <div key={i} className={`w-3 h-3 rounded-full border border-white/50 ${i >= (clicksRequired - clicksRemaining) ? 'bg-white/20' : 'bg-white shadow-[0_0_10px_white]'}`} />
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="animate-bounce inline-block">👆 Cliquez pour ouvrir !</span>
+                    )}
                   </div>
                 )}
               </div>
