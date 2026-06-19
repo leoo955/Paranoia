@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
+
+const manageSchema = z.object({
+  action: z.string().min(1),
+  cardId: z.string().optional(),
+  userId: z.string().optional(),
+  minecraftName: z.string().optional(),
+  boxType: z.string().optional(),
+  amount: z.number().int().optional(),
+});
 
 export async function POST(req: Request) {
   try {
@@ -11,8 +21,14 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const body = await req.json();
-    const { action, cardId, userId, minecraftName, boxType, amount } = body;
+    const rawBody = await req.json();
+    const parsed = manageSchema.safeParse(rawBody);
+    
+    if (!parsed.success) {
+      return new NextResponse("Invalid request payload", { status: 400 });
+    }
+
+    const { action, cardId, userId, minecraftName, boxType, amount } = parsed.data;
 
     if (!action) {
       return new NextResponse("Missing action parameter", { status: 400 });

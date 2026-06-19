@@ -181,16 +181,18 @@ export async function DELETE(req: Request) {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
 
-    if (!id) {
+    if (!id || typeof id !== 'string') {
       return new NextResponse("Missing ID", { status: 400 });
     }
 
+    const stringId = String(id);
+
     await prisma.userCard.deleteMany({
-      where: { tradingCardId: id }
+      where: { tradingCardId: stringId }
     });
 
     await prisma.tradingCard.delete({
-      where: { id }
+      where: { id: stringId }
     });
 
     return NextResponse.json({ success: true });
