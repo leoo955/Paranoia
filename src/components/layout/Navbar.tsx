@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { Menu, X, MessageSquare, Trophy, FileText, Sparkles, Home, LogIn, LogOut, ShieldAlert, ShoppingCart } from "lucide-react";
+import { Menu, X, MessageSquare, Trophy, FileText, Sparkles, Home, LogIn, LogOut, ShieldAlert, ShoppingCart, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -31,10 +31,6 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useEffect(() => {
-    router.refresh();
-  }, [pathname, router]);
 
   return (
     <nav
@@ -93,10 +89,16 @@ export default function Navbar() {
                     <ShieldAlert className="w-4 h-4" /> Admin
                   </Link>
                 )}
-                <div className="flex items-center space-x-2">
+                {(session.user as any)?.paraCoins !== undefined && (
+                  <div className="flex items-center gap-1.5 bg-yellow-500/10 border border-yellow-500/20 px-3 py-1.5 rounded-lg">
+                    <img src="/Paracoin.png" alt="PARA" className="w-4 h-4 object-contain" />
+                    <span className="text-sm font-black text-yellow-400">{(session.user as any)?.paraCoins ?? 0}</span>
+                  </div>
+                )}
+                <Link href="/cards" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
                   <img src={session.user?.image || ""} alt="Avatar" className="w-8 h-8 rounded-full border border-[var(--color-border-color)]" />
                   <span className="text-sm font-medium text-white">{(session.user as any)?.minecraftName || session.user?.name}</span>
-                </div>
+                </Link>
                 <button onClick={() => signOut()} className="text-[var(--color-text-secondary)] hover:text-red-500 transition-colors p-2" title="Déconnexion">
                   <LogOut className="w-4 h-4" />
                 </button>

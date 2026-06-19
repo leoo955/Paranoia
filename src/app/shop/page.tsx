@@ -4,8 +4,11 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 export const metadata = {
-  title: "Boutique | PARANOIA",
+  title: "Boutique & Éditions | PARANOIA",
+  description: "Découvrez les éditions de cartes PARANOIA. Achetez des boosters spéciaux, cosmétiques et soutenez le serveur.",
 };
+
+export const revalidate = 60;
 
 export default async function ShopPage() {
   const session = await getServerSession(authOptions);

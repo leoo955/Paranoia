@@ -21,6 +21,7 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role;
         token.minecraftName = (user as any).minecraftName;
         token.isMcVerified = (user as any).isMcVerified;
+        token.paraCoins = (user as any).paraCoins;
       }
       if (account && account.provider === 'discord' && account.providerAccountId === process.env.ADMIN_DISCORD_ID) {
         token.role = 'ADMIN';
@@ -30,6 +31,7 @@ export const authOptions: NextAuthOptions = {
         if (dbUser) {
           token.minecraftName = dbUser.minecraftName;
           token.isMcVerified = dbUser.isMcVerified;
+          token.paraCoins = dbUser.paraCoins;
         }
       }
       return token;
@@ -40,6 +42,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role;
         session.user.minecraftName = token.minecraftName;
         session.user.isMcVerified = token.isMcVerified;
+        (session.user as any).paraCoins = token.paraCoins;
       }
       return session;
     },

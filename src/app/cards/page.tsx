@@ -10,6 +10,7 @@ export const revalidate = 0;
 
 export const metadata = {
   title: "Trading Cards | PARANOIA",
+  description: "Collectionnez les cartes des joueurs du serveur PARANOIA. Achetez des boosters, découvrez des cartes animées 3D rares et complétez votre collection.",
 };
 
 export default async function CardsPage() {
