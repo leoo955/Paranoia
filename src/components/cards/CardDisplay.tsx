@@ -157,24 +157,24 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
         <div
           className="absolute inset-0 pointer-events-none z-[60] rounded-xl overflow-hidden mix-blend-color-dodge transition-opacity duration-300"
           style={{
-            opacity: isHovered ? 0.7 : 0.2,
+            opacity: isHovered ? 0.35 : 0.1,
             backgroundImage: `
               linear-gradient(
                 115deg, 
                 transparent 0%, 
-                rgba(255, 0, 0, 0.4) 15%, 
-                rgba(255, 255, 0, 0.4) 30%, 
-                rgba(0, 255, 0, 0.4) 45%, 
-                rgba(0, 255, 255, 0.4) 60%, 
-                rgba(0, 0, 255, 0.4) 75%, 
-                rgba(255, 0, 255, 0.4) 90%, 
+                rgba(255, 0, 0, 0.3) 15%, 
+                rgba(255, 255, 0, 0.3) 30%, 
+                rgba(0, 255, 0, 0.3) 45%, 
+                rgba(0, 255, 255, 0.3) 60%, 
+                rgba(0, 0, 255, 0.3) 75%, 
+                rgba(255, 0, 255, 0.3) 90%, 
                 transparent 100%
               )
             `,
             backgroundSize: '300% 300%',
             backgroundPosition: `${glarePosition.x}% ${glarePosition.y}%`,
-            filter: 'brightness(1.2) contrast(1.5)',
-            transform: 'translateZ(30px)'
+            filter: 'brightness(1.1) contrast(1.2)',
+            transform: 'translateZ(5px)'
           }}
         />
       )}
