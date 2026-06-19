@@ -610,7 +610,7 @@ export default function AdminCardsPage() {
                         </div>
 
                         <div className="md:col-span-2">
-                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2.5 ml-1">Lore / Description (Effets, Histoire...)</label>
+                            <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2.5 ml-1">Description de la carte (Effets, Histoire...)</label>
                             <textarea 
                                 value={cardDesc} 
                                 onChange={e => setCardDesc(e.target.value)} 
@@ -645,7 +645,7 @@ export default function AdminCardsPage() {
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer group">
                                     <input type="checkbox" className="custom-checkbox" checked={hideDescription} onChange={e => setHideDescription(e.target.checked)} />
-                                    <span className="text-xs text-gray-400 group-hover:text-white transition-colors">Cacher Lore</span>
+                                    <span className="text-xs text-gray-400 group-hover:text-white transition-colors">Cacher Description</span>
                                 </label>
                             </div>
                         </div>
@@ -661,7 +661,7 @@ export default function AdminCardsPage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs text-gray-400 mb-1">Couleur du Lore</label>
+                                    <label className="block text-xs text-gray-400 mb-1">Couleur Description</label>
                                     <div className="flex gap-2 items-center">
                                         <input type="color" value={descColor} onChange={e => setDescColor(e.target.value)} className="w-8 h-8 rounded bg-transparent cursor-pointer" />
                                         <input type="text" value={descColor} onChange={e => setDescColor(e.target.value)} className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white" placeholder="#FFFFFF" />
@@ -933,7 +933,7 @@ export default function AdminCardsPage() {
                             id: "preview",
                             title: cardTitle || players.find(p => p.id === cardPlayerId)?.minecraftName || "Pseudo Joueur",
                             rarity: cardRarity, level: cardLevel, edition: cardEdition,
-                            description: cardDesc || "Lore de la carte...",
+                            description: cardDesc || "Description de la carte...",
                             customBackground: cardCustomBg, imageUrl: cardImageUrl,
                             customBadges: cardCustomBadges,
                             characterPosition: { x: charPosX, y: charPosY, scale: charScale },

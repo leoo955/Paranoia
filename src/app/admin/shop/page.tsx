@@ -181,7 +181,7 @@ export default function AdminShopPage() {
                       </div>
 
                       <div className="space-y-2">
-                          <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Lore / Description</label>
+                          <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1">Description</label>
                           <textarea value={newEditionDescription} onChange={e => setNewEditionDescription(e.target.value)} className="w-full bg-[#0a0a0f] border border-white/10 rounded-2xl px-4 py-3 text-sm text-white outline-none min-h-[100px] resize-none" placeholder="Racontez l'histoire de cette édition..." />
                       </div>
 

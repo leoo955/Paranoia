@@ -612,7 +612,7 @@ export default function PackOpenerClient({
               <div className="absolute -right-20 -top-20 w-64 h-64 bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.2)_0%,_transparent_70%)] rounded-full pointer-events-none"></div>
               <h3 className="text-4xl font-outfit font-black text-white mb-4 relative z-10">
                 {selectedCard.title}
-                {selectedCard.isVariant && selectedCard.asVariantLinks?.[0]?.variantProfile && (
+                {selectedCard.asVariantLinks && selectedCard.asVariantLinks.length > 0 && selectedCard.asVariantLinks[0].variantProfile && (
                   <span className="ml-4 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400 opacity-90">({selectedCard.asVariantLinks[0].variantProfile.name})</span>
                 )}
               </h3>
@@ -631,8 +631,8 @@ export default function PackOpenerClient({
               {activeModalTab === "details" ? (
                 <>
                   <div className="flex-1 bg-black/40 rounded-2xl p-6 border border-white/5 relative z-10">
-                    <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-3 uppercase tracking-widest flex items-center gap-2"><Sparkles className="w-3 h-3" /> Lore de la Carte</h4>
-                    <p className="text-white/90 whitespace-pre-wrap leading-relaxed font-medium text-lg">{selectedCard.description || "Une aura mystérieuse entoure cette relique. Son histoire reste à écrire..."}</p>
+                    <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-3 uppercase tracking-widest flex items-center gap-2"><Sparkles className="w-3 h-3" /> Description de la Carte</h4>
+                    <p className="text-white/90 whitespace-pre-wrap leading-relaxed font-medium text-lg">{selectedCard.description || "Aucune description pour cette carte"}</p>
                   </div>
                   {selectedCard.player && (
                     <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between relative z-10 bg-white/5 rounded-xl p-4">
