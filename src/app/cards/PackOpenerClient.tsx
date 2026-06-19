@@ -628,6 +628,17 @@ export default function PackOpenerClient({
                     ({(selectedCard as any).specialEffect})
                   </span>
                 )}
+                {(() => {
+                  const attrs = typeof selectedCard.attributes === 'string' ? JSON.parse(selectedCard.attributes) : (selectedCard.attributes || {});
+                  if (attrs.variantName) {
+                    return (
+                      <span className="px-4 py-1.5 rounded-full text-sm font-bold border bg-emerald-500/10 text-emerald-300 border-emerald-500/30 bg-gradient-to-r from-emerald-500/20 to-teal-500/20">
+                        ({attrs.variantName})
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               <div className="flex gap-4 mb-6 border-b border-white/10 relative z-10">
                 <button onClick={() => setActiveModalTab("details")} className={`px-4 py-2 font-bold transition-colors ${activeModalTab === 'details' ? 'text-white border-b-2 border-purple-500' : 'text-white/40 hover:text-white/60'}`}>Détails</button>
