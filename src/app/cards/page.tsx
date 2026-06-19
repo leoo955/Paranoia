@@ -35,7 +35,8 @@ export default async function CardsPage() {
             player: true,
             motherLinks: {
               include: { variantProfile: true }
-            }
+            },
+            variantProfile: true
           }
         }
       },
@@ -51,7 +52,8 @@ export default async function CardsPage() {
       player: true,
       motherLinks: {
         include: { variantProfile: true }
-      }
+      },
+      variantProfile: true
     },
     orderBy: { rarity: 'desc' }
   });

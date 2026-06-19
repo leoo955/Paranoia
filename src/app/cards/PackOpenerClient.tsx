@@ -447,6 +447,7 @@ export default function PackOpenerClient({
                   ))}
                 </div>
               )}
+              <h3 className="text-2xl font-black text-white/50 mb-8 uppercase tracking-[0.3em] animate-pulse">Cliquez sur les cartes pour les révéler</h3>
               <div className="flex flex-row justify-center items-center gap-6 md:gap-10 px-4 flex-wrap w-fit mx-auto max-w-full overflow-visible">
                 {drawnCards.map((card, i) => <FlippableCard key={i} card={card} index={i} boxType={selectedBoxType} allCards={allCards} ownedVariantIds={ownedVariantIds} />)}
               </div>
@@ -609,7 +610,12 @@ export default function PackOpenerClient({
             </div>
             <div className="flex-1 w-full max-h-[80vh] overflow-y-auto custom-scrollbar bg-gradient-to-br from-[#161622] to-[#0a0a0f] border border-[var(--color-border-color)] rounded-3xl p-8 flex flex-col shadow-2xl relative">
               <div className="absolute -right-20 -top-20 w-64 h-64 bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.2)_0%,_transparent_70%)] rounded-full pointer-events-none"></div>
-              <h3 className="text-4xl font-outfit font-black text-white mb-4 relative z-10">{selectedCard.title}</h3>
+              <h3 className="text-4xl font-outfit font-black text-white mb-4 relative z-10">
+                {selectedCard.title}
+                {selectedCard.isVariant && selectedCard.variantProfile && (
+                  <span className="ml-4 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400 opacity-90">({selectedCard.variantProfile.name})</span>
+                )}
+              </h3>
               <div className="flex items-center gap-3 mb-8 relative z-10">
                 <span className={`px-4 py-1.5 rounded-full text-sm font-bold border uppercase tracking-wider ${selectedCard.rarity === 'COMMON' ? 'bg-gray-500/20 text-gray-300 border-gray-500/50' : selectedCard.rarity === 'UNCOMMON' ? 'bg-green-500/20 text-green-300 border-green-500/50' : selectedCard.rarity === 'RARE' ? 'bg-blue-500/20 text-blue-300 border-blue-500/50' : selectedCard.rarity === 'EPIC' ? 'bg-purple-500/20 text-purple-300 border-purple-500/50' : selectedCard.rarity === 'LEGENDARY' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50' : 'bg-red-500/20 text-red-300 border-red-500/50'}`}>{selectedCard.rarity}</span>
                 <span className="px-4 py-1.5 rounded-full text-sm font-bold border bg-indigo-500/10 text-indigo-300 border-indigo-500/30">Niveau {selectedCard.level}</span>
