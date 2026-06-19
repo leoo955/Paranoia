@@ -101,19 +101,14 @@
     100% { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes center-booster {
-    0% { transform: scale(0.2) rotate(0deg); opacity: 0; filter: brightness(0) blur(20px); }
-    20% { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1.5) blur(0px); }
-    40% { transform: scale(1.1) rotate(5deg); filter: brightness(2) drop-shadow(0 0 40px white); }
-    50% { transform: scale(1.1) rotate(-5deg); filter: brightness(2.5) drop-shadow(0 0 60px white); }
-    60% { transform: scale(1.2) rotate(8deg); filter: brightness(3) drop-shadow(0 0 80px white); }
-    70% { transform: scale(1.2) rotate(-8deg); filter: brightness(3.5) drop-shadow(0 0 100px white); }
-    85% { transform: scale(1.5) rotate(0deg); filter: brightness(5) drop-shadow(0 0 150px white); opacity: 1; }
-    100% { transform: scale(3); filter: brightness(10) blur(50px); opacity: 0; }
+  @keyframes booster-drop {
+    0% { transform: scale(0.5) translateY(-50vh); opacity: 0; }
+    60% { transform: scale(1.1) translateY(20px); opacity: 1; filter: drop-shadow(0 0 20px rgba(255,255,255,0.3)); }
+    100% { transform: scale(1) translateY(0); opacity: 1; filter: drop-shadow(0 0 40px rgba(255,255,255,0.6)); }
   }
 
-  .animate-booster-open {
-    animation: center-booster 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  .animate-booster-drop {
+    animation: booster-drop 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
   @keyframes epic-card-reveal {

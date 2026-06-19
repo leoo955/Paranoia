@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Image from "next/image";
 import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock, BookOpen, Flame, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -108,6 +108,8 @@ export default function PackOpenerClient({
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
   const [activeModalTab, setActiveModalTab] = useState<"details" | "variants">("details");
+  const [boosterStep, setBoosterStep] = useState<"idle" | "waiting_click" | "exploding">("idle");
+  const fetchedCardsRef = useRef<any[]>([]);
   
   useEffect(() => {
     if (selectedCard) {
@@ -176,6 +178,7 @@ export default function PackOpenerClient({
     setDrawnCards([]);
     setShowReveal(false);
     setOpeningGlow(null);
+    setBoosterStep("idle");
 
     try {
       const res = await fetch("/api/packs", {
@@ -206,19 +209,29 @@ export default function PackOpenerClient({
 
       setBoxes(prev => prev.map(b => b.boxType === selectedBoxType ? { ...b, amount: b.amount - 1 } : b));
 
-      setTimeout(() => {
-        const cardsWithEffects = data.userCards.map((uc: any) => ({ ...uc.tradingCard, specialEffect: uc.specialEffect }));
-        setDrawnCards(cardsWithEffects);
-        setShowReveal(true);
-        setIsOpening(false);
-        setInventory(prev => [...data.userCards, ...prev]);
-        router.refresh();
-      }, 1400);
+      const cardsWithEffects = data.userCards.map((uc: any) => ({ ...uc.tradingCard, specialEffect: uc.specialEffect }));
+      fetchedCardsRef.current = cardsWithEffects;
+      setInventory(prev => [...data.userCards, ...prev]);
+      setBoosterStep("waiting_click");
 
     } catch (error: any) {
       toast.error(error.message, { position: 'top-center' });
       setIsOpening(false);
     }
+  };
+
+  const handleBoosterClick = () => {
+    if (boosterStep !== "waiting_click") return;
+    setBoosterStep("exploding");
+    
+    // Jouer l'effet d'explosion pendant 600ms puis révéler
+    setTimeout(() => {
+      setDrawnCards(fetchedCardsRef.current);
+      setShowReveal(true);
+      setIsOpening(false);
+      setBoosterStep("idle");
+      router.refresh();
+    }, 600);
   };
 
   const groupedInventory = useMemo(() => {
@@ -419,16 +432,24 @@ export default function PackOpenerClient({
           )}
           {isOpening && (
             <div className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 ${openingGlow === 'MYTHIC' ? 'bg-red-900/20' : openingGlow === 'LEGENDARY' ? 'bg-yellow-900/20' : openingGlow === 'EPIC' ? 'bg-purple-900/20' : 'bg-black/90'}`}>
-              <div className="animate-booster-open relative flex items-center justify-center">
+              <div 
+                className={`relative flex items-center justify-center transition-all duration-300 ${boosterStep === 'waiting_click' ? 'cursor-pointer hover:scale-110 hover:-rotate-3 active:scale-95 animate-pulse' : ''} ${boosterStep === 'exploding' ? 'animate-[huge-reveal_0.6s_ease-out_forwards]' : 'animate-booster-drop'}`}
+                onClick={handleBoosterClick}
+              >
               {showReveal && (openingGlow === 'MYTHIC' || openingGlow === 'LEGENDARY') && (
                 <div className="fixed inset-0 z-[160] flex items-center justify-center pointer-events-none">
                   <h2 className={`font-black uppercase tracking-widest animate-huge-reveal ${openingGlow === 'MYTHIC' ? 'text-red-500 drop-shadow-[0_0_80px_rgba(239,68,68,1)] text-stroke-mythic' : 'text-yellow-400 drop-shadow-[0_0_80px_rgba(250,204,21,1)] text-stroke-legendary'}`} style={{ WebkitTextStroke: '3px white', filter: 'drop-shadow(0px 10px 20px rgba(0,0,0,0.8))' }}>{openingGlow === 'MYTHIC' ? 'MYTHIQUE !' : 'LÉGENDAIRE !'}</h2>
                 </div>
               )}
-              {openingGlow && <div className={`absolute inset-0 z-0  blur-lg ${openingGlow === 'MYTHIC' ? 'bg-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : openingGlow === 'LEGENDARY' ? 'bg-yellow-400/30 shadow-[0_0_50px_rgba(250,204,21,0.5)]' : 'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'}`} />}
+              {openingGlow && <div className={`absolute inset-0 z-0 blur-lg ${openingGlow === 'MYTHIC' ? 'bg-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : openingGlow === 'LEGENDARY' ? 'bg-yellow-400/30 shadow-[0_0_50px_rgba(250,204,21,0.5)]' : 'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'}`} />}
                 <div className={`relative w-80 h-[480px] z-10 transition-all duration-700 ${openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' : openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' : openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' : 'drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]'}`}>
                   <Image src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" priority fill className="object-contain" sizes="320px" />
                 </div>
+                {boosterStep === 'waiting_click' && (
+                  <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 text-white font-black uppercase tracking-widest text-xl animate-bounce whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+                    👆 Cliquez pour ouvrir !
+                  </div>
+                )}
               </div>
             </div>
           )}
