@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
 import { PackageOpen, Loader2, X, Search, Filter, Sparkles, Layers, Lock, BookOpen, Flame, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -374,7 +375,9 @@ export default function PackOpenerClient({
                         <motion.div key={key} onClick={() => !isOpening && !isActive && setSelectedBoxType(key)} initial={false} animate={{ x: offset * 320, scale: isActive ? 1.2 : 0.75, opacity: isActive ? 1 : 0.4, rotateY: offset * -15, zIndex: isActive ? 20 : 10 }} transition={{ type: "spring", stiffness: 100, damping: 20, mass: 1.2 }} className={`absolute flex flex-col items-center justify-center cursor-pointer ${isActive ? 'pointer-events-auto' : 'pointer-events-auto hover:opacity-80'}`} drag={isActive ? "x" : false} dragConstraints={{ left: 0, right: 0 }} dragElastic={0.2} onDragEnd={(e, { offset, velocity }) => { const swipe = offset.x; if (swipe < -50) setSelectedBoxType(keys[(activeIndex + 1) % n]); else if (swipe > 50) setSelectedBoxType(keys[(activeIndex - 1 + n) % n]); }}>
                           <div className={`relative flex justify-center ${isActive && isOpening ? 'animate-shake' : isActive ? 'animate-float' : ''}`}>
                             {isActive && <div className={`absolute inset-0 opacity-50 blur-3xl rounded-full ${box.glow} transition-all duration-700 ${isOpening ? 'scale-150' : ''}`} />}
-                            <img src={box.image} alt={box.name} fetchPriority="high" className={`w-48 md:w-56 h-auto drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] relative z-10 ${isActive && isOpening ? 'brightness-150 contrast-125' : ''}`} draggable={false} />
+                            <div className={`relative w-48 h-72 md:w-56 md:h-84 drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] z-10`}>
+                              <Image src={box.image} alt={box.name} priority fill className={`object-contain ${isActive && isOpening ? 'brightness-150 contrast-125' : ''}`} draggable={false} sizes="(max-width: 768px) 192px, 224px" />
+                            </div>
                             {isActive && isOpening && <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none"><Sparkles className={`w-40 h-40 animate-ping ${box.text}`} /></div>}
                           </div>
                         </motion.div>
@@ -423,7 +426,9 @@ export default function PackOpenerClient({
                 </div>
               )}
               {openingGlow && <div className={`absolute inset-0 z-0  blur-lg ${openingGlow === 'MYTHIC' ? 'bg-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : openingGlow === 'LEGENDARY' ? 'bg-yellow-400/30 shadow-[0_0_50px_rgba(250,204,21,0.5)]' : 'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'}`} />}
-                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" fetchPriority="high" className={`w-80 h-auto relative z-10 transition-all duration-700 ${openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' : openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' : openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' : 'drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]'}`} />
+                <div className={`relative w-80 h-[480px] z-10 transition-all duration-700 ${openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' : openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' : openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' : 'drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]'}`}>
+                  <Image src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" priority fill className="object-contain" sizes="320px" />
+                </div>
               </div>
             </div>
           )}

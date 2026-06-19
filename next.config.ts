@@ -4,6 +4,14 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'vzge.me' },
+      { protocol: 'https', hostname: 'cdn.discordapp.com' },
+      { protocol: 'https', hostname: 'www.pokememes.fr' },
+      { protocol: 'https', hostname: 'raw.githubusercontent.com' }
+    ]
+  },
   poweredByHeader: false,
   async headers() {
     return [
