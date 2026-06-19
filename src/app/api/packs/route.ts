@@ -44,7 +44,11 @@ export async function POST(req: Request) {
     });
 
     const cards = await prisma.tradingCard.findMany({
-      include: { player: true },
+      include: {
+        player: true,
+        motherLinks: { include: { variantProfile: true } },
+        asVariantLinks: { include: { variantProfile: true } }
+      },
     });
 
     if (cards.length === 0) {
@@ -141,7 +145,11 @@ export async function POST(req: Request) {
         },
         include: {
           tradingCard: {
-            include: { player: true }
+            include: {
+              player: true,
+              motherLinks: { include: { variantProfile: true } },
+              asVariantLinks: { include: { variantProfile: true } }
+            }
           }
         }
       });

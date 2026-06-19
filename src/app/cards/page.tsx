@@ -36,7 +36,7 @@ export default async function CardsPage() {
             motherLinks: {
               include: { variantProfile: true }
             },
-            variantProfile: true
+            asVariantLinks: { include: { variantProfile: true } }
           }
         }
       },
@@ -53,7 +53,7 @@ export default async function CardsPage() {
       motherLinks: {
         include: { variantProfile: true }
       },
-      variantProfile: true
+      asVariantLinks: { include: { variantProfile: true } }
     },
     orderBy: { rarity: 'desc' }
   });

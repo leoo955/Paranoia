@@ -612,8 +612,8 @@ export default function PackOpenerClient({
               <div className="absolute -right-20 -top-20 w-64 h-64 bg-[radial-gradient(ellipse_at_center,_rgba(168,85,247,0.2)_0%,_transparent_70%)] rounded-full pointer-events-none"></div>
               <h3 className="text-4xl font-outfit font-black text-white mb-4 relative z-10">
                 {selectedCard.title}
-                {selectedCard.isVariant && selectedCard.variantProfile && (
-                  <span className="ml-4 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400 opacity-90">({selectedCard.variantProfile.name})</span>
+                {selectedCard.isVariant && selectedCard.asVariantLinks?.[0]?.variantProfile && (
+                  <span className="ml-4 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400 opacity-90">({selectedCard.asVariantLinks[0].variantProfile.name})</span>
                 )}
               </h3>
               <div className="flex items-center gap-3 mb-8 relative z-10">
