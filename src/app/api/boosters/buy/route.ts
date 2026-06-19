@@ -43,24 +43,15 @@ export async function POST(req: Request) {
         data: { paraCoins: { decrement: price } }
       });
 
-      const existingBox = await tx.userBox.findFirst({
-        where: { userId, boxType }
+      await tx.userBox.upsert({
+        where: { userId_boxType: { userId, boxType } },
+        update: { amount: { increment: 1 } },
+        create: {
+          userId,
+          boxType,
+          amount: 1
+        }
       });
-
-      if (existingBox) {
-        await tx.userBox.update({
-          where: { id: existingBox.id },
-          data: { amount: { increment: 1 } }
-        });
-      } else {
-        await tx.userBox.create({
-          data: {
-            userId,
-            boxType,
-            amount: 1
-          }
-        });
-      }
     });
 
     return NextResponse.json({ success: true, remainingCoins: user.paraCoins - price });

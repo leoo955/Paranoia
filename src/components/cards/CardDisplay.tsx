@@ -211,7 +211,7 @@ export default function CardDisplay({
   disableTilt = false,
   specialEffect = null,
   childVariantBadges = [],
-  ownedVariantIds = [],
+  ownedVariantIds = new Set(),
   onUpdateElement
 }: {
   card: any,
@@ -221,7 +221,7 @@ export default function CardDisplay({
   disableTilt?: boolean,
   specialEffect?: string | null,
   childVariantBadges?: string[],
-  ownedVariantIds?: string[],
+  ownedVariantIds?: Set<string>,
   onUpdateElement?: (type: string, id: string, data: any) => void
 }) {
   const wrapperClass = size === "lg" ? "w-80" : size === "md" ? "w-full max-w-[18rem]" : "w-56";
@@ -404,7 +404,7 @@ export default function CardDisplay({
         {!card.isVariant && variantLinks.length > 0 && (
           <div className="absolute bottom-[11cqi] left-0 right-0 z-40 flex justify-center gap-[1.5cqi] pointer-events-none px-[2cqi]">
             {variantLinks.map((link: any) => {
-              const owned = ownedVariantIds?.includes(link.targetCardId);
+              const owned = ownedVariantIds?.has(link.targetCardId);
               return (
                 <div
                   key={link.id}

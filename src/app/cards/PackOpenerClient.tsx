@@ -12,7 +12,7 @@ type Player = { id: string; minecraftName: string };
 type TradingCard = { id: string; title: string; rarity: string; level: string; edition: string; description: string | null; player: Player | null; attributes?: string; imageUrl?: string | null };
 type UserCard = { id: string; obtainedAt: Date; tradingCard: TradingCard; specialEffect?: string | null };
 
-const FlippableCard = ({ card, index, boxType, allCards, ownedVariantIds }: { card: TradingCard, index: number, boxType: string, allCards: any[], ownedVariantIds: string[] }) => {
+const FlippableCard = ({ card, index, boxType, allCards, ownedVariantIds }: { card: TradingCard, index: number, boxType: string, allCards: any[], ownedVariantIds: Set<string> }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [showWow, setShowWow] = useState(false);
 
@@ -222,9 +222,6 @@ export default function PackOpenerClient({
 
   const groupedInventory = useMemo(() => {
     const acc: Record<string, { card: any, count: number, latestObtained: Date, specialEffect?: string | null }> = {};
-    allCards.forEach(card => {
-      acc[`${card.id}-none`] = { card, count: 0, latestObtained: new Date(0), specialEffect: null };
-    });
 
     inventory.forEach((curr: any) => {
       if (!curr || !curr.tradingCard) return;
@@ -306,7 +303,7 @@ export default function PackOpenerClient({
     }
   };
   const activeBox = boxesData[selectedBoxType] || boxesData['standard'];
-  const ownedVariantIds = useMemo(() => Array.from(new Set(inventory.map(item => item.tradingCard.id))), [inventory]);
+  const ownedVariantIds = useMemo(() => new Set(inventory.map(item => item.tradingCard.id)), [inventory]);
 
   return (
     <div className="w-full">
@@ -572,13 +569,13 @@ export default function PackOpenerClient({
             {['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'].map(rarity => {
               const cardsOfRarity = allCards.filter(c => c.rarity === rarity);
               if (cardsOfRarity.length === 0) return null;
-              const ownedCount = cardsOfRarity.filter(c => inventory.some(i => i.tradingCard?.id === c.id)).length;
+              const ownedCount = cardsOfRarity.filter(c => ownedVariantIds.has(c.id)).length;
               return (
                 <div key={rarity}>
                   <h2 className={`text-3xl font-bold mb-6 flex items-center gap-3 border-b border-white/10 pb-4 ${rarity === 'MYTHIC' ? 'text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]' : rarity === 'LEGENDARY' ? 'text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]' : rarity === 'EPIC' ? 'text-purple-400' : rarity === 'RARE' ? 'text-blue-400' : rarity === 'UNCOMMON' ? 'text-green-400' : 'text-gray-400'}`}><Sparkles className="w-8 h-8" />{rarity === 'MYTHIC' ? 'Mythique' : rarity === 'LEGENDARY' ? 'Légendaire' : rarity === 'EPIC' ? 'Épique' : rarity === 'RARE' ? 'Rare' : rarity === 'UNCOMMON' ? 'Peu Commune' : 'Commune'}<span className="text-sm font-normal text-[var(--color-text-secondary)] bg-white/5 px-3 py-1 rounded-full ml-4 border border-white/10 drop-shadow-none flex items-center gap-2"><Layers className="w-4 h-4" /> {ownedCount} / {cardsOfRarity.length} possédées</span></h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                     {cardsOfRarity.map(card => {
-                      const isOwned = inventory.some(i => i.tradingCard?.id === card.id);
+                      const isOwned = ownedVariantIds.has(card.id);
                       return (
                         <div key={card.id} className={`relative group perspective-1000 ${!isOwned ? 'opacity-50 grayscale hover:grayscale-0 transition-all duration-500' : ''}`}>
                           <div onClick={() => isOwned && setSelectedCard(card)} className={`transition-all duration-500 transform-style-3d group-hover:scale-105 group-hover:-translate-y-4 group-hover:shadow-[0_20px_30px_rgba(0,0,0,0.5)] rounded-xl ${isOwned ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
