@@ -415,20 +415,49 @@ export default function PackOpenerClient({
             </div>
           )}
           {isOpening && (
-            <div className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 bg-black/90`}>
-              <div 
-                className={`relative flex items-center justify-center transition-all duration-300 ${boosterStep === 'waiting_click' ? 'cursor-pointer hover:scale-105 active:scale-95' : ''} ${boosterStep === 'exploding' ? 'animate-[huge-reveal_0.6s_ease-out_forwards]' : 'animate-booster-drop'}`}
-                onClick={handleBoosterClick}
-              >
-                <div className={`relative w-80 h-[480px] z-10 transition-all duration-150 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]`}>
-                  <Image src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" priority fill className="object-contain" sizes="320px" />
-                </div>
-                {boosterStep === 'waiting_click' && (
-                  <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 text-white font-black uppercase tracking-widest text-xl whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] pointer-events-none">
-                    <span className="animate-bounce inline-block">Cliquez pour ouvrir !</span>
-                  </div>
+            <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 bg-black/90 overflow-hidden">
+              <AnimatePresence>
+                {boosterStep !== "idle" && (
+                  <motion.div 
+                    className="relative flex items-center justify-center"
+                    initial={{ y: -500, opacity: 0 }}
+                    animate={
+                      boosterStep === "waiting_click" 
+                      ? { y: [0, -20, 0], opacity: 1, transition: { y: { repeat: Infinity, duration: 3, ease: "easeInOut" }, opacity: { duration: 0.5 } } }
+                      : { 
+                          scale: [1, 0.8, 1.3, 0], 
+                          rotate: [0, -10, 20, -20, 90],
+                          filter: ["brightness(1) blur(0px)", "brightness(0.5) blur(2px)", "brightness(3) drop-shadow(0 0 100px white) blur(0px)", "brightness(10) blur(20px)"],
+                          transition: { duration: 1.8, ease: "easeInOut", times: [0, 0.4, 0.8, 1] }
+                        }
+                    }
+                    exit={{ opacity: 0 }}
+                    onClick={handleBoosterClick}
+                    style={{ cursor: boosterStep === "waiting_click" ? "pointer" : "default" }}
+                  >
+                    <div className="relative w-80 h-[480px] z-10 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+                      <Image src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" priority fill className="object-contain" sizes="320px" />
+                    </div>
+                    {boosterStep === 'waiting_click' && (
+                      <motion.div 
+                        className="absolute -bottom-20 left-1/2 -translate-x-1/2 text-white font-black uppercase tracking-widest text-xl whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] pointer-events-none"
+                        animate={{ opacity: [0.3, 1, 0.3], y: [0, -5, 0] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      >
+                        Cliquez pour ouvrir
+                      </motion.div>
+                    )}
+                    {boosterStep === 'exploding' && (
+                      <motion.div 
+                        className="absolute inset-0 z-[-1] rounded-full bg-white mix-blend-overlay"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: [0, 2, 8, 30], opacity: [0, 1, 1, 0] }}
+                        transition={{ duration: 1.8, ease: "easeIn" }}
+                      />
+                    )}
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
             </div>
           )}
           {showReveal && drawnCards.length > 0 && (

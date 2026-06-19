@@ -81,6 +81,7 @@ export default function AdminCardsPage() {
   const [variantBadgePos, setVariantBadgePos] = useState({ x: 15, y: 15, scale: 100 });
 
   const [isVariant, setIsVariant] = useState(false);
+  const [cardCustomBadges, setCardCustomBadges] = useState<any[]>([]);
   
   // Variant Linking State
   const [cardVariantLinks, setCardVariantLinks] = useState<any[]>([]);
