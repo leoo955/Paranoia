@@ -102,6 +102,7 @@ export default function PackOpenerClient({
   const [inventory, setInventory] = useState<UserCard[]>(initialInventory);
   const [boxes, setBoxes] = useState<any[]>(initialBoxes || []);
   const [coins, setCoins] = useState<number>(initialCoins || 0);
+  const [spendingAnimations, setSpendingAnimations] = useState<{id: number, amount: number}[]>([]);
   const [selectedBoxType, setSelectedBoxType] = useState<string>("standard");
   const [isOpening, setIsOpening] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
@@ -150,6 +151,11 @@ export default function PackOpenerClient({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur d'achat");
       setCoins(data.remainingCoins);
+      const animId = Date.now();
+      setSpendingAnimations(prev => [...prev, { id: animId, amount: price }]);
+      setTimeout(() => {
+        setSpendingAnimations(prev => prev.filter(a => a.id !== animId));
+      }, 1500);
       setBoxes(prev => {
         const existing = prev.find(b => b.boxType === type);
         if (existing) return prev.map(b => b.boxType === type ? { ...b, amount: b.amount + 1 } : b);
@@ -331,7 +337,23 @@ export default function PackOpenerClient({
             </div>
             <div className="flex flex-col items-start justify-center">
               <span className="text-xs text-amber-500/70 font-bold uppercase tracking-wider">Solde</span>
-              <span className="font-outfit font-black text-white text-2xl leading-none tracking-tight">{coins.toLocaleString()}</span>
+              <span className="relative font-outfit font-black text-white text-2xl leading-none tracking-tight">
+                {coins.toLocaleString()}
+                <AnimatePresence>
+                  {spendingAnimations.map(anim => (
+                    <motion.span
+                      key={anim.id}
+                      initial={{ opacity: 1, y: 0, scale: 1 }}
+                      animate={{ opacity: 0, y: -40, scale: 1.2 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 1.5, ease: "easeOut" }}
+                      className="absolute -top-6 left-1/2 -translate-x-1/2 text-red-500 font-black text-xl drop-shadow-[0_0_10px_rgba(239,68,68,0.8)] pointer-events-none z-50"
+                    >
+                      -{anim.amount}
+                    </motion.span>
+                  ))}
+                </AnimatePresence>
+              </span>
             </div>
           </div>
         )}

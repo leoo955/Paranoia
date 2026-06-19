@@ -155,28 +155,26 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
       {/* Reactive Holo Layer */}
       {attrs.isHolo && (
         <div
-          className="absolute inset-0 pointer-events-none z-[5] rounded-xl overflow-hidden mix-blend-color-dodge opacity-[0.10]"
+          className="absolute inset-0 pointer-events-none z-[60] rounded-xl overflow-hidden mix-blend-color-dodge transition-opacity duration-300"
           style={{
+            opacity: isHovered ? 0.7 : 0.2,
             backgroundImage: `
               linear-gradient(
                 115deg, 
-                transparent 10%, 
-                rgba(255, 255, 255, 0.4) 15%, 
-                rgba(255, 0, 0, 0.1) 20%, 
-                rgba(255, 255, 0, 0.1) 25%, 
-                rgba(0, 255, 0, 0.1) 30%, 
-                rgba(255, 255, 0, 0.1) 35%, 
-                rgba(0, 0, 255, 0.1) 40%, 
-                rgba(255, 0, 255, 0.1) 45%, 
-                rgba(255, 255, 255, 0.4) 50%, 
-                transparent 60%
+                transparent 0%, 
+                rgba(255, 0, 0, 0.4) 15%, 
+                rgba(255, 255, 0, 0.4) 30%, 
+                rgba(0, 255, 0, 0.4) 45%, 
+                rgba(0, 255, 255, 0.4) 60%, 
+                rgba(0, 0, 255, 0.4) 75%, 
+                rgba(255, 0, 255, 0.4) 90%, 
+                transparent 100%
               )
             `,
-            backgroundSize: '200% 200%',
+            backgroundSize: '300% 300%',
             backgroundPosition: `${glarePosition.x}% ${glarePosition.y}%`,
-            mixBlendMode: 'color-dodge',
-            filter: 'brightness(1.1) contrast(1.1)',
-            transform: 'translateZ(5px)'
+            filter: 'brightness(1.2) contrast(1.5)',
+            transform: 'translateZ(30px)'
           }}
         />
       )}
@@ -319,7 +317,8 @@ export default function CardDisplay({
                 src={card.imageUrl || `https://vzge.me/bust/512/${card.player?.minecraftName || card.title}.png`}
                 alt={card.title}
                 loading={isEditing ? "eager" : "lazy"} decoding="async"
-                className={`w-[120%] h-[85%] object-cover object-top drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`}
+                className={`w-[120%] h-[85%] object-cover object-top drop-shadow-2xl transition-transform duration-300 ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`}
+                style={{ transform: (card.rarity === 'MYTHIC' || card.rarity === 'MYTHIQUE') ? 'translateZ(40px) scale(1.05)' : 'translateZ(10px)' }}
                 onMouseDown={(e) => handleMouseDown(e, 'character')}
                 onWheel={(e) => handleWheel(e, 'character')}
               />
