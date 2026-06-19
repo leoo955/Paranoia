@@ -618,17 +618,22 @@ export default function PackOpenerClient({
               <div className="flex items-center gap-3 mb-8 relative z-10">
                 <span className={`px-4 py-1.5 rounded-full text-sm font-bold border uppercase tracking-wider ${selectedCard.rarity === 'COMMON' ? 'bg-gray-500/20 text-gray-300 border-gray-500/50' : selectedCard.rarity === 'UNCOMMON' ? 'bg-green-500/20 text-green-300 border-green-500/50' : selectedCard.rarity === 'RARE' ? 'bg-blue-500/20 text-blue-300 border-blue-500/50' : selectedCard.rarity === 'EPIC' ? 'bg-purple-500/20 text-purple-300 border-purple-500/50' : selectedCard.rarity === 'LEGENDARY' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50' : 'bg-red-500/20 text-red-300 border-red-500/50'}`}>{selectedCard.rarity}</span>
                 <span className="px-4 py-1.5 rounded-full text-sm font-bold border bg-indigo-500/10 text-indigo-300 border-indigo-500/30">Niveau {selectedCard.level}</span>
-                {selectedCard.asVariantLinks && selectedCard.asVariantLinks.length > 0 && selectedCard.asVariantLinks[0].variantProfile && (
-                  <span className="px-4 py-1.5 rounded-full text-sm font-bold border bg-pink-500/10 text-pink-300 border-pink-500/30 bg-gradient-to-r from-pink-500/20 to-purple-500/20 uppercase tracking-wider shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-                    Variante {selectedCard.asVariantLinks[0].variantProfile.name}
-                  </span>
-                )}
-                {selectedCard.isVariant && (!selectedCard.asVariantLinks || selectedCard.asVariantLinks.length === 0) && selectedCard.edition && selectedCard.edition !== 'STANDARD' && (
-                  <span className="px-4 py-1.5 rounded-full text-sm font-bold border bg-pink-500/10 text-pink-300 border-pink-500/30 bg-gradient-to-r from-pink-500/20 to-purple-500/20 uppercase tracking-wider shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-                    Variante {selectedCard.edition}
-                  </span>
-                )}
-                {!selectedCard.isVariant && selectedCard.edition && selectedCard.edition !== 'STANDARD' && (
+                {(() => {
+                  const attrs = typeof selectedCard.attributes === 'string' ? JSON.parse(selectedCard.attributes) : (selectedCard.attributes || {});
+                  const variantName = (selectedCard.asVariantLinks && selectedCard.asVariantLinks.length > 0 && selectedCard.asVariantLinks[0].variantProfile) 
+                    ? selectedCard.asVariantLinks[0].variantProfile.name 
+                    : attrs.variantName;
+
+                  if (selectedCard.isVariant && variantName) {
+                    return (
+                      <span className="px-4 py-1.5 rounded-full text-sm font-bold border bg-pink-500/10 text-pink-300 border-pink-500/30 bg-gradient-to-r from-pink-500/20 to-purple-500/20 uppercase tracking-wider shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                        Variante {variantName}
+                      </span>
+                    );
+                  }
+                  return null;
+                })()}
+                {!selectedCard.isVariant && selectedCard.edition && selectedCard.edition !== 'STANDARD' && selectedCard.edition !== 'Standard' && (
                   <span className="px-4 py-1.5 rounded-full text-sm font-bold border bg-cyan-500/10 text-cyan-300 border-cyan-500/30 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 uppercase tracking-wider">
                     Édition {selectedCard.edition}
                   </span>
@@ -638,17 +643,7 @@ export default function PackOpenerClient({
                     ({(selectedCard as any).specialEffect})
                   </span>
                 )}
-                {(() => {
-                  const attrs = typeof selectedCard.attributes === 'string' ? JSON.parse(selectedCard.attributes) : (selectedCard.attributes || {});
-                  if (attrs.variantName) {
-                    return (
-                      <span className="px-4 py-1.5 rounded-full text-sm font-bold border bg-emerald-500/10 text-emerald-300 border-emerald-500/30 bg-gradient-to-r from-emerald-500/20 to-teal-500/20">
-                        ({attrs.variantName})
-                      </span>
-                    );
-                  }
-                  return null;
-                })()}
+
               </div>
               <div className="flex gap-4 mb-6 border-b border-white/10 relative z-10">
                 <button onClick={() => setActiveModalTab("details")} className={`px-4 py-2 font-bold transition-colors ${activeModalTab === 'details' ? 'text-white border-b-2 border-purple-500' : 'text-white/40 hover:text-white/60'}`}>Détails</button>

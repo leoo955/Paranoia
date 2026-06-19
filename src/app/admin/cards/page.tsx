@@ -62,7 +62,8 @@ export default function AdminCardsPage() {
   const [levelBadgeUrl, setLevelBadgeUrl] = useState("");
   const [editionBadgeUrl, setEditionBadgeUrl] = useState("");
   const [variantBadgeUrl, setVariantBadgeUrl] = useState("");
-  const [cardCustomBadges, setCardCustomBadges] = useState<any[]>([]);
+  const [variantName, setVariantName] = useState("");
+  const [parentCardId, setParentCardId] = useState("");
   
   const [charPosX, setCharPosX] = useState(50);
   const [charPosY, setCharPosY] = useState(50);
@@ -236,6 +237,7 @@ export default function AdminCardsPage() {
       setLevelBadgeUrl(attrs.levelBadgeUrl || "");
       setEditionBadgeUrl(attrs.editionBadgeUrl || "");
       setVariantBadgeUrl(attrs.variantBadgeUrl || "");
+      setVariantName(attrs.variantName || "");
       setParentCardId(attrs.parentCardId || "");
     } catch (e) { console.error(e); }
 
@@ -298,7 +300,7 @@ export default function AdminCardsPage() {
           borderColor: cardBorderColor, cardBgColor, cardGlowColor, factionColor, rarityBadgeColor,
           frameUrl: cardFrameUrl, titlePos, descPos, rarityBadgePos, levelTextPos,
           levelBadgePos, editionBadgePos, variantBadgePos,
-          levelBadgeUrl, editionBadgeUrl, variantBadgeUrl,
+          levelBadgeUrl, editionBadgeUrl, variantBadgeUrl, variantName,
           parentCardId, isFullArt, isHolo,
           hideCharacter, hideRarityBox, hideSideText, hideDescription,
           hideNameplate, hideRole, hideTitle, hideBottomText,
@@ -769,8 +771,11 @@ export default function AdminCardsPage() {
                                                 const val = e.target.value;
                                                 if (val === "custom") {
                                                     if (!variantBadgeUrl) setVariantBadgeUrl("https://");
+                                                    setVariantName("");
                                                 } else {
                                                     setVariantBadgeUrl(val);
+                                                    const selectedVariant = variants.find(v => v.iconUrl === val);
+                                                    if (selectedVariant) setVariantName(selectedVariant.name);
                                                 }
                                             }} 
                                             className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-2.5 text-white outline-none focus:border-purple-500"
