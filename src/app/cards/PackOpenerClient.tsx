@@ -106,6 +106,9 @@ export default function PackOpenerClient({
   const [isOpening, setIsOpening] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   const [drawnCards, setDrawnCards] = useState<TradingCard[]>([]);
+  const [showReveal, setShowReveal] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
+  const [activeModalTab, setActiveModalTab] = useState<"details" | "variants">("details");
   const [boosterStep, setBoosterStep] = useState<"idle" | "waiting_click" | "exploding">("idle");
   const fetchedCardsRef = useRef<any[]>([]);
   
