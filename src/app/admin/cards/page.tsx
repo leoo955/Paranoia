@@ -733,7 +733,7 @@ export default function AdminCardsPage() {
                             </div>
                             <div className="flex flex-wrap gap-6 pt-2">
                                 <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" className="custom-checkbox" checked={isFullArt} onChange={e => setIsFullArt(e.target.checked)} />nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn 
+                                    <input type="checkbox" className="custom-checkbox" checked={isFullArt} onChange={e => setIsFullArt(e.target.checked)} />
                                     <span className="text-xs font-bold text-gray-400 group-hover:text-white transition-colors uppercase tracking-[0.2em]">Full Art</span>
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer group">
