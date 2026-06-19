@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Sparkles } from "lucide-react";
 
 export const getRarityGlow = (rarity: string) => {
@@ -56,14 +56,14 @@ export const getRarityBadge = (rarity: string) => {
   return 'bg-gray-500/20 text-gray-400 border-gray-500/50';
 }
 
-export const InteractiveCard = ({ card, children, className = "", style: customStyle = {} }: { card: any, children: React.ReactNode, className?: string, style?: React.CSSProperties }) => {
+export const InteractiveCard = ({ card, children, className = "", style: customStyle = {}, disableTilt = false }: { card: any, children: React.ReactNode, className?: string, style?: React.CSSProperties, disableTilt?: boolean }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [glarePosition, setGlarePosition] = useState({ x: 50, y: 50 });
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (card?.isEditing) return;
+    if (disableTilt || card?.isEditing) return;
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -79,8 +79,12 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
     setGlarePosition({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
   };
 
-  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseEnter = () => {
+    if (disableTilt) return;
+    setIsHovered(true);
+  };
   const handleMouseLeave = () => {
+    if (disableTilt) return;
     setIsHovered(false);
     setRotation({ x: 0, y: 0 });
   };
@@ -151,20 +155,20 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
       {/* Reactive Holo Layer */}
       {attrs.isHolo && (
         <div
-          className="absolute inset-0 pointer-events-none z-[5] rounded-xl overflow-hidden mix-blend-color-dodge opacity-[0.20]"
+          className="absolute inset-0 pointer-events-none z-[5] rounded-xl overflow-hidden mix-blend-color-dodge opacity-[0.10]"
           style={{
             backgroundImage: `
               linear-gradient(
                 115deg, 
                 transparent 10%, 
-                rgba(255, 255, 255, 0.7) 15%, 
-                rgba(255, 0, 0, 0.15) 20%, 
-                rgba(255, 255, 0, 0.15) 25%, 
-                rgba(0, 255, 0, 0.15) 30%, 
-                rgba(255, 255, 0, 0.15) 35%, 
-                rgba(0, 0, 255, 0.15) 40%, 
-                rgba(255, 0, 255, 0.15) 45%, 
-                rgba(255, 255, 255, 0.7) 50%, 
+                rgba(255, 255, 255, 0.4) 15%, 
+                rgba(255, 0, 0, 0.1) 20%, 
+                rgba(255, 255, 0, 0.1) 25%, 
+                rgba(0, 255, 0, 0.1) 30%, 
+                rgba(255, 255, 0, 0.1) 35%, 
+                rgba(0, 0, 255, 0.1) 40%, 
+                rgba(255, 0, 255, 0.1) 45%, 
+                rgba(255, 255, 255, 0.4) 50%, 
                 transparent 60%
               )
             `,
@@ -308,29 +312,13 @@ export default function CardDisplay({
         className={`${wrapperClass} aspect-[2.5/3.5] border-2 rounded-xl overflow-hidden ${getLevelBorder(card.level)} ${(attrs.cardGlowColor || attrs.mainColor) ? 'animate-pulse-glow-custom' : getRarityGlow(card.rarity)} relative`}
         style={combinedStyle}
       >
-        {}
-        {card.specialEffect === "Holographique" && (
-          <div className="absolute inset-0 z-[60] mix-blend-color-dodge pointer-events-none opacity-50 bg-gradient-to-tr from-transparent via-white to-transparent animate-shimmer" style={{ backgroundSize: '200% 200%' }} />
-        )}
-        {card.specialEffect === "Paillettes" && (
-          <div className="absolute inset-0 z-[60] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-80 mix-blend-screen" />
-        )}
-        {card.specialEffect === "Doré" && (
-          <div className="absolute inset-0 z-[60] pointer-events-none border-4 border-yellow-400 shadow-[inset_0_0_20px_rgba(250,204,21,0.8)] mix-blend-overlay" />
-        )}
-        {card.specialEffect === "Glitch" && (
-          <div className="absolute inset-0 z-[60] pointer-events-none mix-blend-difference bg-gradient-to-b from-transparent via-red-500/10 to-transparent animate-pulse" />
-        )}
-        {card.specialEffect === "Néon" && (
-          <div className="absolute inset-0 z-[60] pointer-events-none border-4 border-cyan-400 shadow-[inset_0_0_30px_rgba(34,211,238,1)] mix-blend-screen" />
-        )}
-        {}
         <div className="absolute inset-0 z-10 w-full h-full flex items-end justify-center overflow-hidden rounded-xl">
           {!attrs.hideCharacter && (
             (card.imageUrl || card.player?.minecraftName || card.title) ? (
               <img
                 src={card.imageUrl || `https://vzge.me/bust/512/${card.player?.minecraftName || card.title}.png`}
                 alt={card.title}
+                loading={isEditing ? "eager" : "lazy"} decoding="async"
                 className={`w-[120%] h-[85%] object-cover object-top drop-shadow-2xl ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`}
                 onMouseDown={(e) => handleMouseDown(e, 'character')}
                 onWheel={(e) => handleWheel(e, 'character')}
@@ -362,6 +350,7 @@ export default function CardDisplay({
           <img
             src={attrs.editionBadgeUrl}
             alt="Edition Badge"
+            loading={isEditing ? "eager" : "lazy"} decoding="async"
             className={`absolute z-[70] object-contain drop-shadow-md ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
             style={{
               left: `${editionBadgePos.x}%`,
@@ -381,6 +370,7 @@ export default function CardDisplay({
             <img
               src={attrs.variantBadgeUrl}
               alt="Variant Badge"
+              loading={isEditing ? "eager" : "lazy"} decoding="async"
               className="object-contain drop-shadow-md"
               style={{ width: '15cqi', height: '15cqi' }}
               draggable={false}
@@ -391,6 +381,7 @@ export default function CardDisplay({
               key={`manual-${idx}`}
               src={badgeUrl}
               alt={`Variant Badge ${idx}`}
+              loading={isEditing ? "eager" : "lazy"} decoding="async"
               className="object-contain drop-shadow-md"
               style={{ width: '15cqi', height: '15cqi' }}
               draggable={false}
@@ -401,6 +392,7 @@ export default function CardDisplay({
               key={`child-${idx}`}
               src={badgeUrl}
               alt={`Child Variant Badge ${idx}`}
+              loading={isEditing ? "eager" : "lazy"} decoding="async"
               className="object-contain drop-shadow-md"
               style={{ width: '15cqi', height: '15cqi' }}
               draggable={false}
@@ -419,7 +411,7 @@ export default function CardDisplay({
                   className={`w-[8cqi] h-[8cqi] rounded-full border border-white/30 bg-black/60 backdrop-blur-md flex items-center justify-center overflow-hidden transition-all shadow-lg ${owned ? 'shadow-indigo-500/50 scale-110 border-indigo-400' : 'grayscale opacity-40'}`}
                   style={{ transform: 'translateZ(45px)' }}
                 >
-                  <img src={link.variantProfile.iconUrl} className="w-[70%] h-[70%] object-contain" alt="" />
+                  <img src={link.variantProfile.iconUrl} loading={isEditing ? "eager" : "lazy"} decoding="async" className="w-[70%] h-[70%] object-contain" alt="" />
                 </div>
               );
             })}
@@ -460,6 +452,7 @@ export default function CardDisplay({
             key={badge.id || i}
             src={badge.url}
             alt="Badge"
+            loading={isEditing ? "eager" : "lazy"} decoding="async"
             className={`absolute z-[60] object-contain drop-shadow-lg ${isEditing ? 'cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_10px_white]' : 'pointer-events-none'}`}
             style={{
               left: `${badge.x}%`,
@@ -492,7 +485,7 @@ export default function CardDisplay({
 
         {/* Card Frame overlay */}
         {attrs.frameUrl && (
-          <img src={attrs.frameUrl} alt="Card Frame" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
+          <img src={attrs.frameUrl} alt="Card Frame" loading={isEditing ? "eager" : "lazy"} decoding="async" className="absolute inset-0 w-full h-full object-cover pointer-events-none rounded-xl" style={{ transform: 'translateZ(10px)' }} />
         )}
       </InteractiveCard>
     </div>

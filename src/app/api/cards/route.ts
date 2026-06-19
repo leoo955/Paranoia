@@ -2,6 +2,25 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
+
+const cardSchema = z.object({
+  title: z.string().optional().nullable(),
+  playerName: z.string().optional().nullable(),
+  playerId: z.string(),
+  rarity: z.string(),
+  level: z.string(),
+  edition: z.string().optional().nullable(),
+  proba: z.union([z.string(), z.number()]).optional().nullable(),
+  description: z.string().optional().nullable(),
+  customBackground: z.string().optional().nullable(),
+  customBadges: z.any().optional().nullable(),
+  characterPosition: z.any().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
+  renderedImageUrl: z.string().optional().nullable(),
+  attributes: z.any().optional().nullable(),
+  isVariant: z.boolean().optional().nullable(),
+});
 
 export async function POST(req: Request) {
   try {
@@ -11,10 +30,13 @@ export async function POST(req: Request) {
     if (!session || !user || user.role !== "ADMIN") {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const { title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes, isVariant } = await req.json();
-    if (!playerId || !rarity || !level) {
-      return new NextResponse("Missing required fields", { status: 400 });
+    const body = await req.json();
+    const parsed = cardSchema.safeParse(body);
+    if (!parsed.success) {
+      return new NextResponse("Invalid input", { status: 400 });
     }
+    const { title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes, isVariant } = parsed.data;
+
 
     const parsedProba = parseFloat(proba);
     const validProba = isNaN(parsedProba) ? 100 : parsedProba;
@@ -89,11 +111,16 @@ export async function PUT(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id, title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes, isVariant } = await req.json();
-
-    if (!id) {
-      return new NextResponse("Missing id", { status: 400 });
+    const body = await req.json();
+    
+    // Partial validation for PUT since sometimes it's just an image update
+    const putSchema = cardSchema.partial().extend({ id: z.string() });
+    const parsed = putSchema.safeParse(body);
+    if (!parsed.success) {
+      return new NextResponse("Invalid input", { status: 400 });
     }
+    
+    const { id, title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes, isVariant } = parsed.data;
 
     if (renderedImageUrl !== undefined && !playerId && !rarity) {
       const card = await prisma.tradingCard.update({

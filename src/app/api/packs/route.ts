@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
+
+const packSchema = z.object({
+  boxType: z.string().optional().default("standard")
+});
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +22,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Compte introuvable. Veuillez vous déconnecter et vous reconnecter." }, { status: 401 });
     }
 
-    const { boxType } = await req.json().catch(() => ({ boxType: "standard" }));
+    let body;
+    try { body = await req.json(); } catch { body = {}; }
+    const parsed = packSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    }
+    const boxType = parsed.data.boxType;
 
     const userBox = await prisma.userBox.findUnique({
       where: { userId_boxType: { userId, boxType: boxType || "standard" } }

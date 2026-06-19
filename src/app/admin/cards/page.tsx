@@ -733,7 +733,7 @@ export default function AdminCardsPage() {
                             </div>
                             <div className="flex flex-wrap gap-6 pt-2">
                                 <label className="flex items-center gap-3 cursor-pointer group">
-                                    <input type="checkbox" className="custom-checkbox" checked={isFullArt} onChange={e => setIsFullArt(e.target.checked)} />
+                                    <input type="checkbox" className="custom-checkbox" checked={isFullArt} onChange={e => setIsFullArt(e.target.checked)} />nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn 
                                     <span className="text-xs font-bold text-gray-400 group-hover:text-white transition-colors uppercase tracking-[0.2em]">Full Art</span>
                                 </label>
                                 <label className="flex items-center gap-3 cursor-pointer group">
@@ -764,25 +764,22 @@ export default function AdminCardsPage() {
                                     <div>
                                         <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Badge de Variante (Profil)</label>
                                         <select 
-                                            value={variants.find(v => v.iconUrl === variantBadgeUrl)?.name || (variantBadgeUrl ? "custom" : "")} 
+                                            value={variants.some(v => v.iconUrl === variantBadgeUrl) ? variantBadgeUrl : (variantBadgeUrl ? "custom" : "")} 
                                             onChange={(e) => {
                                                 const val = e.target.value;
                                                 if (val === "custom") {
-                                                    // keep current
-                                                } else if (val === "") {
-                                                    setVariantBadgeUrl("");
+                                                    if (!variantBadgeUrl) setVariantBadgeUrl("https://");
                                                 } else {
-                                                    const v = variants.find(v => v.name === val);
-                                                    if (v) setVariantBadgeUrl(v.iconUrl || "");
+                                                    setVariantBadgeUrl(val);
                                                 }
                                             }} 
                                             className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-2.5 text-white outline-none focus:border-purple-500"
                                         >
                                             <option value="">-- Aucun badge --</option>
-                                            {variants.map(v => <option key={v.id} value={v.name}>{v.name}</option>)}
+                                            {variants.map(v => <option key={v.id} value={v.iconUrl}>{v.name}</option>)}
                                             <option value="custom">URL Personnalisée</option>
                                         </select>
-                                        {(!variants.find(v => v.iconUrl === variantBadgeUrl) && variantBadgeUrl !== "" || variants.length === 0) && (
+                                        {(!variants.some(v => v.iconUrl === variantBadgeUrl) && variantBadgeUrl !== "" || variants.length === 0) && (
                                             <input type="text" value={variantBadgeUrl} onChange={e => setVariantBadgeUrl(e.target.value)} className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-4 py-2.5 text-xs text-white outline-none mt-2" placeholder="URL du badge..." />
                                         )}
                                     </div>
@@ -969,10 +966,12 @@ export default function AdminCardsPage() {
                     </div>
 
                     <button 
-                        onClick={() => {/* Discord capture logic */}}
-                        className="w-full py-5 bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center gap-3 shadow-xl"
+                        onClick={handleCaptureDiscordImage}
+                        disabled={isCapturing}
+                        className="w-full py-5 bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-600 hover:text-white transition-all flex items-center justify-center gap-3 shadow-xl disabled:opacity-50"
                     >
-                        <ImagePlus className="w-6 h-6" /> Figer pour Discord
+                        {isCapturing ? <Loader2 className="w-6 h-6 animate-spin" /> : <ImagePlus className="w-6 h-6" />} 
+                        {isCapturing ? "Génération en cours..." : "Figer pour Discord"}
                     </button>
                 </div>
             </div>

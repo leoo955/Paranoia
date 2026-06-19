@@ -49,7 +49,7 @@ model User {
   discordId     String?   @unique
   minecraftName      String?
   minecraftUuid      String?   @unique
-  mcVerificationCode String?   @unique
+  mcVerificationCode String?   @uniquey
   isMcVerified       Boolean   @default(false)
   role               String    @default("MEMBER")
   paraCoins          Int       @default(0)

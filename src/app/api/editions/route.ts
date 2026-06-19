@@ -2,6 +2,16 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { z } from "zod";
+
+const editionSchema = z.object({
+  name: z.string().min(1),
+  iconUrl: z.string().optional().nullable(),
+  bannerUrl: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  showInShop: z.boolean().optional(),
+  isPurchasable: z.boolean().optional()
+});
 
 export async function GET() {
   try {
@@ -21,8 +31,11 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { name, iconUrl, bannerUrl, description, showInShop, isPurchasable } = await req.json();
-    if (!name) return new NextResponse("Name is required", { status: 400 });
+    const body = await req.json();
+    const parsed = editionSchema.safeParse(body);
+    if (!parsed.success) return new NextResponse("Invalid input", { status: 400 });
+
+    const { name, iconUrl, bannerUrl, description, showInShop, isPurchasable } = parsed.data;
 
     const edition = await prisma.edition.create({
       data: { 
@@ -49,8 +62,12 @@ export async function PUT(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { id, name, iconUrl, bannerUrl, description, showInShop, isPurchasable } = await req.json();
-    if (!id) return new NextResponse("ID is required", { status: 400 });
+    const body = await req.json();
+    const putSchema = editionSchema.partial().extend({ id: z.string().min(1) });
+    const parsed = putSchema.safeParse(body);
+    if (!parsed.success) return new NextResponse("Invalid input", { status: 400 });
+
+    const { id, name, iconUrl, bannerUrl, description, showInShop, isPurchasable } = parsed.data;
 
     const edition = await prisma.edition.update({
       where: { id },

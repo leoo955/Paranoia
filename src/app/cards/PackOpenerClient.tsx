@@ -68,7 +68,7 @@ const FlippableCard = ({ card, index, boxType, allCards, ownedVariantIds }: { ca
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-2 border-dashed border-purple-500/20 animate-[spin_20s_linear_infinite] pointer-events-none"></div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border border-purple-400/30 animate-[spin_15s_linear_infinite_reverse] pointer-events-none"></div>
             <div className="relative z-10 flex flex-col items-center justify-center pointer-events-none w-full px-4">
-              <img src="/Paranoia_logo.png" className="w-[85%] h-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
+              <img src="/Paranoia_logo.png" fetchPriority="high" className="w-[85%] h-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
             </div>
             <div className="absolute inset-2 border-2 border-white/5 rounded-xl pointer-events-none"></div>
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
@@ -377,7 +377,7 @@ export default function PackOpenerClient({
                         <motion.div key={key} onClick={() => !isOpening && !isActive && setSelectedBoxType(key)} initial={false} animate={{ x: offset * 320, scale: isActive ? 1.2 : 0.75, opacity: isActive ? 1 : 0.4, rotateY: offset * -15, zIndex: isActive ? 20 : 10 }} transition={{ type: "spring", stiffness: 100, damping: 20, mass: 1.2 }} className={`absolute flex flex-col items-center justify-center cursor-pointer ${isActive ? 'pointer-events-auto' : 'pointer-events-auto hover:opacity-80'}`} drag={isActive ? "x" : false} dragConstraints={{ left: 0, right: 0 }} dragElastic={0.2} onDragEnd={(e, { offset, velocity }) => { const swipe = offset.x; if (swipe < -50) setSelectedBoxType(keys[(activeIndex + 1) % n]); else if (swipe > 50) setSelectedBoxType(keys[(activeIndex - 1 + n) % n]); }}>
                           <div className={`relative flex justify-center ${isActive && isOpening ? 'animate-shake' : isActive ? 'animate-float' : ''}`}>
                             {isActive && <div className={`absolute inset-0 opacity-50 blur-3xl rounded-full ${box.glow} transition-all duration-700 ${isOpening ? 'scale-150' : ''}`} />}
-                            <img src={box.image} alt={box.name} className={`w-48 md:w-56 h-auto drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] relative z-10 ${isActive && isOpening ? 'brightness-150 contrast-125' : ''}`} draggable={false} />
+                            <img src={box.image} alt={box.name} fetchPriority="high" className={`w-48 md:w-56 h-auto drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] relative z-10 ${isActive && isOpening ? 'brightness-150 contrast-125' : ''}`} draggable={false} />
                             {isActive && isOpening && <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none"><Sparkles className={`w-40 h-40 animate-ping ${box.text}`} /></div>}
                           </div>
                         </motion.div>
@@ -400,7 +400,7 @@ export default function PackOpenerClient({
                     ) : (
                       <button onClick={(e) => { e.stopPropagation(); buyBooster(selectedBoxType, activeBox.price); }} disabled={isBuying} className={`group relative overflow-hidden flex items-center justify-center gap-2 w-full rounded-xl font-black text-white transition-all hover:-translate-y-0.5 active:translate-y-0.5 active:border-b-0 shadow-lg border-t border-x border-b-4 ${activeBox.border} bg-black/60 ${activeBox.owned > 0 ? 'py-3 text-sm' : 'py-4 text-xl'}`}>
                         <div className={`absolute inset-0 ${activeBox.glow} opacity-10 group-hover:opacity-30 transition-opacity`} />
-                        <span className="relative flex items-center gap-2 drop-shadow-md uppercase tracking-widest">ACHETER POUR <img src="/Paracoin.png" alt="PARA" className="w-5 h-5 object-contain" /> {activeBox.price}</span>
+                        <span className="relative flex items-center gap-2 drop-shadow-md uppercase tracking-widest">ACHETER POUR <img src="/Paracoin.png" alt="PARA" loading="lazy" decoding="async" className="w-5 h-5 object-contain" /> {activeBox.price}</span>
                       </button>
                     )
                   )}
@@ -426,7 +426,7 @@ export default function PackOpenerClient({
                 </div>
               )}
               {openingGlow && <div className={`absolute inset-0 z-0  blur-lg ${openingGlow === 'MYTHIC' ? 'bg-red-500/30 shadow-[0_0_50px_rgba(239,68,68,0.5)]' : openingGlow === 'LEGENDARY' ? 'bg-yellow-400/30 shadow-[0_0_50px_rgba(250,204,21,0.5)]' : 'bg-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.5)]'}`} />}
-                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" className={`w-80 h-auto relative z-10 transition-all duration-700 ${openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' : openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' : openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' : 'drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]'}`} />
+                <img src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" fetchPriority="high" className={`w-80 h-auto relative z-10 transition-all duration-700 ${openingGlow === 'MYTHIC' ? 'drop-shadow-[0_0_30px_rgba(239,68,68,0.7)]' : openingGlow === 'LEGENDARY' ? 'drop-shadow-[0_0_30px_rgba(250,204,21,0.7)]' : openingGlow === 'EPIC' ? 'drop-shadow-[0_0_30px_rgba(168,85,247,0.7)]' : 'drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]'}`} />
               </div>
             </div>
           )}
@@ -629,7 +629,7 @@ export default function PackOpenerClient({
                   {selectedCard.player && (
                     <div className="mt-6 pt-6 border-t border-white/10 flex items-center justify-between relative z-10 bg-white/5 rounded-xl p-4">
                       <div className="flex items-center gap-4">
-                        <img src={`https://vzge.me/bust/512/${selectedCard.player.minecraftName}.png`} alt="Skin" className="w-12 h-12 object-contain drop-shadow-lg" />
+                        <img src={`https://vzge.me/bust/512/${selectedCard.player.minecraftName}.png`} alt="Skin" fetchPriority="high" className="w-12 h-12 object-contain drop-shadow-lg" />
                         <div><span className="text-xs text-[var(--color-text-secondary)] block uppercase tracking-wider font-bold">Joueur Associé</span><span className="text-lg font-black text-white">{selectedCard.player.minecraftName}</span></div>
                       </div>
                       <div className="text-right"><span className="text-xs text-[var(--color-text-secondary)] block">Authentifié par</span><span className="text-sm font-bold text-indigo-400">Le Serveur Paranoia</span></div>
@@ -651,7 +651,7 @@ export default function PackOpenerClient({
                           <div className="grid grid-cols-1 gap-4">
                             {relatedCards.map(c => (
                               <div key={c.id} onClick={() => setSelectedCard(c)} className="flex items-center gap-4 bg-white/5 hover:bg-white/10 p-3 rounded-xl border border-white/10 cursor-pointer transition-all group">
-                                <div className="w-12 h-16 bg-gray-800 rounded-lg overflow-hidden shrink-0"><img src={c.imageUrl || `https://vzge.me/bust/512/${c.player?.minecraftName || c.title}.png`} className="w-full h-full object-cover" alt="" /></div>
+                                <div className="w-12 h-16 bg-gray-800 rounded-lg overflow-hidden shrink-0"><img src={c.imageUrl || `https://vzge.me/bust/512/${c.player?.minecraftName || c.title}.png`} loading="lazy" decoding="async" className="w-full h-full object-cover" alt="" /></div>
                                 <div className="flex-1"><span className="text-sm font-black text-white group-hover:text-purple-400 transition-colors">{c.title}</span><div className="flex items-center gap-2"><span className="text-[10px] text-white/50 uppercase">{c.rarity}</span><span className="text-[10px] text-indigo-400 uppercase font-bold">{c.level}</span></div></div>
                                 <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-white transition-all" />
                               </div>

@@ -23,7 +23,7 @@ export default function NotFound() {
         </h2>
         
         <p className="text-[var(--color-text-secondary)] text-lg md:text-xl max-w-md mx-auto mb-12 font-medium leading-relaxed">
-          Il semblerait que vous vous soyez aventuré un peu trop loin dans les entrailles de Paranoïa. Cette page n'existe pas ou a été déplacée.
+          Il semblerait que vous vous soyez aventuré un peu trop loin dans les entrailles de Paranoïa. Cette page n&apos;existe pas ou a été déplacée.
         </p>
         
         <Link 
