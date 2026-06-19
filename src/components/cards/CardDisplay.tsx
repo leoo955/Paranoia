@@ -489,19 +489,78 @@ export default function CardDisplay({
 
         {/* Special Effects Overlays */}
         {specialEffect === 'Holographique' && (
-          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl mix-blend-color-dodge opacity-50 bg-[linear-gradient(105deg,transparent_20%,#ff0080_25%,#ff8c00_30%,#40e0d0_35%,transparent_40%)]" style={{ backgroundSize: '200% 200%', backgroundPosition: '100% 100%' }} />
+          <>
+            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl overflow-hidden mix-blend-color-dodge" style={{
+              backgroundImage: 'linear-gradient(105deg, transparent 20%, #ff0080 25%, #ff8c00 30%, #40e0d0 35%, #7b68ee 40%, #ff0080 45%, transparent 50%)',
+              backgroundSize: '300% 300%',
+              animation: 'holo-sweep 3s ease-in-out infinite',
+              opacity: 0.5
+            }} />
+            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl overflow-hidden mix-blend-overlay" style={{
+              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+              animation: 'holo-lines 2s linear infinite'
+            }} />
+          </>
         )}
         {specialEffect === 'Doré' && (
-          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl mix-blend-overlay bg-gradient-to-tr from-yellow-600/80 via-yellow-200/80 to-yellow-700/80 opacity-80 shadow-[inset_0_0_30px_rgba(234,179,8,0.5)]" />
+          <>
+            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl overflow-hidden mix-blend-overlay" style={{
+              background: 'linear-gradient(135deg, rgba(255,215,0,0.4) 0%, rgba(184,134,11,0.2) 25%, rgba(255,223,0,0.6) 50%, rgba(184,134,11,0.2) 75%, rgba(255,215,0,0.4) 100%)',
+              backgroundSize: '200% 200%',
+              animation: 'gold-shimmer 4s ease-in-out infinite'
+            }} />
+            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl" style={{
+              boxShadow: 'inset 0 0 40px rgba(255,215,0,0.3), inset 0 0 80px rgba(255,215,0,0.1), 0 0 20px rgba(255,215,0,0.2)'
+            }} />
+          </>
         )}
         {specialEffect === 'Néon' && (
-          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl shadow-[inset_0_0_30px_rgba(0,255,255,0.8),0_0_20px_rgba(0,255,255,0.5)] border-2 border-cyan-400/50" />
+          <>
+            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl" style={{
+              boxShadow: 'inset 0 0 20px rgba(0,255,255,0.6), inset 0 0 60px rgba(0,255,255,0.2), 0 0 15px rgba(0,255,255,0.5), 0 0 40px rgba(0,255,255,0.2)',
+              animation: 'neon-pulse 2s ease-in-out infinite',
+              border: '2px solid rgba(0,255,255,0.5)'
+            }} />
+            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl mix-blend-screen overflow-hidden" style={{
+              background: 'linear-gradient(180deg, transparent 0%, rgba(0,255,255,0.05) 50%, transparent 100%)',
+              backgroundSize: '100% 200%',
+              animation: 'neon-scan 3s linear infinite'
+            }} />
+          </>
         )}
         {specialEffect === 'Glitch' && (
-          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl mix-blend-exclusion bg-red-500/20 opacity-50 animate-pulse" style={{ animationDuration: '0.1s' }} />
+          <>
+            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl overflow-hidden" style={{ animation: 'glitch-clip 3s steps(1) infinite' }}>
+              <div className="absolute inset-0 mix-blend-screen bg-red-500/20" style={{ transform: 'translateX(-3px)', animation: 'glitch-r 0.3s steps(2) infinite' }} />
+              <div className="absolute inset-0 mix-blend-screen bg-cyan-500/20" style={{ transform: 'translateX(3px)', animation: 'glitch-b 0.3s steps(2) infinite reverse' }} />
+            </div>
+            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl overflow-hidden mix-blend-overlay" style={{
+              backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.03) 1px, rgba(255,255,255,0.03) 2px)',
+              animation: 'glitch-scan 8s linear infinite'
+            }} />
+          </>
         )}
         {specialEffect === 'Paillettes' && (
-          <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl mix-blend-color-dodge opacity-70" style={{ backgroundImage: 'radial-gradient(circle, #fff 10%, transparent 20%)', backgroundSize: '10px 10px' }} />
+          <>
+            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl overflow-hidden mix-blend-screen">
+              {Array.from({ length: 25 }).map((_, i) => (
+                <div key={i} className="absolute rounded-full bg-white" style={{
+                  width: `${Math.random() * 3 + 1}px`,
+                  height: `${Math.random() * 3 + 1}px`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  boxShadow: '0 0 6px 2px rgba(255,255,255,0.8)',
+                  animation: `sparkle ${1.5 + Math.random() * 2}s ease-in-out infinite`,
+                  animationDelay: `${Math.random() * 2}s`
+                }} />
+              ))}
+            </div>
+            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl mix-blend-color-dodge opacity-30" style={{
+              backgroundImage: 'radial-gradient(circle 1px, rgba(255,255,255,0.8) 0%, transparent 100%)',
+              backgroundSize: '15px 15px',
+              animation: 'sparkle-field 4s ease-in-out infinite'
+            }} />
+          </>
         )}
       </InteractiveCard>
     </div>

@@ -392,3 +392,61 @@
   10% { opacity: 1; }
   100% { opacity: 0; }
 }
+
+/* === Card Special Effect Animations === */
+@keyframes holo-sweep {
+  0% { background-position: 200% 0%; }
+  50% { background-position: -200% 0%; }
+  100% { background-position: 200% 0%; }
+}
+@keyframes holo-lines {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 -100px; }
+}
+@keyframes gold-shimmer {
+  0% { background-position: 0% 0%; }
+  50% { background-position: 200% 200%; }
+  100% { background-position: 0% 0%; }
+}
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: inset 0 0 20px rgba(0,255,255,0.6), inset 0 0 60px rgba(0,255,255,0.1), 0 0 15px rgba(0,255,255,0.4), 0 0 40px rgba(0,255,255,0.15);
+  }
+  50% {
+    box-shadow: inset 0 0 30px rgba(0,255,255,0.8), inset 0 0 80px rgba(0,255,255,0.3), 0 0 25px rgba(0,255,255,0.7), 0 0 60px rgba(0,255,255,0.3);
+  }
+}
+@keyframes neon-scan {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 200%; }
+}
+@keyframes glitch-r {
+  0% { transform: translateX(-3px); opacity: 0.5; }
+  50% { transform: translateX(2px); opacity: 0.3; }
+  100% { transform: translateX(-3px); opacity: 0.5; }
+}
+@keyframes glitch-b {
+  0% { transform: translateX(3px); opacity: 0.5; }
+  50% { transform: translateX(-2px); opacity: 0.3; }
+  100% { transform: translateX(3px); opacity: 0.5; }
+}
+@keyframes glitch-clip {
+  0%, 95% { clip-path: inset(0); }
+  96% { clip-path: inset(20% 0 60% 0); }
+  97% { clip-path: inset(50% 0 10% 0); }
+  98% { clip-path: inset(70% 0 5% 0); }
+  99% { clip-path: inset(10% 0 70% 0); }
+  100% { clip-path: inset(0); }
+}
+@keyframes glitch-scan {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 1000px; }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.5); }
+}
+@keyframes sparkle-field {
+  0%, 100% { opacity: 0.2; background-position: 0 0; }
+  50% { opacity: 0.5; background-position: 5px 5px; }
+}
