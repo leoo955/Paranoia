@@ -415,26 +415,17 @@ export default function PackOpenerClient({
             </div>
           )}
           {isOpening && (
-            <div className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 bg-black/90 overflow-hidden ${boosterStep === 'exploding' ? 'animate-screen-earthquake' : ''}`}>
+            <div className={`fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md transition-colors duration-1000 bg-black/90`}>
               <div 
-                className={`relative flex items-center justify-center transition-all duration-300 ${boosterStep === 'waiting_click' ? 'cursor-pointer hover:scale-105 active:scale-95' : ''} ${boosterStep === 'exploding' ? 'animate-hyper-shake' : 'animate-booster-drop'}`}
+                className={`relative flex items-center justify-center transition-all duration-300 ${boosterStep === 'waiting_click' ? 'cursor-pointer hover:scale-105 active:scale-95' : ''} ${boosterStep === 'exploding' ? 'animate-[huge-reveal_0.6s_ease-out_forwards]' : 'animate-booster-drop'}`}
                 onClick={handleBoosterClick}
               >
-                {boosterStep === 'exploding' && (
-                  <>
-                    <div className="absolute top-1/2 left-1/2 w-[200vw] h-2 bg-white -translate-y-1/2 -translate-x-1/2 animate-laser-beam origin-center rotate-45"></div>
-                    <div className="absolute top-1/2 left-1/2 w-[200vw] h-2 bg-white -translate-y-1/2 -translate-x-1/2 animate-laser-beam origin-center -rotate-45" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="absolute top-1/2 left-1/2 w-[200vw] h-2 bg-white -translate-y-1/2 -translate-x-1/2 animate-laser-beam origin-center rotate-90" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="absolute top-1/2 left-1/2 w-[200vw] h-2 bg-white -translate-y-1/2 -translate-x-1/2 animate-laser-beam origin-center rotate-0" style={{ animationDelay: '0.3s' }}></div>
-                    <div className="absolute inset-0 flex items-center justify-center z-[-1]"><div className="w-96 h-96 rounded-full animate-black-hole mix-blend-difference"></div></div>
-                  </>
-                )}
                 <div className={`relative w-80 h-[480px] z-10 transition-all duration-150 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]`}>
                   <Image src={selectedBoxType === "standard" ? "/StandardB.png" : selectedBoxType === "premium" ? "/PreniumB.png" : selectedBoxType === "legendary" ? "/LegendaireB.png" : "/MythiqueB.png"} alt="Booster Pack" priority fill className="object-contain" sizes="320px" />
                 </div>
                 {boosterStep === 'waiting_click' && (
                   <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 text-white font-black uppercase tracking-widest text-xl whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] pointer-events-none">
-                    <span className="animate-bounce inline-block">Cliquez pour exploser !</span>
+                    <span className="animate-bounce inline-block">Cliquez pour ouvrir !</span>
                   </div>
                 )}
               </div>
