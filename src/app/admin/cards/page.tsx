@@ -602,12 +602,31 @@ export default function AdminCardsPage() {
                                     </select>
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2.5 ml-1">Édition de collection</label>
-                                <select value={cardEdition} onChange={(e) => setCardEdition(e.target.value)} className="w-full bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none">
-                                    <option value="Standard">Standard</option>
-                                    {editions.map(ed => <option key={ed.id} value={ed.name}>{ed.name}</option>)}
-                                </select>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2.5 ml-1">Édition de collection</label>
+                                    <select value={cardEdition} onChange={(e) => setCardEdition(e.target.value)} className="w-full bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none">
+                                        <option value="Standard">Standard</option>
+                                        {editions.map(ed => <option key={ed.id} value={ed.name}>{ed.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2.5 ml-1">Probabilité / Drop Rate</label>
+                                    <div className="relative">
+                                        <input 
+                                            type="number" 
+                                            min="0" 
+                                            step="0.1"
+                                            value={cardProba} 
+                                            onChange={(e) => setCardProba(parseFloat(e.target.value) || 0)} 
+                                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none" 
+                                            placeholder="100" 
+                                        />
+                                        <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-gray-500 text-sm font-bold">
+                                            (Poids)
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
