@@ -12,6 +12,15 @@ import toast from 'react-hot-toast';
 import { cn } from "@/lib/utils";
 
 export default function AdminCardsPage() {
+  const defaultProbas: Record<string, number> = {
+    COMMON: 45,
+    UNCOMMON: 35,
+    RARE: 15,
+    EPIC: 3,
+    LEGENDARY: 1,
+    MYTHIC: 0.2
+  };
+
   const [activeTab, setActiveTab] = useState("editor"); // editor | list
   const [cards, setCards] = useState<any[]>([]);
   const [players, setPlayers] = useState<any[]>([]);
@@ -26,7 +35,7 @@ export default function AdminCardsPage() {
   const [cardRarity, setCardRarity] = useState("COMMON");
   const [cardLevel, setCardLevel] = useState("Normal");
   const [cardEdition, setCardEdition] = useState("Standard");
-  const [cardProba, setCardProba] = useState<number | string>(100);
+  const [cardProba, setCardProba] = useState<number | string>(45);
   const [isCustomProba, setIsCustomProba] = useState(false);
   const [cardDesc, setCardDesc] = useState("");
   const [cardTitle, setCardTitle] = useState("");
@@ -190,8 +199,9 @@ export default function AdminCardsPage() {
     setCardPlayerId(card.playerId);
     setCardRarity(card.rarity);
     setCardLevel(card.level);
-    setCardProba(card.proba ?? 100);
-    setIsCustomProba(card.proba !== undefined && card.proba !== null && card.proba !== 100);
+    const baseProba = defaultProbas[card.rarity] || 100;
+    setCardProba(card.proba ?? baseProba);
+    setIsCustomProba(card.proba !== undefined && card.proba !== null && card.proba !== baseProba);
     setCardDesc(card.description || "");
     setCardTitle(card.title || "");
     setCardEdition(card.edition || "Standard");
@@ -584,7 +594,7 @@ export default function AdminCardsPage() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2.5 ml-1">Rareté</label>
-                                    <select value={cardRarity} onChange={(e) => setCardRarity(e.target.value)} className="w-full bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none">
+                                    <select value={cardRarity} onChange={(e) => { const val = e.target.value; setCardRarity(val); if (!isCustomProba) setCardProba(defaultProbas[val] || 100); }} className="w-full bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none">
                                         <option value="COMMON">COMMON</option>
                                         <option value="UNCOMMON">UNCOMMON</option>
                                         <option value="RARE">RARE</option>
@@ -623,7 +633,7 @@ export default function AdminCardsPage() {
                                                 onChange={e => {
                                                     const checked = e.target.checked;
                                                     setIsCustomProba(checked);
-                                                    if (!checked) setCardProba(100);
+                                                    if (!checked) setCardProba(defaultProbas[cardRarity] || 100);
                                                 }} 
                                             />
                                             <span className="text-[10px] text-gray-400 group-hover:text-white transition-colors uppercase font-bold">Custom</span>
