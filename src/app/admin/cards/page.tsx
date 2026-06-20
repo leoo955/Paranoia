@@ -26,7 +26,8 @@ export default function AdminCardsPage() {
   const [cardRarity, setCardRarity] = useState("COMMON");
   const [cardLevel, setCardLevel] = useState("Normal");
   const [cardEdition, setCardEdition] = useState("Standard");
-  const [cardProba, setCardProba] = useState(100);
+  const [cardProba, setCardProba] = useState<number | string>(100);
+  const [isCustomProba, setIsCustomProba] = useState(false);
   const [cardDesc, setCardDesc] = useState("");
   const [cardTitle, setCardTitle] = useState("");
   const [cardCustomBg, setCardCustomBg] = useState("");
@@ -67,10 +68,10 @@ export default function AdminCardsPage() {
   
   const [charPosX, setCharPosX] = useState(50);
   const [charPosY, setCharPosY] = useState(50);
-  const [charScale, setCharScale] = useState(100);
+  const [charScale, setCharScale] = useState<number | string>(100);
   const [bgPosX, setBgPosX] = useState(50);
   const [bgPosY, setBgPosY] = useState(50);
-  const [bgScale, setBgScale] = useState(100);
+  const [bgScale, setBgScale] = useState<number | string>(100);
   
   const [titlePos, setTitlePos] = useState({ x: 50, y: 75, scale: 100 });
   const [descPos, setDescPos] = useState({ x: 50, y: 92, scale: 100 });
@@ -190,6 +191,7 @@ export default function AdminCardsPage() {
     setCardRarity(card.rarity);
     setCardLevel(card.level);
     setCardProba(card.proba ?? 100);
+    setIsCustomProba(card.proba !== undefined && card.proba !== null && card.proba !== 100);
     setCardDesc(card.description || "");
     setCardTitle(card.title || "");
     setCardEdition(card.edition || "Standard");
@@ -611,19 +613,36 @@ export default function AdminCardsPage() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2.5 ml-1">Probabilité / Drop Rate</label>
+                                    <div className="flex items-center justify-between mb-2.5 ml-1">
+                                        <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest">Probabilité (Poids)</label>
+                                        <label className="flex items-center gap-2 cursor-pointer group">
+                                            <input 
+                                                type="checkbox" 
+                                                className="custom-checkbox w-3 h-3" 
+                                                checked={isCustomProba} 
+                                                onChange={e => {
+                                                    const checked = e.target.checked;
+                                                    setIsCustomProba(checked);
+                                                    if (!checked) setCardProba(100);
+                                                }} 
+                                            />
+                                            <span className="text-[10px] text-gray-400 group-hover:text-white transition-colors uppercase font-bold">Custom</span>
+                                        </label>
+                                    </div>
                                     <div className="relative">
                                         <input 
                                             type="number" 
-                                            min="0" 
-                                            step="0.1"
+                                            min="0.001" 
+                                            max="100"
+                                            step="0.001"
                                             value={cardProba} 
-                                            onChange={(e) => setCardProba(parseFloat(e.target.value) || 0)} 
-                                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none" 
+                                            onChange={(e) => setCardProba(e.target.value === '' ? '' : Math.min(100, Math.max(0, parseFloat(e.target.value) || 0)))} 
+                                            disabled={!isCustomProba}
+                                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3.5 text-white outline-none disabled:opacity-50 transition-all" 
                                             placeholder="100" 
                                         />
                                         <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-gray-500 text-sm font-bold">
-                                            (Poids)
+                                            %
                                         </div>
                                     </div>
                                 </div>
