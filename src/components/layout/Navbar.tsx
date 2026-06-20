@@ -24,8 +24,6 @@ export default function Navbar() {
   const router = useRouter();
   const { data: session, status } = useSession();
 
-  if (pathname === '/coming-soon') return null;
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -33,6 +31,9 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+if (pathname === '/coming-soon') return null;
+
 
   return (
     <nav
@@ -45,7 +46,6 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {}
           <Link href="/" className="flex-shrink-0 flex items-center group">
             <Image
               src="/Paranoia_no_effect.png"
@@ -55,8 +55,6 @@ export default function Navbar() {
               className="object-contain drop-shadow-[0_0_10px_rgba(179,102,255,0.5)] transition-transform group-hover:scale-105"
             />
           </Link>
-
-          {}
           <div className="hidden md:flex items-center space-x-1 lg:space-x-4">
             {navLinks.map((link) => {
               const isActive = pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
@@ -68,24 +66,21 @@ export default function Navbar() {
                   className={cn(
                     "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 group",
                     isActive
-                      ? "text-white bg-[rgba(255,255,255,0.05)] border-b-2 border-[var(--color-accent-red)]"
+                      ? "text-white bg-[rgba(255,255,255,0.05)] border-b-2 border-[var(--color-accent-purple)]"
                       : "text-[var(--color-text-secondary)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
                   )}
                 >
-                  <Icon className={cn("w-4 h-4", isActive ? "text-[var(--color-accent-red)]" : "group-hover:text-[var(--color-accent-red)] transition-colors")} />
+                  <Icon className={cn("w-4 h-4", isActive ? "text-[var(--color-accent-purple)]" : "group-hover:text-[var(--color-accent-purple)] transition-colors")} />
                   <span>{link.name}</span>
                 </Link>
               );
             })}
           </div>
-
-          {}
           <div className="hidden md:flex items-center space-x-4">
             {status === "loading" ? (
               <div className="w-24 h-10 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
             ) : session ? (
               <div className="flex items-center space-x-4">
-                {}
                 {session.user?.role === "ADMIN" && (
                   <Link href="/admin" className="flex items-center gap-2 text-[var(--color-accent-purple)] hover:text-white transition-colors text-sm font-bold">
                     <ShieldAlert className="w-4 h-4" /> Admin
@@ -112,8 +107,6 @@ export default function Navbar() {
               </button>
             )}
           </div>
-
-          {}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -124,8 +117,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-
-      {}
       {isMobileMenuOpen && (
         <div className="md:hidden panel-matte border-t-0 animate-slide-up origin-top absolute top-20 left-0 right-0 p-4 space-y-2">
           {navLinks.map((link) => {
@@ -139,11 +130,11 @@ export default function Navbar() {
                 className={cn(
                   "flex items-center space-x-3 px-4 py-3 rounded-lg text-base font-medium transition-colors",
                   isActive
-                    ? "bg-[rgba(179,102,255,0.1)] text-white border-l-4 border-[var(--color-accent-red)]"
+                    ? "bg-[rgba(179,102,255,0.1)] text-white border-l-4 border-[var(--color-accent-purple)]"
                     : "text-[var(--color-text-secondary)] hover:text-white hover:bg-[rgba(255,255,255,0.05)]"
                 )}
               >
-                <Icon className={cn("w-5 h-5", isActive ? "text-[var(--color-accent-red)]" : "")} />
+                <Icon className={cn("w-5 h-5", isActive ? "text-[var(--color-accent-purple)]" : "")} />
                 <span>{link.name}</span>
               </Link>
             );
@@ -153,7 +144,6 @@ export default function Navbar() {
               <div className="w-full h-12 bg-[var(--color-bg-elevated)] animate-pulse rounded-lg"></div>
             ) : session ? (
               <div className="space-y-3">
-                {}
                 {session.user?.role === "ADMIN" && (
                   <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="w-full flex items-center justify-center space-x-2 py-3 bg-[var(--color-bg-elevated)] rounded-lg text-[var(--color-accent-purple)] font-bold">
                     <ShieldAlert className="w-5 h-5" />

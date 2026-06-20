@@ -13,7 +13,6 @@ const globalForPrisma = globalThis as unknown as {
 const connectionString = process.env.DATABASE_URL
 
 if (!globalForPrisma.pool) {
-  console.log('Creating new pg Pool for database connection...');
   const isRender = connectionString?.includes('render.com')
   globalForPrisma.pool = new Pool({ 
     connectionString,

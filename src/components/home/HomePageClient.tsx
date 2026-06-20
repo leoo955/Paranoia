@@ -208,7 +208,7 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
 
       <section className="relative w-full py-32 overflow-hidden mt-12 border-t border-white/10">
         <div className="absolute inset-0 bg-black z-0"></div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518130028744-97d34293f9ec?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center opacity-20 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/40 via-[#111118]/20 to-black opacity-30 mix-blend-overlay"></div>
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[400px] bg-[radial-gradient(ellipse_at_center,_rgba(147,51,234,0.2)_0%,_transparent_70%)] rounded-t-full z-0"></div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center flex flex-col items-center">
           <ShieldAlert className="w-16 h-16 text-purple-500 mx-auto mb-8 opacity-80" />
@@ -219,7 +219,7 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
             Le serveur est actuellement sous liste blanche stricte. Seuls les joueurs les plus motivés et stratèges seront acceptés.
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Link href="/candidature" className="inline-flex items-center justify-center gap-3 px-12 py-5 text-xl font-black uppercase tracking-widest text-white bg-purple-600 rounded-2xl shadow-[0_0_40px_rgba(147,51,234,0.4)] border-b-4 border-red-800 hover:bg-red-500 hover:border-red-700 transition-colors">
+            <Link href="/candidature" className="inline-flex items-center justify-center gap-3 px-12 py-5 text-xl font-black uppercase tracking-widest text-white bg-purple-600 rounded-2xl shadow-[0_0_40px_rgba(147,51,234,0.4)] border-b-4 border-purple-800 hover:bg-purple-500 hover:border-purple-700 transition-colors">
               Soumettre ma Candidature
             </Link>
           </motion.div>
