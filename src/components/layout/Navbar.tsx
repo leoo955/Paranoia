@@ -24,6 +24,8 @@ export default function Navbar() {
   const router = useRouter();
   const { data: session, status } = useSession();
 
+  if (pathname === '/coming-soon') return null;
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);

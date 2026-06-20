@@ -5,6 +5,22 @@ export default withAuth(
   function middleware(req) {
     const token = req.nextauth.token;
     const isSetupPage = req.nextUrl.pathname === "/setup";
+    const isComingSoonPage = req.nextUrl.pathname === "/coming-soon";
+    const isAdmin = token && token.role === "ADMIN";
+
+    // Enforce "Coming Soon" for everyone except ADMINs
+    if (!isAdmin) {
+      if (!isComingSoonPage) {
+        return NextResponse.redirect(new URL("/coming-soon", req.url));
+      }
+      return; // Let non-admins stay on the coming-soon page
+    }
+
+    // Admins bypass coming-soon and go to home
+    if (isComingSoonPage && isAdmin) {
+       return NextResponse.redirect(new URL("/", req.url));
+    }
+
     if (token && !token.minecraftName && !isSetupPage) {
       return NextResponse.redirect(new URL("/setup", req.url));
     }
@@ -26,5 +42,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|Paranoia_no_effect.png).*)"],
 };
