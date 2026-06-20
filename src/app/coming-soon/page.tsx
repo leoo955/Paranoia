@@ -30,7 +30,7 @@ export default function ComingSoonPage() {
         >
           <div className="absolute inset-0 bg-[var(--color-accent-purple)] blur-3xl opacity-20 rounded-full"></div>
           <Image 
-            src="/Paranoia_no_effect.png" 
+            src="/Paranoia_no_effect.png" unoptimized 
             alt="PARANOIA SMP" 
             width={300} 
             height={100} 

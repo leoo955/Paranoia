@@ -70,7 +70,7 @@ const FlippableCard = ({ card, index, boxType, allCards, ownedVariantIds }: { ca
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border-2 border-dashed border-purple-500/20 animate-[spin_20s_linear_infinite] pointer-events-none"></div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border border-purple-400/30 animate-[spin_15s_linear_infinite_reverse] pointer-events-none"></div>
             <div className="relative z-10 flex flex-col items-center justify-center pointer-events-none w-full px-4">
-              <img src="/Paranoia_logo.png" fetchPriority="high" className="w-[85%] h-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
+              <img src="/Paranoia_logo.png" unoptimized fetchPriority="high" className="w-[85%] h-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.6)]" alt="Paranoia Card Back" />
             </div>
             <div className="absolute inset-2 border-2 border-white/5 rounded-xl pointer-events-none"></div>
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>

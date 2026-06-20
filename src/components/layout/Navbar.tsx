@@ -48,7 +48,7 @@ if (pathname === '/coming-soon') return null;
         <div className="flex justify-between items-center h-20">
           <Link href="/" className="flex-shrink-0 flex items-center group">
             <Image
-              src="/Paranoia_no_effect.png"
+              src="/Paranoia_no_effect.png" unoptimized
               alt="PARANOIA SMP"
               width={160}
               height={50}

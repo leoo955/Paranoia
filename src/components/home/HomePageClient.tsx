@@ -28,7 +28,7 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
           >
             <div className="absolute -inset-10 bg-[radial-gradient(ellipse_at_center,_rgba(147,51,234,0.2)_0%,_rgba(147,51,234,0.2)_50%,_transparent_70%)] -z-10 rounded-full"></div>
             <Image 
-              src="/Paranoia_logo.png" 
+              src="/Paranoia_logo.png" unoptimized 
               alt="PARANOIA SMP" 
               width={800} 
               height={266} 
