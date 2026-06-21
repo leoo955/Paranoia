@@ -78,7 +78,7 @@ export default function ComingSoonPage() {
         >
           <div className="bg-black/40 border border-[var(--color-border-color)] rounded-xl p-5 flex flex-col items-center justify-center gap-3">
             <Clock className="w-6 h-6 text-[var(--color-text-muted)]" />
-            <span className="text-sm font-medium text-[var(--color-text-secondary)]">Patience requise</span>
+            <span className="text-sm font-medium text-[var(--color-text-secondary)]">Ouvre Bientôt</span>
           </div>
           <div className="bg-black/40 border border-[var(--color-border-color)] rounded-xl p-5 flex flex-col items-center justify-center gap-3">
             <Sparkles className="w-6 h-6 text-[var(--color-accent-purple)] drop-shadow-[0_0_10px_rgba(179,102,255,0.5)]" />

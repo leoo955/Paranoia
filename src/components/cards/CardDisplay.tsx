@@ -34,12 +34,25 @@ export const getLevelStyle = (level: string): React.CSSProperties => {
 
 export const getRarityBackground = (rarity: string): React.CSSProperties => {
   const r = rarity.toUpperCase();
-  if (r === "MYTHIC" || r === "MYTHIQUE") return { backgroundImage: "url('/netherite.png')", backgroundSize: 'cover' };
-  if (r === "LEGENDARY" || r === "LÉGENDAIRE" || r === "LEGENDAIRE") return { backgroundImage: "url('/OR.png')", backgroundSize: 'cover' };
-  if (r === "EPIC" || r === "ÉPIQUE" || r === "EPIQUE") return { backgroundImage: "url('/Amethyst.png')", backgroundSize: 'cover' };
-  if (r === "RARE") return { backgroundImage: "url('/Diamond.png')", backgroundSize: 'cover' };
-  if (r === "UNCOMMON" || r === "PEU COMMUNE") return { backgroundImage: "url('/Emerald.png')", backgroundSize: 'cover' };
-  return { backgroundImage: "url('/Iron.png')", backgroundSize: 'cover' };
+  if (r === "MYTHIC" || r === "MYTHIQUE") return {
+    backgroundColor: "#0a0510",
+    backgroundImage: "radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.5) 0%, transparent 50%), radial-gradient(circle at 50% 100%, rgba(88, 28, 135, 0.8) 0%, transparent 60%), url('https://www.transparenttextures.com/patterns/dark-matter.png')"
+  };
+  if (r === "LEGENDARY" || r === "LÉGENDAIRE" || r === "LEGENDAIRE") return { 
+    backgroundImage: "linear-gradient(135deg, #facc15 0%, #a16207 40%, #fef08a 50%, #854d0e 60%, #422006 100%)" 
+  };
+  if (r === "EPIC" || r === "ÉPIQUE" || r === "EPIQUE") return { 
+    backgroundImage: "linear-gradient(135deg, #a855f7 0%, #6b21a8 40%, #d8b4fe 50%, #581c87 60%, #3b0764 100%)" 
+  };
+  if (r === "RARE") return { 
+    backgroundImage: "conic-gradient(from 120deg at 50% 50%, #0891b2, #06b6d4, #67e8f9, #0891b2, #164e63, #0891b2)" 
+  };
+  if (r === "UNCOMMON" || r === "PEU COMMUNE") return { 
+    backgroundImage: "linear-gradient(135deg, #22c55e 0%, #166534 40%, #86efac 50%, #14532d 60%, #052e16 100%)" 
+  };
+  return { 
+    backgroundImage: "linear-gradient(135deg, #6b7280 0%, #374151 40%, #9ca3af 50%, #1f2937 60%, #111827 100%)" 
+  };
 };
 
 export const getLevelBorder = (level: string) => {
