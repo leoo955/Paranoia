@@ -17,6 +17,9 @@ const cardSchema = z.object({
   customBadges: z.any().optional().nullable(),
   characterPosition: z.any().optional().nullable(),
   imageUrl: z.string().optional().nullable(),
+  layer1Url: z.string().optional().nullable(),
+  layer2Url: z.string().optional().nullable(),
+  layer3Url: z.string().optional().nullable(),
   renderedImageUrl: z.string().optional().nullable(),
   attributes: z.any().optional().nullable(),
   isVariant: z.boolean().optional().nullable(),
@@ -35,7 +38,7 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return new NextResponse("Invalid input", { status: 400 });
     }
-    const { title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes, isVariant } = parsed.data;
+    const { title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, layer1Url, layer2Url, layer3Url, renderedImageUrl, attributes, isVariant } = parsed.data;
 
 
     const parsedProba = parseFloat(proba);
@@ -54,6 +57,9 @@ export async function POST(req: Request) {
         proba: validProba,
         description: description || "",
         imageUrl: imageUrl || null,
+        layer1Url: layer1Url || null,
+        layer2Url: layer2Url || null,
+        layer3Url: layer3Url || null,
         renderedImageUrl: renderedImageUrl || null,
         customBackground: customBackground || null,
         customBadges: parsedBadges,
@@ -120,7 +126,7 @@ export async function PUT(req: Request) {
       return new NextResponse("Invalid input", { status: 400 });
     }
     
-    const { id, title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, renderedImageUrl, attributes, isVariant } = parsed.data;
+    const { id, title, playerName, playerId, rarity, level, edition, proba, description, customBackground, customBadges, characterPosition, imageUrl, layer1Url, layer2Url, layer3Url, renderedImageUrl, attributes, isVariant } = parsed.data;
 
     if (renderedImageUrl !== undefined && !playerId && !rarity) {
       const card = await prisma.tradingCard.update({
@@ -152,6 +158,9 @@ export async function PUT(req: Request) {
         proba: validProba,
         description: description || "",
         imageUrl: imageUrl || null,
+        layer1Url: layer1Url || null,
+        layer2Url: layer2Url || null,
+        layer3Url: layer3Url || null,
         renderedImageUrl: renderedImageUrl !== undefined ? renderedImageUrl : undefined,
         customBackground: customBackground || null,
         customBadges: parsedBadges,

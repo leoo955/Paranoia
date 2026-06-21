@@ -58,6 +58,10 @@ export default async function CardsPage() {
     orderBy: { rarity: 'desc' }
   });
 
+  const allEditions = await prisma.edition.findMany({
+    orderBy: { createdAt: 'asc' }
+  });
+
   const allUsers = await prisma.user.findMany({
     select: { minecraftName: true, id: true }
   });
@@ -127,6 +131,7 @@ export default async function CardsPage() {
           initialCoins={paraCoins}
           isLoggedIn={!!userId}
           allCards={allCards}
+          allEditions={allEditions}
           serverPlayers={serverPlayers}
           currentUserMCName={currentUserMCName}
         />

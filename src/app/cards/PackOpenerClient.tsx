@@ -88,6 +88,7 @@ export default function PackOpenerClient({
   initialCoins,
   isLoggedIn,
   allCards = [],
+  allEditions = [],
   serverPlayers = [],
   currentUserMCName = ""
 }: {
@@ -96,6 +97,7 @@ export default function PackOpenerClient({
   initialCoins: number,
   isLoggedIn: boolean,
   allCards?: TradingCard[],
+  allEditions?: any[],
   serverPlayers?: string[],
   currentUserMCName?: string
 }) {
@@ -110,7 +112,7 @@ export default function PackOpenerClient({
   const [showReveal, setShowReveal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<TradingCard | null>(null);
   const [activeModalTab, setActiveModalTab] = useState<"details" | "variants">("details");
-  const [boosterStep, setBoosterStep] = useState<"idle" | "waiting_click" | "exploding">("idle");
+  const [boosterStep, setBoosterStep] = useState<"idle" | "fetching" | "waiting_click" | "charging" | "exploding">("idle");
   const fetchedCardsRef = useRef<any[]>([]);
   
   useEffect(() => {
@@ -130,6 +132,8 @@ export default function PackOpenerClient({
   const [rarityFilter, setRarityFilter] = useState("ALL");
   const [filterEdition, setFilterEdition] = useState("ALL");
   const [filterEffect, setFilterEffect] = useState("ALL");
+  const editionsList = useMemo(() => Array.from(new Set(allCards.map(c => c.edition || 'Standard'))), [allCards]);
+  const [selectedCatalogueEdition, setSelectedCatalogueEdition] = useState<string>(editionsList[0] || "Standard");
   const router = useRouter();
 
   const buyBooster = async (type: string, price: number) => {
@@ -185,7 +189,7 @@ export default function PackOpenerClient({
     setDrawnCards([]);
     setShowReveal(false);
     setOpeningGlow(null);
-    setBoosterStep("idle");
+    setBoosterStep("fetching");
 
     try {
       const res = await fetch("/api/packs", {
@@ -463,7 +467,7 @@ export default function PackOpenerClient({
                     className="relative flex flex-col items-center justify-center"
                     initial={{ y: -600, opacity: 0, scale: 0.5 }}
                     animate={
-                      boosterStep === "waiting_click" 
+                      (boosterStep === "waiting_click" || boosterStep === "fetching")
                       ? { 
                           y: 0, opacity: 1, scale: 1,
                           transition: { type: "spring", stiffness: 80, damping: 15, mass: 1.5 }
@@ -524,6 +528,13 @@ export default function PackOpenerClient({
                     </div>
 
                     {/* Click to open text */}
+                    {boosterStep === "fetching" && (
+                      <div className="mt-8 text-white/50 font-black uppercase tracking-[0.3em] text-lg whitespace-nowrap drop-shadow-[0_2px_20px_rgba(0,0,0,0.9)] pointer-events-none flex items-center gap-3 animate-pulse">
+                        <span className="w-8 h-[1px] bg-white/10" />
+                        Chargement...
+                        <span className="w-8 h-[1px] bg-white/10" />
+                      </div>
+                    )}
                     {boosterStep === "waiting_click" && (
                       <motion.div 
                         className="mt-8 text-white/80 font-black uppercase tracking-[0.3em] text-lg whitespace-nowrap drop-shadow-[0_2px_20px_rgba(0,0,0,0.9)] pointer-events-none flex items-center gap-3"
@@ -711,20 +722,40 @@ export default function PackOpenerClient({
                     <div className="absolute right-4 pointer-events-none text-purple-300/50">▼</div>
                   </div>
                 </div>
-                <div className="relative w-full sm:w-56 group">
-                  <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="relative flex items-center">
-                    <Layers className="absolute left-4 w-5 h-5 text-blue-300/50 group-focus-within:text-blue-400 transition-colors" />
-                    <select value={filterEdition} onChange={(e) => setFilterEdition(e.target.value)} className="w-full pl-12 pr-10 py-3 bg-black/40 border border-white/10 rounded-xl text-white outline-none focus:border-blue-500/50 transition-all appearance-none shadow-inner cursor-pointer">
-                      <option value="ALL">Toutes Éditions</option>
-                      {Array.from(new Set(allCards.map(c => c.edition))).filter(Boolean).map(ed => <option key={ed} value={ed}>{ed}</option>)}
-                    </select>
-                    <div className="absolute right-4 pointer-events-none text-blue-300/50">▼</div>
-                  </div>
-                </div>
               </div>
             </div>
+            
+            {/* Onglets d'Édition */}
+            <div className="flex flex-wrap gap-3 px-6 pb-6 pt-2">
+               {editionsList.map(ed => {
+                  const isActive = selectedCatalogueEdition === ed;
+                  return (
+                    <button key={ed} onClick={() => setSelectedCatalogueEdition(ed)} className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] border border-purple-500/50' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white border border-white/5'}`}>
+                      {ed}
+                    </button>
+                  );
+               })}
+            </div>
           </div>
+          
+          {/* Panorama de l'Édition */}
+          {(() => {
+            const currentEdition = allEditions?.find(e => e.name === selectedCatalogueEdition);
+            if (currentEdition?.bannerUrl) {
+              return (
+                <div className="w-full h-64 md:h-80 rounded-3xl overflow-hidden mb-12 relative group border border-white/10 shadow-2xl">
+                  <img src={currentEdition.bannerUrl} alt={currentEdition.name} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                  <div className="absolute bottom-8 left-8">
+                     <h3 className="text-4xl font-black text-white uppercase tracking-widest drop-shadow-lg">{currentEdition.name}</h3>
+                     {currentEdition.description && <p className="text-white/80 mt-2 max-w-2xl text-lg">{currentEdition.description}</p>}
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
+
           <div className="flex flex-col gap-16">
             {['MYTHIC', 'LEGENDARY', 'EPIC', 'RARE', 'UNCOMMON', 'COMMON'].map(rarity => {
               const cardsOfRarity = allCards.filter(c => {
@@ -733,7 +764,7 @@ export default function PackOpenerClient({
                 const playerMatch = c.player ? c.player.minecraftName.toLowerCase().includes(searchQuery.toLowerCase()) : false;
                 const matchesSearch = titleMatch || playerMatch;
                 const matchesRarity = rarityFilter === "ALL" || c.rarity === rarityFilter;
-                const matchesEdition = filterEdition === "ALL" || c.edition === filterEdition;
+                const matchesEdition = c.edition === selectedCatalogueEdition;
                 return matchesSearch && matchesRarity && matchesEdition;
               });
               if (cardsOfRarity.length === 0) return null;
@@ -765,7 +796,7 @@ export default function PackOpenerClient({
                 const playerMatch = c.player ? c.player.minecraftName.toLowerCase().includes(searchQuery.toLowerCase()) : false;
                 const matchesSearch = titleMatch || playerMatch;
                 const matchesRarity = rarityFilter === "ALL" || c.rarity === rarityFilter;
-                const matchesEdition = filterEdition === "ALL" || c.edition === filterEdition;
+                const matchesEdition = c.edition === selectedCatalogueEdition;
                 return matchesSearch && matchesRarity && matchesEdition;
               }).length > 0;
             }) && (

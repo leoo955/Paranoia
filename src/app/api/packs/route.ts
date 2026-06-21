@@ -127,15 +127,24 @@ export async function POST(req: Request) {
 
     drawnCards.sort((a, b) => (rarityWeight[a.rarity] || 0) - (rarityWeight[b.rarity] || 0));
 
-    const SPECIAL_EFFECTS = ["Holographique", "Glitch", "Paillettes", "Doré", "Néon"];
-    const EFFECT_DROP_CHANCE = 0.02;
+    const EFFECTS_PROBABILITY = [
+      { name: "Holo", prob: 0.05 }, // 5%
+      { name: "Glitch", prob: 0.02 }, // 2%
+      { name: "Cosmic", prob: 0.005 }, // 0.5%
+    ];
+
+    const drawEffect = () => {
+      let rand = Math.random();
+      for (const effect of EFFECTS_PROBABILITY) {
+        if (rand < effect.prob) return effect.name;
+        rand -= effect.prob;
+      }
+      return null;
+    };
 
     const userCards = [];
     for (const card of drawnCards) {
-      let specialEffect = null;
-      if (Math.random() < EFFECT_DROP_CHANCE) {
-        specialEffect = SPECIAL_EFFECTS[Math.floor(Math.random() * SPECIAL_EFFECTS.length)];
-      }
+      const specialEffect = drawEffect();
 
       const userCard = await prisma.userCard.create({
         data: {

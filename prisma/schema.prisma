@@ -129,7 +129,10 @@ model TradingCard {
   playerId    String?
   player      Player?  @relation(fields: [playerId], references: [id])
   description String?
-  imageUrl    String?
+  imageUrl        String?
+  layer1Url       String?
+  layer2Url       String?
+  layer3Url       String?
   renderedImageUrl String?
   customBackground String?
   customBadges String @default("[]") // JSON stored as text

@@ -2,34 +2,58 @@
 
 export default function Loading() {
   return (
-    <div className="min-h-[80vh] flex flex-col items-center justify-center relative overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[var(--color-accent-purple)] rounded-full blur-[200px] opacity-10 pointer-events-none animate-pulse"></div>
+    <div className="fixed inset-0 z-[999] bg-[#0a0510] flex flex-col items-center justify-center overflow-hidden">
+      {/* Background Deep Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-900/20 rounded-full blur-[150px] pointer-events-none animate-pulse-slow"></div>
 
-      {/* Logo Pulse */}
-      <div className="relative mb-8">
-        <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shadow-2xl animate-pulse">
-          <svg className="w-10 h-10 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
+      {/* Cyberpunk Grid */}
+      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none mix-blend-overlay"></div>
+      
+      {/* Main Logo & Text container */}
+      <div className="relative flex flex-col items-center z-10">
+        
+        {/* Animated Paranoia Glitch Text */}
+        <div className="relative">
+          <h1 className="text-6xl md:text-8xl font-black font-outfit text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-500 to-indigo-500 tracking-widest uppercase drop-shadow-[0_0_30px_rgba(168,85,247,0.5)] z-20" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.1)' }}>
+            PARANOIA
+          </h1>
+          <h1 className="absolute inset-0 text-6xl md:text-8xl font-black font-outfit text-white tracking-widest uppercase opacity-50 z-10" style={{ transform: 'translateX(-4px)', animation: 'glitch-r 2s infinite linear alternate-reverse' }}>
+            PARANOIA
+          </h1>
+          <h1 className="absolute inset-0 text-6xl md:text-8xl font-black font-outfit text-fuchsia-500 tracking-widest uppercase opacity-50 z-10" style={{ transform: 'translateX(4px)', animation: 'glitch-b 3s infinite linear alternate' }}>
+            PARANOIA
+          </h1>
         </div>
-        <div className="absolute -inset-4 bg-purple-500/20 rounded-3xl blur-xl animate-pulse"></div>
+
+        {/* Loading Bar Container */}
+        <div className="mt-12 w-64 h-1.5 bg-white/5 rounded-full overflow-hidden relative shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+          {/* Progress fill */}
+          <div className="h-full w-full bg-gradient-to-r from-purple-600 via-fuchsia-500 to-indigo-500 origin-left animate-[scale-x_2s_ease-in-out_infinite]"></div>
+          {/* Glare overlay */}
+          <div className="absolute inset-0 bg-white/20 w-1/4 blur-sm animate-[slide-right_1.5s_ease-in-out_infinite]"></div>
+        </div>
+
+        {/* Loading text */}
+        <div className="mt-6 flex items-center gap-3 text-purple-200/60 font-bold uppercase tracking-[0.4em] text-sm">
+          <span className="w-2 h-2 rounded-full bg-fuchsia-500 animate-ping"></span>
+          Initialisation
+          <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping" style={{ animationDelay: '0.2s' }}></span>
+        </div>
+
       </div>
 
-      {/* Loading Bar */}
-      <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden mb-6">
-        <div className="h-full w-1/2 bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-full animate-loading-bar"></div>
-      </div>
-
-      {/* Text */}
-      <p className="text-sm text-[var(--color-text-muted)] uppercase tracking-[0.3em] font-bold animate-pulse">
-        Chargement
-      </p>
-
-      {/* Decorative */}
-      <div className="absolute bottom-10 left-10 text-[10vw] font-black text-white/[0.015] select-none pointer-events-none uppercase">
-        Loading
-      </div>
+      {/* CSS additions for this loading screen */}
+      <style jsx>{`
+        @keyframes scale-x {
+          0% { transform: scaleX(0); }
+          50% { transform: scaleX(1); }
+          100% { transform: scaleX(0); transform-origin: right; }
+        }
+        @keyframes slide-right {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(400%); }
+        }
+      `}</style>
     </div>
   );
 }

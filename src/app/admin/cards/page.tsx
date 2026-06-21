@@ -41,6 +41,9 @@ export default function AdminCardsPage() {
   const [cardTitle, setCardTitle] = useState("");
   const [cardCustomBg, setCardCustomBg] = useState("");
   const [cardImageUrl, setCardImageUrl] = useState("");
+  const [layer1Url, setLayer1Url] = useState("");
+  const [layer2Url, setLayer2Url] = useState("");
+  const [layer3Url, setLayer3Url] = useState("");
   const [cardBorderColor, setCardBorderColor] = useState("");
   const [cardBgColor, setCardBgColor] = useState("");
   const [cardGlowColor, setCardGlowColor] = useState("");
@@ -207,6 +210,9 @@ export default function AdminCardsPage() {
     setCardEdition(card.edition || "Standard");
     setCardCustomBg(card.customBackground || "");
     setCardImageUrl(card.imageUrl || "");
+    setLayer1Url(card.layer1Url || "");
+    setLayer2Url(card.layer2Url || "");
+    setLayer3Url(card.layer3Url || "");
     
     try {
       const attrs = typeof card.attributes === 'string' ? JSON.parse(card.attributes) : (card.attributes || {});
@@ -275,6 +281,9 @@ export default function AdminCardsPage() {
     setCardDesc("");
     setCardCustomBg("");
     setCardImageUrl("");
+    setLayer1Url("");
+    setLayer2Url("");
+    setLayer3Url("");
     setCardCustomBadges([]);
     setCardRarity("COMMON");
     setCardLevel("Normal");
@@ -304,6 +313,9 @@ export default function AdminCardsPage() {
         description: cardDesc,
         customBackground: cardCustomBg,
         imageUrl: cardImageUrl,
+        layer1Url,
+        layer2Url,
+        layer3Url,
         customBadges: cardCustomBadges,
         characterPosition: { x: charPosX, y: charPosY, scale: charScale },
         isVariant,
@@ -463,15 +475,10 @@ export default function AdminCardsPage() {
       }]);
   };
 
-  const waitForVideo = async (cardElement: HTMLElement) => {
-    const videoEl = cardElement.querySelector("video");
-    if (videoEl && videoEl.readyState < 2) {
-      await new Promise(resolve => {
-        videoEl.addEventListener('loadeddata', resolve, { once: true });
-        setTimeout(resolve, 3000);
-      });
-      await new Promise(r => setTimeout(r, 200));
-    }
+  const waitForCaptureReady = async () => {
+    toast.info("Préparation de la carte : patience (10s) pour la vidéo/animation...", { id: "capture-wait" });
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    toast.dismiss("capture-wait");
   };
 
   const handleCaptureDiscordImage = async () => {
@@ -481,7 +488,7 @@ export default function AdminCardsPage() {
       const cardElement = document.getElementById("live-preview-card");
       if (!cardElement) throw new Error("Card element not found");
 
-      await waitForVideo(cardElement);
+      await waitForCaptureReady();
 
       const blob = await toBlob(cardElement, {
         pixelRatio: 2,
@@ -751,6 +758,22 @@ export default function AdminCardsPage() {
                                     <button type="button" className="p-3 bg-white/5 border border-white/10 rounded-2xl text-gray-400 hover:text-white transition-colors"><UploadCloud className="w-5 h-5" /></button>
                                 </div>
                             </div>
+                            
+                            {cardRarity === "MYTHIC" && (
+                                <div className="space-y-4 pt-4 border-t border-white/5">
+                                    <label className="block text-[10px] font-black text-purple-400 uppercase tracking-widest mb-2.5 ml-1">Calques Mythiques (Optionnel)</label>
+                                    <div className="flex gap-2">
+                                        <input type="text" value={layer1Url} onChange={e => setLayer1Url(e.target.value)} className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3 text-xs text-white outline-none" placeholder="Layer 1 (Fond)..." />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <input type="text" value={layer2Url} onChange={e => setLayer2Url(e.target.value)} className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3 text-xs text-white outline-none" placeholder="Layer 2 (Milieu)..." />
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <input type="text" value={layer3Url} onChange={e => setLayer3Url(e.target.value)} className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-2xl px-5 py-3 text-xs text-white outline-none" placeholder="Layer 3 (Premier plan)..." />
+                                    </div>
+                                </div>
+                            )}
+
                             <div>
                                 <label className="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2.5 ml-1">Effet Visuel Spécial</label>
                                 <select 
@@ -988,6 +1011,7 @@ export default function AdminCardsPage() {
                             rarity: cardRarity, level: cardLevel, edition: cardEdition,
                             description: cardDesc || "Description de la carte...",
                             customBackground: cardCustomBg, imageUrl: cardImageUrl,
+                            layer1Url, layer2Url, layer3Url,
                             customBadges: cardCustomBadges,
                             characterPosition: { x: charPosX, y: charPosY, scale: charScale },
                             attributes: JSON.stringify({

@@ -32,6 +32,16 @@ export const getLevelStyle = (level: string): React.CSSProperties => {
   }
 };
 
+export const getRarityBackground = (rarity: string): React.CSSProperties => {
+  const r = rarity.toUpperCase();
+  if (r === "MYTHIC" || r === "MYTHIQUE") return { backgroundImage: "url('/netherite.png')", backgroundSize: 'cover' };
+  if (r === "LEGENDARY" || r === "LÉGENDAIRE" || r === "LEGENDAIRE") return { backgroundImage: "url('/OR.png')", backgroundSize: 'cover' };
+  if (r === "EPIC" || r === "ÉPIQUE" || r === "EPIQUE") return { backgroundImage: "url('/Amethyst.png')", backgroundSize: 'cover' };
+  if (r === "RARE") return { backgroundImage: "url('/Diamond.png')", backgroundSize: 'cover' };
+  if (r === "UNCOMMON" || r === "PEU COMMUNE") return { backgroundImage: "url('/Emerald.png')", backgroundSize: 'cover' };
+  return { backgroundImage: "url('/Iron.png')", backgroundSize: 'cover' };
+};
+
 export const getLevelBorder = (level: string) => {
   return "";
 };
@@ -116,7 +126,7 @@ export const InteractiveCard = ({ card, children, className = "", style: customS
               backgroundSize: attrs.bgScale ? `${attrs.bgScale}%` : 'cover',
               backgroundPosition: `${attrs.bgPosX ?? 50}% ${attrs.bgPosY ?? 50}%`
             }
-          : (!hasVideoBg && card ? getLevelStyle(card.level) : { backgroundColor: "transparent" })))
+          : (!hasVideoBg && card ? getRarityBackground(card.rarity) : { backgroundColor: "transparent" })))
   };
 
   return (
@@ -312,19 +322,28 @@ export default function CardDisplay({
       >
         <div className="absolute inset-0 z-10 w-full h-full flex items-end justify-center overflow-hidden rounded-xl">
           {!attrs.hideCharacter && (
-            (card.imageUrl || card.player?.minecraftName || card.title) ? (
-              <img
-                src={card.imageUrl || `https://vzge.me/bust/512/${card.player?.minecraftName || card.title}.png`}
-                alt={card.title}
-                loading={isEditing ? "eager" : "lazy"} decoding="async"
-                className={`w-[120%] h-[85%] object-cover object-top drop-shadow-2xl transition-transform duration-300 ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`}
-                style={{ transform: (card.rarity === 'MYTHIC' || card.rarity === 'MYTHIQUE') ? 'translateZ(40px) scale(1.05)' : 'translateZ(10px)' }}
-                onMouseDown={(e) => handleMouseDown(e, 'character')}
-                onWheel={(e) => handleWheel(e, 'character')}
-              />
-            ) : (
-              <div className="w-20 h-20 bg-gray-700/50 rounded-full mb-10 border border-white/10"></div>
-            )
+            <div className="w-[120%] h-[85%] relative flex items-end justify-center pointer-events-none" style={{ transformStyle: 'preserve-3d' }}>
+              {(card.layer1Url || card.layer2Url || card.layer3Url) ? (
+                <>
+                  {card.layer1Url && <img src={card.layer1Url} alt="Layer 1" loading="lazy" className="absolute bottom-0 w-full object-contain pointer-events-none" style={{ transform: 'translateZ(20px)' }} />}
+                  {card.layer2Url && <img src={card.layer2Url} alt="Layer 2" loading="lazy" className="absolute bottom-0 w-full object-contain pointer-events-none" style={{ transform: 'translateZ(40px) scale(1.05)' }} />}
+                  {card.layer3Url && <img src={card.layer3Url} alt="Layer 3" loading="lazy" className="absolute bottom-0 w-full object-contain pointer-events-none" style={{ transform: 'translateZ(70px) scale(1.1)' }} />}
+                  {(!card.layer2Url && card.imageUrl) && <img src={card.imageUrl} alt="Fallback" loading="lazy" className="absolute bottom-0 w-full object-contain pointer-events-none" style={{ transform: 'translateZ(40px) scale(1.05)' }} />}
+                </>
+              ) : (card.imageUrl || card.player?.minecraftName || card.title) ? (
+                <img
+                  src={card.imageUrl || `https://vzge.me/bust/512/${card.player?.minecraftName || card.title}.png`}
+                  alt={card.title}
+                  loading={isEditing ? "eager" : "lazy"} decoding="async"
+                  className={`w-full h-full object-cover object-top drop-shadow-2xl transition-transform duration-300 ${isEditing ? 'pointer-events-auto cursor-grab active:cursor-grabbing hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]' : 'pointer-events-none'}`}
+                  style={{ transform: (card.rarity === 'MYTHIC' || card.rarity === 'MYTHIQUE') ? 'translateZ(40px) scale(1.05)' : 'translateZ(10px)' }}
+                  onMouseDown={(e) => handleMouseDown(e, 'character')}
+                  onWheel={(e) => handleWheel(e, 'character')}
+                />
+              ) : (
+                <div className="w-20 h-20 bg-gray-700/50 rounded-full mb-10 border border-white/10"></div>
+              )}
+            </div>
           )}
         </div>
 
@@ -488,7 +507,7 @@ export default function CardDisplay({
         )}
 
         {/* Special Effects Overlays */}
-        {specialEffect === 'Holographique' && (
+        {specialEffect === 'Holo' && (
           <>
             <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl overflow-hidden mix-blend-color-dodge" style={{
               backgroundImage: 'linear-gradient(105deg, transparent 20%, #ff0080 25%, #ff8c00 30%, #40e0d0 35%, #7b68ee 40%, #ff0080 45%, transparent 50%)',
@@ -499,32 +518,6 @@ export default function CardDisplay({
             <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl overflow-hidden mix-blend-overlay" style={{
               backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
               animation: 'holo-lines 2s linear infinite'
-            }} />
-          </>
-        )}
-        {specialEffect === 'Doré' && (
-          <>
-            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl overflow-hidden mix-blend-overlay" style={{
-              background: 'linear-gradient(135deg, rgba(255,215,0,0.4) 0%, rgba(184,134,11,0.2) 25%, rgba(255,223,0,0.6) 50%, rgba(184,134,11,0.2) 75%, rgba(255,215,0,0.4) 100%)',
-              backgroundSize: '200% 200%',
-              animation: 'gold-shimmer 4s ease-in-out infinite'
-            }} />
-            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl" style={{
-              boxShadow: 'inset 0 0 40px rgba(255,215,0,0.3), inset 0 0 80px rgba(255,215,0,0.1), 0 0 20px rgba(255,215,0,0.2)'
-            }} />
-          </>
-        )}
-        {specialEffect === 'Néon' && (
-          <>
-            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl" style={{
-              boxShadow: 'inset 0 0 20px rgba(0,255,255,0.6), inset 0 0 60px rgba(0,255,255,0.2), 0 0 15px rgba(0,255,255,0.5), 0 0 40px rgba(0,255,255,0.2)',
-              animation: 'neon-pulse 2s ease-in-out infinite',
-              border: '2px solid rgba(0,255,255,0.5)'
-            }} />
-            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl mix-blend-screen overflow-hidden" style={{
-              background: 'linear-gradient(180deg, transparent 0%, rgba(0,255,255,0.05) 50%, transparent 100%)',
-              backgroundSize: '100% 200%',
-              animation: 'neon-scan 3s linear infinite'
             }} />
           </>
         )}
@@ -540,26 +533,24 @@ export default function CardDisplay({
             }} />
           </>
         )}
-        {specialEffect === 'Paillettes' && (
+        {specialEffect === 'Cosmic' && (
           <>
-            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl overflow-hidden mix-blend-screen">
-              {Array.from({ length: 25 }).map((_, i) => (
-                <div key={i} className="absolute rounded-full bg-white" style={{
-                  width: `${Math.random() * 3 + 1}px`,
-                  height: `${Math.random() * 3 + 1}px`,
+            <div className="absolute inset-0 z-[90] pointer-events-none rounded-xl overflow-hidden mix-blend-screen opacity-70" style={{
+              backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.5), transparent 60%), radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.3), transparent 40%)',
+              animation: 'cosmic-pulse 4s ease-in-out infinite alternate'
+            }} />
+            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl mix-blend-color-dodge overflow-hidden">
+              {Array.from({ length: 30 }).map((_, i) => (
+                <div key={i} className="absolute rounded-full bg-white shadow-[0_0_8px_2px_rgba(255,255,255,0.8)]" style={{
+                  width: `${Math.random() * 2 + 1}px`,
+                  height: `${Math.random() * 2 + 1}px`,
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
-                  boxShadow: '0 0 6px 2px rgba(255,255,255,0.8)',
-                  animation: `sparkle ${1.5 + Math.random() * 2}s ease-in-out infinite`,
+                  animation: `sparkle ${1 + Math.random() * 3}s ease-in-out infinite`,
                   animationDelay: `${Math.random() * 2}s`
                 }} />
               ))}
             </div>
-            <div className="absolute inset-0 z-[91] pointer-events-none rounded-xl mix-blend-color-dodge opacity-30" style={{
-              backgroundImage: 'radial-gradient(circle 1px, rgba(255,255,255,0.8) 0%, transparent 100%)',
-              backgroundSize: '15px 15px',
-              animation: 'sparkle-field 4s ease-in-out infinite'
-            }} />
           </>
         )}
       </InteractiveCard>
