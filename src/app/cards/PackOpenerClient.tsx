@@ -218,19 +218,19 @@ export default function PackOpenerClient({
     
     setBoosterStep("charging");
     
-    // Phase 1: Charging anticipation (1.2s)
+    // Phase 1: Charging anticipation (0.4s)
     setTimeout(() => {
       setBoosterStep("exploding");
-    }, 1200);
+    }, 400);
     
-    // Phase 2: Explosion + white flash + reveal cards (after 2.5s total)
+    // Phase 2: Explosion + white flash + reveal cards (after 1.0s total)
     setTimeout(() => {
       setDrawnCards(fetchedCardsRef.current);
       setShowReveal(true);
       setIsOpening(false);
       setBoosterStep("idle");
       router.refresh();
-    }, 2500);
+    }, 1000);
   };
 
   const groupedInventory = useMemo(() => {
@@ -479,14 +479,14 @@ export default function PackOpenerClient({
                           rotate: [0, -2, 2, -2, 2, 0],
                           transition: { 
                             scale: { duration: 0.3, ease: "easeOut" },
-                            rotate: { duration: 1.2, ease: "linear", repeat: Infinity }
+                            rotate: { duration: 0.4, ease: "linear", repeat: Infinity }
                           }
                         }
                       : {
                           scale: [0.92, 1.4, 0],
                           opacity: [1, 1, 0],
                           filter: ["brightness(1)", "brightness(4)", "brightness(10)"],
-                          transition: { duration: 1.3, ease: [0.22, 1, 0.36, 1], times: [0, 0.3, 1] }
+                          transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1], times: [0, 0.3, 1] }
                         }
                     }
                     exit={{ opacity: 0, scale: 0, transition: { duration: 0.3 } }}
@@ -501,7 +501,7 @@ export default function PackOpenerClient({
                         boosterStep === "charging" 
                         ? { scale: [1, 1.5, 1.2], opacity: [0.3, 0.8, 0.6], transition: { duration: 1.2, repeat: Infinity } }
                         : boosterStep === "exploding"
-                        ? { scale: [1.2, 4], opacity: [0.8, 0], transition: { duration: 1.3 } }
+                        ? { scale: [1.2, 4], opacity: [0.8, 0], transition: { duration: 0.6 } }
                         : { scale: [0.8, 1.1, 0.8], opacity: [0.2, 0.4, 0.2], transition: { duration: 3, repeat: Infinity, ease: "easeInOut" } }
                       }
                     />
@@ -516,7 +516,7 @@ export default function PackOpenerClient({
                             style={{ transformOrigin: "bottom center" }}
                             initial={{ opacity: 0, scaleY: 0, rotate: i * 45 }}
                             animate={{ opacity: [0, 0.8, 0], scaleY: [0, 1.5, 0.5], rotate: i * 45 + 15 }}
-                            transition={{ duration: 1.2, delay: i * 0.05, repeat: Infinity, ease: "easeOut" }}
+                            transition={{ duration: 0.4, delay: i * 0.05, repeat: Infinity, ease: "easeOut" }}
                           />
                         ))}
                       </>
@@ -556,7 +556,7 @@ export default function PackOpenerClient({
                   className="fixed inset-0 z-[60] bg-white pointer-events-none"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: [0, 0, 0.9, 0] }}
-                  transition={{ duration: 1.3, times: [0, 0.2, 0.4, 1], ease: "easeOut" }}
+                  transition={{ duration: 0.6, times: [0, 0.2, 0.4, 1], ease: "easeOut" }}
                 />
               )}
             </div>
