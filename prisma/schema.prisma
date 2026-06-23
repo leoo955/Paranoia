@@ -64,6 +64,7 @@ model User {
   createdCards  TradingCard[]
   inventory     UserCard[]
   applications  Application[]
+  modApplications ModApplication[]
   boxes         UserBox[]
 }
 
@@ -232,4 +233,20 @@ model UserBox {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, boxType])
+}
+
+model ModApplication {
+  id              String   @id @default(cuid())
+  discordName     String
+  minecraftName   String?
+  platform        String
+  experience      String   @db.Text
+  motivation      String   @db.Text
+  additions       String   @db.Text
+  other           String?  @db.Text
+  status          String   @default("PENDING")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  applicantId     String?
+  applicant       User?    @relation(fields: [applicantId], references: [id], onDelete: SetNull)
 }

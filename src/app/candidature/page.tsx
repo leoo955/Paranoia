@@ -28,9 +28,14 @@ export default function CandidaturePage() {
         <h1 className="text-4xl font-outfit font-black text-white glow-red inline-block mb-4 text-gradient">
           Rejoindre le Serveur
         </h1>
-        <p className="text-[var(--color-text-secondary)] max-w-2xl mx-auto">
+        <p className="text-[var(--color-text-secondary)] max-w-2xl mx-auto mb-6">
           Soumettez votre candidature pour accéder au SMP.
         </p>
+        <div className="flex justify-center gap-4">
+          <a href="/candidature/moderateur" className="px-6 py-2.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-xl hover:bg-indigo-500/20 transition-colors font-bold text-sm flex items-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+            Devenir Modérateur
+          </a>
+        </div>
       </div>
 
       <div className="panel-matte p-8 md:p-12 rounded-2xl relative overflow-hidden">
