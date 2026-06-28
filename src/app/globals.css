@@ -61,16 +61,68 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500;
   }
 
+  .glitch-text {
+    text-shadow: 2px 0 0 rgba(255, 0, 0, 0.7), -2px 0 0 rgba(0, 255, 255, 0.7);
+    position: relative;
+    display: inline-block;
+  }
+
+  .glitch-text:hover {
+    animation: glitch-anim 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+  }
+
+  .hard-shadow {
+    box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8);
+  }
+
+  .hard-shadow-purple {
+    box-shadow: 4px 4px 0px 0px var(--color-accent-purple-dark);
+  }
+
   .btn-primary {
-    @apply relative overflow-hidden rounded-md bg-gradient-to-r from-[#b366ff] to-[#7a1fa2] text-white font-semibold py-2 px-6 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(179,102,255,0.4)] active:scale-95;
+    @apply relative overflow-hidden rounded-md bg-[var(--color-accent-purple)] text-white font-bold py-3 px-6 transition-all duration-200 border-2 border-[var(--color-accent-purple-dark)];
+    box-shadow: 4px 4px 0px 0px var(--color-accent-purple-dark);
+  }
+
+  .btn-primary:hover {
+    @apply -translate-y-1 bg-[#c084fc];
+    box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8);
+  }
+
+  .btn-primary:active {
+    @apply translate-y-1;
+    box-shadow: none;
   }
 
   .btn-secondary {
-    @apply relative overflow-hidden rounded-md bg-[var(--color-panel-bg)] shadow-md text-white font-semibold py-2 px-6 transition-all duration-200 hover:bg-[#1a1a24] active:scale-95 border border-[var(--color-panel-border)];
+    @apply relative overflow-hidden rounded-md bg-[#111118] text-white font-bold py-3 px-6 transition-all duration-200 border-2 border-zinc-700;
+    box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.8);
+  }
+
+  .btn-secondary:hover {
+    @apply -translate-y-1 bg-zinc-800;
+  }
+
+  .btn-secondary:active {
+    @apply translate-y-1;
+    box-shadow: none;
   }
 
   .card-hover {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:border-[var(--color-accent-purple-dark)];
+    @apply transition-all duration-300 hover:-translate-y-2 hover:border-[var(--color-accent-purple)];
+  }
+
+  .card-hover:hover {
+    box-shadow: 4px 4px 0px 0px var(--color-accent-purple-dark);
+  }
+
+  @keyframes glitch-anim {
+    0% { transform: translate(0) }
+    20% { transform: translate(-2px, 2px) }
+    40% { transform: translate(-2px, -2px) }
+    60% { transform: translate(2px, 2px) }
+    80% { transform: translate(2px, -2px) }
+    100% { transform: translate(0) }
   }
 
   .animate-float {
