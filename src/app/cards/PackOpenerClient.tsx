@@ -133,7 +133,7 @@ export default function PackOpenerClient({
   const [filterEdition, setFilterEdition] = useState("ALL");
   const [filterEffect, setFilterEffect] = useState("ALL");
   const editionsList = useMemo(() => Array.from(new Set(allCards.map(c => c.edition || 'Standard'))), [allCards]);
-  const [selectedCatalogueEdition, setSelectedCatalogueEdition] = useState<string>(editionsList[0] || "Standard");
+  const [selectedCatalogueEdition, setSelectedCatalogueEdition] = useState<string>("Toutes");
   const router = useRouter();
 
   const buyBooster = async (type: string, price: number) => {
@@ -725,12 +725,21 @@ export default function PackOpenerClient({
               </div>
             </div>
             
-            {/* Onglets d'Édition */}
-            <div className="flex flex-wrap gap-3 px-6 pb-6 pt-2">
+            {/* Onglets d'Édition (Bulles scrollables) */}
+            <div className="flex overflow-x-auto gap-3 px-6 pb-6 pt-2 snap-x hide-scrollbar" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+               <style dangerouslySetInnerHTML={{__html: `
+                 .hide-scrollbar::-webkit-scrollbar { display: none; }
+               `}} />
+               <button 
+                 onClick={() => setSelectedCatalogueEdition("Toutes")} 
+                 className={`snap-start shrink-0 px-6 py-2 rounded-full font-bold transition-all duration-300 ${selectedCatalogueEdition === "Toutes" ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] border border-purple-500/50' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white border border-white/5'}`}
+               >
+                 Toutes les éditions
+               </button>
                {editionsList.map(ed => {
                   const isActive = selectedCatalogueEdition === ed;
                   return (
-                    <button key={ed} onClick={() => setSelectedCatalogueEdition(ed)} className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] border border-purple-500/50' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white border border-white/5'}`}>
+                    <button key={ed} onClick={() => setSelectedCatalogueEdition(ed)} className={`snap-start shrink-0 px-6 py-2 rounded-full font-bold transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] border border-purple-500/50' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white border border-white/5'}`}>
                       {ed}
                     </button>
                   );
@@ -764,7 +773,7 @@ export default function PackOpenerClient({
                 const playerMatch = c.player ? c.player.minecraftName.toLowerCase().includes(searchQuery.toLowerCase()) : false;
                 const matchesSearch = titleMatch || playerMatch;
                 const matchesRarity = rarityFilter === "ALL" || c.rarity === rarityFilter;
-                const matchesEdition = c.edition === selectedCatalogueEdition;
+                const matchesEdition = selectedCatalogueEdition === "Toutes" || c.edition === selectedCatalogueEdition;
                 return matchesSearch && matchesRarity && matchesEdition;
               });
               if (cardsOfRarity.length === 0) return null;
@@ -796,7 +805,7 @@ export default function PackOpenerClient({
                 const playerMatch = c.player ? c.player.minecraftName.toLowerCase().includes(searchQuery.toLowerCase()) : false;
                 const matchesSearch = titleMatch || playerMatch;
                 const matchesRarity = rarityFilter === "ALL" || c.rarity === rarityFilter;
-                const matchesEdition = c.edition === selectedCatalogueEdition;
+                const matchesEdition = selectedCatalogueEdition === "Toutes" || c.edition === selectedCatalogueEdition;
                 return matchesSearch && matchesRarity && matchesEdition;
               }).length > 0;
             }) && (
