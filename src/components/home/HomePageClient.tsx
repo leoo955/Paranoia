@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { MessageSquare, Trophy, FileText, Sparkles, ChevronRight, ShieldAlert, Swords, Layers, Zap } from "lucide-react";
-import Countdown from "./Countdown";
 
 interface HomePageClientProps {
   stats: {
@@ -71,7 +70,6 @@ export default function HomePageClient({ stats }: HomePageClientProps) {
               Explorer
             </Link>
           </motion.div>
-          <Countdown />
         </div>
         <motion.div 
           animate={{ y: [0, 10, 0] }}

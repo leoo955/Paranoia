@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Lock, Sparkles, Clock, LogIn } from "lucide-react";
 import { signIn } from "next-auth/react";
+import Countdown from "@/components/home/Countdown";
 
 export default function ComingSoonPage() {
   return (
@@ -70,21 +71,7 @@ export default function ComingSoonPage() {
           L'accès complet sera déverrouillé très bientôt pour tous les membres de la liste blanche.
         </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-4"
-        >
-          <div className="bg-black/40 border border-[var(--color-border-color)] rounded-xl p-5 flex flex-col items-center justify-center gap-3">
-            <Clock className="w-6 h-6 text-[var(--color-text-muted)]" />
-            <span className="text-sm font-medium text-[var(--color-text-secondary)]">Ouvre Bientôt</span>
-          </div>
-          <div className="bg-black/40 border border-[var(--color-border-color)] rounded-xl p-5 flex flex-col items-center justify-center gap-3">
-            <Sparkles className="w-6 h-6 text-[var(--color-accent-purple)] drop-shadow-[0_0_10px_rgba(179,102,255,0.5)]" />
-            <span className="text-sm font-medium text-[var(--color-text-secondary)]">Trading Cards à venir</span>
-          </div>
-        </motion.div>
+        <Countdown />
 
         <motion.div
           initial={{ opacity: 0 }}
